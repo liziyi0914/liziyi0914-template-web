@@ -1,0 +1,7 @@
+@font-face {
+  font-family: NotoColorEmoji;
+  src: url("./fonts/NotoColorEmoji/NotoColorEmoji-flagsonly.ttf")
+    format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
