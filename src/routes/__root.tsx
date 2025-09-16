@@ -1,75 +1,34 @@
-import { NotFoundPage } from '@/components/CommonPages';
-import { Icon } from '@iconify/react';
-import { Outlet, createRootRoute } from '@tanstack/react-router';
-import { useLocalStorageState } from 'ahooks';
-import { FloatButton, Result, Skeleton, theme } from 'antd';
-import React, { Suspense } from 'react';
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
+import { TanStackDevtools } from '@tanstack/react-devtools';
 
-const { useToken } = theme;
+interface MyRouterContext {
+  queryClient: QueryClient;
+}
 
-export const Route = createRootRoute({
-  component: RootComponent,
-  notFoundComponent: () => <NotFoundPage redirectTo="/" />,
-  pendingComponent: () => <Skeleton loading={true} />,
-  errorComponent: (props) => (
-    <Result
-      status="error"
-      title="页面出现了一些故障"
-      subTitle={props.error.message}
-    />
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+  component: () => (
+    <>
+      <Outlet />
+      {import.meta.env.DEV && (
+        <TanStackDevtools
+          config={{
+            position: 'bottom-left',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            {
+              name: 'Tanstack Query',
+              render: <ReactQueryDevtoolsPanel />,
+            },
+          ]}
+        />
+      )}
+    </>
   ),
 });
-
-const Page: React.FC = () => {
-  const { token } = useToken();
-
-  return (
-    <>
-      <div
-        className="w-full h-screen"
-        style={{ background: token.colorBgLayout }}
-      >
-        <Outlet />
-      </div>
-    </>
-  );
-};
-
-const TanStackRouterDevtools = import.meta.env.PROD
-  ? () => null // Render nothing in production
-  : React.lazy(() =>
-      import('@tanstack/router-devtools').then((res) => ({
-        default: res.TanStackRouterDevtools,
-      })),
-    );
-
-function RootComponent() {
-  const [isDark, setIsDark] = useLocalStorageState('theme.dark', {
-    defaultValue: false,
-    listenStorageChange: true,
-  });
-
-  return (
-    <>
-      <FloatButton.Group>
-        <FloatButton
-          tooltip="黑暗模式"
-          icon={
-            isDark ? (
-              <Icon icon="icon-park-outline:moon" />
-            ) : (
-              <Icon icon="icon-park-outline:sun-one" />
-            )
-          }
-          onClick={() => {
-            setIsDark(!isDark);
-          }}
-        />
-      </FloatButton.Group>
-      <Page />
-      <Suspense>
-        <TanStackRouterDevtools position="bottom-right" />
-      </Suspense>
-    </>
-  );
-}
