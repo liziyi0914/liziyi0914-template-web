@@ -45,8 +45,7 @@ export function ThemeProvider({
       return;
     }
 
-    // root.classList.add(theme);
-    root.classList.add('light');
+    root.classList.add(theme);
   }, [theme]);
 
   const value = {
