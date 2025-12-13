@@ -3,6 +3,7 @@ import { pluginReact } from '@rsbuild/plugin-react';
 import { tanstackRouter } from "@tanstack/router-plugin/rspack";
 import {pluginLess} from "@rsbuild/plugin-less";
 import Font from 'vite-plugin-font';
+import { ALIYUN_CAPTCHA } from './src/lib/constants';
 
 export default defineConfig({
   plugins: [pluginReact(), pluginLess()],
@@ -26,5 +27,20 @@ export default defineConfig({
     chunkSplit: {
       strategy: 'split-by-experience',
     },
+  },
+  html: {
+    tags: [
+      {
+        tag: 'script',
+        children: `window.AliyunCaptchaConfig = { region: "cn", prefix: "${ALIYUN_CAPTCHA.prefix}", };`,
+      },
+      {
+        tag: 'script',
+        publicPath: false,
+        attrs: {
+          src: 'https://o.alicdn.com/captcha-frontend/aliyunCaptcha/AliyunCaptcha.js',
+        },
+      },
+    ],
   },
 });
