@@ -1,5 +1,6 @@
 import axios, {type AxiosRequestConfig, type AxiosResponse} from "axios";
 import { BACKEND_URL } from "@/lib/constants";
+import type {CompanyListVO, UserInfoVO} from "@/lib/types.ts";
 
 export interface ApiResult<T = any> {
   code: number;
@@ -183,6 +184,14 @@ export const uploadOss: <T = any>(
 };
 
 export const Api = {
+  common: {
+    getCompanies: () => {
+      return request<CompanyListVO[]>({
+        url: '/common/companies',
+        method: 'GET',
+      });
+    },
+  },
   auth: {
     loginSms: (phone: string, captcha: CaptchaResult) => {
       return requestWithCaptcha({
@@ -193,8 +202,17 @@ export const Api = {
         },
       }, captcha);
     },
-    login: (phone: string, code: string, captcha: CaptchaResult) => {
-      return requestWithCaptcha({
+    login: (phone?: string, code?: string, token?: string, captcha?: CaptchaResult) => {
+      if (!captcha) {
+        return request<Array<string> | null | undefined>({
+          url: '/auth/login',
+          method: 'POST',
+          data: {
+            token,
+          },
+        });
+      }
+      return requestWithCaptcha<Array<string> | null | undefined>({
         url: '/auth/login',
         method: 'POST',
         data: {
@@ -204,7 +222,11 @@ export const Api = {
       }, captcha);
     },
     check: () => {
-      return request({
+      return request<{
+        name: string;
+        idCard: string;
+        companyName: string;
+      }>({
         url: '/auth/check',
         method: 'GET',
       });
@@ -245,6 +267,98 @@ export const Api = {
           phone,
         },
       }, captcha);
+    },
+  },
+  dashboard: {
+    system: {
+      company: {
+        list: (page: PageQuery) => {
+          return requestPage({
+            url: '/dashboard/system/company/',
+            method: 'POST',
+          }, page);
+        },
+        create: (list: Array<{
+          companyName: string;
+          companyRegCode?: string;
+        }>) => {
+          return request({
+            url: '/dashboard/system/company/',
+            method: 'PUT',
+            data: {
+              list,
+            },
+          });
+        },
+        get: (id: string) => {
+          return request<{
+            id: string;
+            companyName: string;
+            companyRegCode: string;
+          }>({
+            url: `/dashboard/system/company/${id}`,
+            method: 'GET',
+          });
+        },
+        update: (id: string, data: {
+          companyName: string;
+          companyRegCode?: string;
+        }) => {
+          return request({
+            url: `/dashboard/system/company/${id}`,
+            method: 'POST',
+            data,
+          });
+        },
+        delete: (id: string) => {
+          return request({
+            url: `/dashboard/system/company/${id}`,
+            method: 'DELETE',
+          });
+        },
+      },
+      user: {
+        list: (page: PageQuery) => {
+          return requestPage<UserInfoVO>({
+            url: '/dashboard/system/user/',
+            method: 'POST',
+          }, page);
+        },
+        create: (list: Array<{
+          name: string;
+          phone: string;
+          idCard: string;
+          isBanned: boolean;
+          companies: Array<string>;
+        }>) => {
+          return request({
+            url: '/dashboard/system/user/',
+            method: 'PUT',
+            data: {
+              list,
+            },
+          });
+        },
+        get: (id: string) => {
+          return request<UserInfoVO>({
+            url: `/dashboard/system/user/${id}`,
+            method: 'GET',
+          });
+        },
+        update: (id: string, data: {
+          name?: string;
+          phone?: string;
+          idCard?: string;
+          isBanned?: boolean;
+          companies?: Array<string>;
+        }) => {
+          return request({
+            url: `/dashboard/system/user/${id}`,
+            method: 'POST',
+            data,
+          });
+        },
+      },
     },
   },
 };
