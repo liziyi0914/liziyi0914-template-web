@@ -1,3 +1,54 @@
+import type {TreeDataNode} from "antd";
+import type {CompanyStructureDepartmentVO} from "@/lib/types.ts";
+import {Icon} from "@iconify/react";
+
+/**
+ * 将 CompanyStructureDepartmentVO 数组转换为 TreeDataNode 树结构
+ * @param departments 部门数组
+ * @param parentId 父级部门ID，根节点为 null 或 undefined
+ * @param allowTypes
+ * @param bannedValues
+ * @returns TreeDataNode 树结构
+ */
+export function convertDepartmentsToTreeData(
+  departments: CompanyStructureDepartmentVO[],
+  parentId: string | null | undefined = null,
+  allowTypes: Array<'department' | 'position'> = ['department', 'position'],
+  bannedValues: Array<string> = [],
+): TreeDataNode[] {
+  return departments
+    .filter(department => (department.parent || null) === parentId)
+    .map(department => {
+      const children = convertDepartmentsToTreeData(departments, department.id, allowTypes, bannedValues);
+
+      const node: TreeDataNode = {
+        title: department.name,
+        key: `department.${department.id}`,
+        // @ts-ignore
+        value: department.id,
+        icon: (
+          <div className="h-full flex justify-center items-center">
+            <Icon icon="lucide:users-round" />
+          </div>
+        ),
+        children: [
+          ...(children.length > 0 ? children : []),
+          ...(department.positions?.map(position => ({
+            title: position.name,
+            key: `position.${position.id}`,
+            value: position.id,
+            selectable: allowTypes.includes('position'),
+            disabled: bannedValues.includes(position.id) || !allowTypes.includes('position'),
+          })) ?? []),
+        ],
+        selectable: allowTypes.includes('department'),
+        disabled: bannedValues.includes(department.id) || !allowTypes.includes('department'),
+      };
+      
+      return node;
+    });
+}
+
 export function validateIdCard(id: string) {
   // 1. 检查长度是否为18位
   if (id.length !== 18) return false;

@@ -1,6 +1,10 @@
 import axios, {type AxiosRequestConfig, type AxiosResponse} from "axios";
 import { BACKEND_URL } from "@/lib/constants";
-import type {CompanyListVO, UserInfoVO} from "@/lib/types.ts";
+import type {
+  AssetsInfoVO, CompanyListVO,
+  CompanyStructureDepartmentUpdateVO,
+  CompanyStructurePositionUpdateVO, CompanyStructureVO, OSSUploadPresignArgs, UserInfoVO
+} from "@/lib/types.ts";
 
 export interface ApiResult<T = any> {
   code: number;
@@ -191,6 +195,50 @@ export const Api = {
         method: 'GET',
       });
     },
+    uploadAssets: (name: string, fileType: string, hash: string, suffix: string) => {
+      return request<OSSUploadPresignArgs>({
+        url: '/common/assets/upload',
+        method: 'POST',
+        data: {
+          name,
+          fileType,
+          hash,
+          suffix,
+        },
+      });
+    },
+    getAssetsLink: (id: string) => {
+      return request<string>({
+        url: '/common/assets/link',
+        method: 'GET',
+        params: {
+          id,
+        },
+      });
+    },
+    getAssetsInfo: (id: string) => {
+      return request<AssetsInfoVO>({
+        url: '/common/assets/info',
+        method: 'GET',
+        params: {
+          id,
+        },
+      });
+    },
+    getDepartments: () => {
+      return request<{
+        id: string;
+        name: string;
+        parent?: string;
+        positions?: Array<{
+          id: string;
+          name: string;
+        }>;
+      }[]>({
+        url: '/common/departments',
+        method: 'GET',
+      });
+    },
   },
   auth: {
     loginSms: (phone: string, captcha: CaptchaResult) => {
@@ -357,6 +405,96 @@ export const Api = {
             method: 'POST',
             data,
           });
+        },
+      },
+    },
+    core: {
+      company: {
+        info: {
+          get: () => {
+            return request({
+              url: '/dashboard/core/company/info/',
+              method: 'GET',
+            });
+          },
+          update: (data: any) => {
+            return request({
+              url: '/dashboard/core/company/info/',
+              method: 'POST',
+              data,
+            });
+          },
+        },
+        assets: {
+          list: (page: PageQuery) => {
+            return requestPage<AssetsInfoVO>({
+              url: '/dashboard/core/company/assets/',
+              method: 'POST',
+            }, page);
+          },
+          rename: (id: string, name: string) => {
+            return request({
+              url: `/dashboard/core/company/assets/${id}/rename`,
+              method: 'POST',
+              data: {
+                name,
+              },
+            });
+          },
+          delete: (id: string) => {
+            return request({
+              url: `/dashboard/core/company/assets/${id}`,
+              method: 'DELETE',
+            });
+          },
+        },
+        structure: {
+          list: () => {
+            return request<CompanyStructureVO>({
+              url: '/dashboard/core/company/structure/',
+              method: 'GET',
+            });
+          },
+          createDepartment: (data: CompanyStructureDepartmentUpdateVO) => {
+            return request<void>({
+              url: '/dashboard/core/company/structure/department',
+              method: 'PUT',
+              data,
+            });
+          },
+          updateDepartment: (id: string, data: CompanyStructureDepartmentUpdateVO) => {
+            return request<void>({
+              url: `/dashboard/core/company/structure/department/${id}`,
+              method: 'POST',
+              data,
+            });
+          },
+          deleteDepartment: (id: string) => {
+            return request<void>({
+              url: `/dashboard/core/company/structure/department/${id}`,
+              method: 'DELETE',
+            });
+          },
+          createPosition: (departmentId: string, data: CompanyStructurePositionUpdateVO) => {
+            return request<void>({
+              url: `/dashboard/core/company/structure/department/${departmentId}/position`,
+              method: 'PUT',
+              data,
+            });
+          },
+          updatePosition: (id: string, data: CompanyStructurePositionUpdateVO) => {
+            return request<void>({
+              url: `/dashboard/core/company/structure/position/${id}`,
+              method: 'POST',
+              data,
+            });
+          },
+          deletePosition: (id: string) => {
+            return request<void>({
+              url: `/dashboard/core/company/structure/position/${id}`,
+              method: 'DELETE',
+            });
+          },
         },
       },
     },

@@ -1,8 +1,27 @@
-import React, {type PropsWithChildren} from "react";
+import React, {type PropsWithChildren, useEffect} from "react";
+import {useQuery} from "@tanstack/react-query";
+import {Api} from "@/lib/api.ts";
+import {useNavigate} from "@tanstack/react-router";
+import {Spin} from "antd";
 
 const Component: React.FC<PropsWithChildren<{
   title?: string;
 }>> = (props) => {
+  const navigate = useNavigate();
+  const query = useQuery({
+    queryKey: ['auth.check'],
+    queryFn: Api.auth.check,
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (query.isSuccess && query.data?.code === 200) {
+      navigate({
+        to: '/',
+      });
+    }
+  }, [query]);
+
   return (
     <div className="h-screen bg-blue-200 md:bg-blue-200">
       <div className="block md:hidden h-48">
@@ -18,7 +37,12 @@ const Component: React.FC<PropsWithChildren<{
             <div className="text-lg">交通运输企业安全生产管理系统</div>
           </div>
           <div className="px-6">
-            {props.children}
+            {query.isLoading && (
+              <Spin spinning tip="加载中">
+                <div className="h-24"/>
+              </Spin>
+            )}
+            {!query.isLoading && (props.children)}
           </div>
         </div>
       </div>

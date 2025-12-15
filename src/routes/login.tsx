@@ -53,7 +53,12 @@ function RouteComponent() {
                     navigate({
                       to: '/',
                     });
-                  } else {}
+                  } else {
+                    Toast.show({
+                      content: '登录失败',
+                    });
+                    setAccounts([]);
+                  }
                 }}
               >
                 {`${jose.decodeJwt(account)?.['companyName']??'-'}`}
@@ -104,7 +109,7 @@ function RouteComponent() {
                 }
               } else {
                 Toast.show({
-                  content: '登录失败',
+                  content: `登录失败: ${resp.data}`,
                 });
                 throw new Error('登录失败');
               }

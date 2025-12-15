@@ -4,7 +4,7 @@ import {Button} from "antd";
 import { Icon } from "@iconify/react";
 import AuthPage from "@/components/AuthPage.tsx";
 import { Api } from "@/lib/api";
-import {validateIdCard} from "@/lib/functions.ts";
+import {validateIdCard} from "@/lib/functions.tsx";
 import AliyunCaptcha, {type AliyunCaptchaRef} from "@/components/AliyunCaptcha.tsx";
 import {useRef} from "react";
 import { Toast } from "antd-mobile";

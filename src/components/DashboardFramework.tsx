@@ -1,5 +1,5 @@
 import React, {type PropsWithChildren, useState} from "react";
-import {Button, Dropdown, Modal} from "antd";
+import {Button, Card, Dropdown, Modal} from "antd";
 import {PageContainer, ProLayout} from "@ant-design/pro-components";
 import {Icon} from "@iconify/react";
 import {Link, useLocation, useNavigate} from "@tanstack/react-router";
@@ -151,6 +151,10 @@ const Component: React.FC<PropsWithChildren<{
                       path: 'structure',
                       name: '组织架构',
                     },
+                    {
+                      path: 'assets',
+                      name: '资源库',
+                    },
                   ],
                 },
                 {
@@ -203,6 +207,16 @@ const Component: React.FC<PropsWithChildren<{
                 menu={{
                   items: [
                     {
+                      key: 'gotoHome',
+                      icon: <Icon icon="ant-design:home-outlined" />,
+                      label: '返回主站',
+                      onClick: () => {
+                        navigate({
+                          to: '/',
+                        });
+                      },
+                    },
+                    {
                       key: 'changeCompany',
                       icon: <Icon icon="basil:exchange-outline" />,
                       label: '切换企业',
@@ -251,9 +265,13 @@ const Component: React.FC<PropsWithChildren<{
           );
         }}
       >
-        <PageContainer>
-          {props.children}
-        </PageContainer>
+        <div className="grow h-0 overflow-y-auto">
+          <PageContainer>
+            <Card>
+              {props.children}
+            </Card>
+          </PageContainer>
+        </div>
       </ProLayout>
     </div>
   );
