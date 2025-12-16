@@ -9,16 +9,60 @@ import { Icon } from '@iconify/react';
 import { useQuery } from '@tanstack/react-query';
 import { App, Button, Modal, Popover, Tabs, Upload } from 'antd';
 import CryptoJS from 'crypto-js';
-import { useMemo, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import OssImage from '@/components/OssImage.tsx';
 import { Api, uploadOss } from '@/lib/api.ts';
 import type { OSSUploadPresignArgs } from '@/lib/types.ts';
 
+const fileTypeMap = {
+  'image/*': '图片',
+  'video/*': '视频',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    'Word',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+    'Excel',
+  'application/pdf': 'PDF',
+};
+
 export const UploadAssetsForm: React.FC<{
   onSuccess?: (assetsId: string) => void;
+  allowFileTypes?: Array<keyof typeof fileTypeMap>;
 }> = (props) => {
   const { message } = App.useApp();
   const [file, setFile] = useState<File>();
+
+  const fileType = useMemo(()=> {
+    const base = [
+      {
+        label: '图片',
+        value: 'image/*',
+      },
+      {
+        label: '视频',
+        value: 'video/*',
+      },
+      {
+        label: 'Word',
+        value:
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      },
+      {
+        label: 'Excel',
+        value:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+      {
+        label: 'PDF',
+        value: 'application/pdf',
+      },
+    ];
+
+    if (!props.allowFileTypes) {
+      return base;
+    }
+
+    return base.filter((item) => props.allowFileTypes?.includes(item.value as any));
+  }, [props.allowFileTypes]);
 
   return (
     <ProForm
@@ -91,31 +135,8 @@ export const UploadAssetsForm: React.FC<{
       <ProFormSelect
         name="fileType"
         label="文件类型"
-        initialValue="image/*"
-        options={[
-          {
-            label: '图片',
-            value: 'image/*',
-          },
-          {
-            label: '视频',
-            value: 'video/*',
-          },
-          {
-            label: 'Word',
-            value:
-              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          },
-          {
-            label: 'Excel',
-            value:
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          },
-          {
-            label: 'PDF',
-            value: 'application/pdf',
-          },
-        ]}
+        initialValue={fileType?.[0]}
+        options={fileType}
         rules={[
           {
             required: true,
@@ -151,11 +172,43 @@ export const UploadAssetsForm: React.FC<{
 };
 
 const AssetsTable: React.FC<{
-  onChoose?: (assetsId: string) => void;
+  multiple?: boolean;
+  value?: string;
+  onChange?: (assetsId?: string) => void;
+  maxCount?: number;
+  allowFileTypes?: Array<keyof typeof fileTypeMap>;
 }> = (props) => {
+  const { message } = App.useApp();
+  const [selectedRowKeys, setSelectedRowKeys] = useState(props.value?.split(';') ?? []);
+
+  useEffect(() => {
+    props.onChange?.(selectedRowKeys?.join(';'));
+  }, [selectedRowKeys]);
+
   return (
     <ProTable
       request={Api.dashboard.core.company.assets.list}
+      rowSelection={{
+        type: props.multiple ? 'checkbox' : 'radio',
+        defaultSelectedRowKeys: props.value?.split(';'),
+        onChange: (selectedRowKeys, rows) => {
+          if (props.maxCount && props.maxCount !== -1) {
+            if (selectedRowKeys.length > props.maxCount) {
+              message.error(`最多选择${props.maxCount}个文件`);
+              return;
+            }
+          }
+
+          if (props.allowFileTypes && rows.filter((row) => !props.allowFileTypes?.includes(row.fileType as any)).length > 0) {
+            message.error('不可选择此文件类型');
+            return;
+          }
+
+          setSelectedRowKeys(selectedRowKeys as string[]);
+        },
+        selectedRowKeys: selectedRowKeys,
+      }}
+      rowKey="id"
       columns={[
         {
           title: '文件名',
@@ -164,15 +217,7 @@ const AssetsTable: React.FC<{
         {
           title: '文件类型',
           dataIndex: 'fileType',
-          valueEnum: {
-            'image/*': '图片',
-            'video/*': '视频',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-              'Word',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-              'Excel',
-            'application/pdf': 'PDF',
-          },
+          valueEnum: fileTypeMap,
         },
         {
           title: '操作',
@@ -191,16 +236,6 @@ const AssetsTable: React.FC<{
             <Button key="download" size="small" type="link">
               下载
             </Button>,
-            <Button
-              key="choose"
-              size="small"
-              type="link"
-              onClick={() => {
-                props.onChoose?.(record.id);
-              }}
-            >
-              选择
-            </Button>,
           ],
         },
       ]}
@@ -211,22 +246,49 @@ const AssetsTable: React.FC<{
 const Component: React.FC<{
   value?: string;
   onChange?: (value?: string) => void;
+  multiple?: boolean;
+  maxCount?: number;
+  allowFileTypes?: Array<keyof typeof fileTypeMap>;
 }> = (props) => {
   const [openModal, setOpenModal] = useState(false);
 
-  const assetsInfo = useQuery({
+  const assetsInfoList = useQuery({
     queryKey: ['assetsInfo', props.value],
     queryFn: async () => {
       if (!props.value) {
         throw new Error('未选择资源');
       }
-      const resp = await Api.common.getAssetsInfo(props.value);
-      if (resp.code !== 200) {
-        throw new Error(resp.msg || '获取资源信息失败');
-      }
-      return resp.data;
+
+      let awaits = await Promise.all(props.value.split(';').map(Api.common.getAssetsInfo));
+
+      return awaits.map((resp) => {
+        if (resp.code !== 200) {
+          return null;
+        }
+        return resp.data;
+      });
     },
   });
+
+  const [libCache, setLibCache] = useState(props.value);
+
+  const cacheFileList = useMemo(() => {
+    return assetsInfoList.data?.map(info => {
+      if (!info) {
+        return <div>资源获取失败</div>;
+      }
+      return (
+        <div>
+          {info.fileType === 'image/*' && (
+            <div>
+              <OssImage src={info.id} width={200} />
+            </div>
+          )}
+          <div>{info.name}</div>
+        </div>
+      );
+    });
+  }, [assetsInfoList.data]);
 
   return (
     <>
@@ -245,12 +307,28 @@ const Component: React.FC<{
               key: 'library',
               label: '资源库',
               children: (
-                <AssetsTable
-                  onChoose={(assetsId) => {
-                    setOpenModal(false);
-                    props.onChange?.(assetsId);
-                  }}
-                />
+                <div>
+                  <AssetsTable
+                    multiple={props.multiple}
+                    value={props.value}
+                    maxCount={props.maxCount}
+                    onChange={(assetsId) => {
+                      setLibCache(assetsId);
+                    }}
+                    allowFileTypes={props.allowFileTypes}
+                  />
+                  <div>
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        setOpenModal(false);
+                        props.onChange?.(libCache);
+                      }}
+                    >
+                      选择
+                    </Button>
+                  </div>
+                </div>
               ),
             },
             {
@@ -262,6 +340,7 @@ const Component: React.FC<{
                     setOpenModal(false);
                     props.onChange?.(assetsId);
                   }}
+                  allowFileTypes={props.allowFileTypes}
                 />
               ),
             },
@@ -272,12 +351,9 @@ const Component: React.FC<{
 
       {props.value && (
         <div>
-          {assetsInfo.data?.fileType === 'image/*' && (
-            <div>
-              <OssImage src={props.value} width={200} />
-            </div>
-          )}
-          <div>{assetsInfo.data?.name}</div>
+          <div>
+            {cacheFileList}
+          </div>
           <div className="flex gap-x-3">
             <Button
               onClick={() => {
@@ -315,26 +391,33 @@ const Component: React.FC<{
 export const AssetsPickerView: React.FC<{
   value?: string;
 }> = (props) => {
-  const assetsInfo = useQuery({
+  const assetsInfoList = useQuery({
     queryKey: ['assetsInfo', props.value],
     queryFn: async () => {
       if (!props.value) {
         throw new Error('未选择资源');
       }
-      const resp = await Api.common.getAssetsInfo(props.value);
-      if (resp.code !== 200) {
-        throw new Error(resp.msg || '获取资源信息失败');
-      }
-      return resp.data;
+
+      let awaits = await Promise.all(props.value.split(';').map(Api.common.getAssetsInfo));
+
+      return awaits.map((resp) => {
+        if (resp.code !== 200) {
+          return null;
+        }
+        return resp.data;
+      });
     },
   });
 
   const name = useMemo(() => {
-    if (!assetsInfo.data) {
+    if (!assetsInfoList.data) {
       return '-';
     }
-    return assetsInfo.data.name;
-  }, [assetsInfo.data]);
+    return assetsInfoList.data
+      .map(i => i?.name)
+      .filter(i => !!i)
+      .join('、');
+  }, [assetsInfoList.data]);
 
   return <>{name}</>;
 };

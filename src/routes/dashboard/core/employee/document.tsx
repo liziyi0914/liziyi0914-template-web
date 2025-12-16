@@ -79,7 +79,7 @@ function RouteComponent() {
                 columns={[
                   {
                     title: '证件照（大头照/小一寸/大一寸）',
-                    dataIndex: 'photo',
+                    dataIndex: 'photoFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -246,17 +246,14 @@ function RouteComponent() {
                     },
                   },
                   {
-                    title: '国徽面',
-                    dataIndex: 'idCardFront',
+                    title: '身份证',
+                    dataIndex: 'idCardFile',
                     valueType: 'assets',
-                    colProps: {
-                      span: 12,
+                    fieldProps: {
+                      multiple: true,
+                      maxCount: 2,
+                      allowFileTypes: ['image/*'],
                     },
-                  },
-                  {
-                    title: '人像面',
-                    dataIndex: 'idCardBack',
-                    valueType: 'assets',
                     colProps: {
                       span: 12,
                     },
@@ -283,7 +280,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'laborContract',
+                    dataIndex: 'laborContractFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -291,7 +288,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'safetyCommitmentLetter',
+                    dataIndex: 'safetyCommitmentLetterFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -299,7 +296,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'responsibilityStatement',
+                    dataIndex: 'responsibilityStatementFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -307,7 +304,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'physicalExaminationCertificate',
+                    dataIndex: 'physicalExaminationCertificateFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -315,7 +312,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'trainingRecord',
+                    dataIndex: 'trainingRecordFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -323,7 +320,19 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'otherDocuments',
+                    dataIndex: 'otherDocumentsFile',
+                    valueType: 'assets',
+                    fieldProps: {
+                      multiple: true,
+                      maxCount: 5,
+                    },
+                    colProps: {
+                      span: 12,
+                    },
+                  },
+                  {
+                    title: '文件',
+                    dataIndex: 'safetyManagementQualificationCertificateFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -331,15 +340,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'safetyManagementQualificationCertificate',
-                    valueType: 'assets',
-                    colProps: {
-                      span: 12,
-                    },
-                  },
-                  {
-                    title: '文件',
-                    dataIndex: 'registeredSafetyEngineerCertificate',
+                    dataIndex: 'registeredSafetyEngineerCertificateFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -355,7 +356,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'professionalQualificationCertificate',
+                    dataIndex: 'professionalQualificationCertificateFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -363,7 +364,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'occupationalHazardsNotificationLetter',
+                    dataIndex: 'occupationalHazardsNotificationLetterFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -371,7 +372,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'trainingCertificate',
+                    dataIndex: 'trainingCertificateFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -379,7 +380,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'assessmentRecord',
+                    dataIndex: 'assessmentRecordFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -387,7 +388,7 @@ function RouteComponent() {
                   },
                   {
                     title: '文件',
-                    dataIndex: 'authorizationLetter',
+                    dataIndex: 'authorizationLetterFile',
                     valueType: 'assets',
                     colProps: {
                       span: 12,
@@ -416,7 +417,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '证件照（大头照/小一寸/大一寸）',
-                                    dataIndex: 'photo',
+                                    dataIndex: 'photoFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -597,17 +598,14 @@ function RouteComponent() {
                                 layoutType="Embed"
                                 columns={[
                                   {
-                                    title: '国徽面',
-                                    dataIndex: 'idCardFront',
+                                    title: '身份证',
+                                    dataIndex: 'idCardFile',
                                     valueType: 'assets',
-                                    colProps: {
-                                      span: 12,
+                                    fieldProps: {
+                                      multiple: true,
+                                      maxCount: 2,
+                                      allowFileTypes: ['image/*'],
                                     },
-                                  },
-                                  {
-                                    title: '人像面',
-                                    dataIndex: 'idCardBack',
-                                    valueType: 'assets',
                                     colProps: {
                                       span: 12,
                                     },
@@ -647,7 +645,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'laborContract',
+                                    dataIndex: 'laborContractFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -668,7 +666,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'safetyCommitmentLetter',
+                                    dataIndex: 'safetyCommitmentLetterFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -689,7 +687,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'responsibilityStatement',
+                                    dataIndex: 'responsibilityStatementFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -710,7 +708,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'physicalExaminationCertificate',
+                                    dataIndex: 'physicalExaminationCertificateFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -731,7 +729,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'trainingRecord',
+                                    dataIndex: 'trainingRecordFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -752,8 +750,12 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'otherDocuments',
+                                    dataIndex: 'otherDocumentsFile',
                                     valueType: 'assets',
+                                    fieldProps: {
+                                      multiple: true,
+                                      maxCount: 5,
+                                    },
                                     colProps: {
                                       span: 12,
                                     },
@@ -786,7 +788,7 @@ function RouteComponent() {
                                   {
                                     title: '文件',
                                     dataIndex:
-                                      'safetyManagementQualificationCertificate',
+                                      'safetyManagementQualificationCertificateFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -808,7 +810,7 @@ function RouteComponent() {
                                   {
                                     title: '文件',
                                     dataIndex:
-                                      'registeredSafetyEngineerCertificate',
+                                      'registeredSafetyEngineerCertificateFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -841,7 +843,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'drivingLicense',
+                                    dataIndex: 'drivingLicenseFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -863,7 +865,7 @@ function RouteComponent() {
                                   {
                                     title: '文件',
                                     dataIndex:
-                                      'professionalQualificationCertificate',
+                                      'professionalQualificationCertificateFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -885,7 +887,7 @@ function RouteComponent() {
                                   {
                                     title: '文件',
                                     dataIndex:
-                                      'occupationalHazardsNotificationLetter',
+                                      'occupationalHazardsNotificationLetterFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -918,7 +920,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'trainingCertificate',
+                                    dataIndex: 'trainingCertificateFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -939,7 +941,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'assessmentRecord',
+                                    dataIndex: 'assessmentRecordFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -973,7 +975,7 @@ function RouteComponent() {
                                   {
                                     title: '文件',
                                     dataIndex:
-                                      'safetyManagementQualificationCertificate',
+                                      'safetyManagementQualificationCertificateFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -994,7 +996,7 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'authorizationLetter',
+                                    dataIndex: 'authorizationLetterFile',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
