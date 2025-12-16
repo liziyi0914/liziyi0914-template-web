@@ -1,15 +1,20 @@
-import { createFileRoute } from '@tanstack/react-router'
-import {App, Button, Modal, Popconfirm, Popover} from "antd";
-import {type ActionType, ModalForm, ProFormText, ProTable} from "@ant-design/pro-components";
-import {Icon} from "@iconify/react";
-import {useRef, useState} from "react";
-import {UploadAssetsForm} from "@/components/AssetsPicker.tsx";
-import {Api} from "@/lib/api.ts";
-import OssImage from "@/components/OssImage.tsx";
+import {
+  type ActionType,
+  ModalForm,
+  ProFormText,
+  ProTable,
+} from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { createFileRoute } from '@tanstack/react-router';
+import { App, Button, Modal, Popconfirm, Popover } from 'antd';
+import { useRef, useState } from 'react';
+import { UploadAssetsForm } from '@/components/AssetsPicker.tsx';
+import OssImage from '@/components/OssImage.tsx';
+import { Api } from '@/lib/api.ts';
 
 export const Route = createFileRoute('/dashboard/core/company/assets')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   const { message } = App.useApp();
@@ -61,8 +66,10 @@ function RouteComponent() {
             valueEnum: {
               'image/*': '图片',
               'video/*': '视频',
-              'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word',
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                'Word',
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                'Excel',
               'application/pdf': 'PDF',
             },
           },
@@ -75,18 +82,19 @@ function RouteComponent() {
                 modalProps={{
                   destroyOnHidden: true,
                 }}
-                trigger={(
-                  <Button
-                    key="rename"
-                    size="small"
-                    type="link"
-                  >重命名</Button>
-                )}
+                trigger={
+                  <Button key="rename" size="small" type="link">
+                    重命名
+                  </Button>
+                }
                 initialValues={{
                   name: record.name,
                 }}
                 onFinish={async (values) => {
-                  const resp = await Api.dashboard.core.company.assets.rename(record.id, values.name);
+                  const resp = await Api.dashboard.core.company.assets.rename(
+                    record.id,
+                    values.name,
+                  );
                   if (resp.code === 200) {
                     message.success('重命名成功');
                     actionRef.current?.reload();
@@ -106,21 +114,14 @@ function RouteComponent() {
                   ]}
                 />
               </ModalForm>,
-              record.fileType==='image/*' ? (
+              record.fileType === 'image/*' ? (
                 <Popover
-                  content={(
-                    <OssImage
-                      src={record.id}
-                      width={200}
-                    />
-                  )}
+                  content={<OssImage src={record.id} width={200} />}
                   destroyOnHidden
                 >
-                  <Button
-                    key="preview"
-                    size="small"
-                    type="link"
-                  >预览</Button>
+                  <Button key="preview" size="small" type="link">
+                    预览
+                  </Button>
                 </Popover>
               ) : undefined,
               <Button
@@ -142,14 +143,18 @@ function RouteComponent() {
                     message.error('下载失败');
                   }
                 }}
-              >下载</Button>,
+              >
+                下载
+              </Button>,
               <Popconfirm
                 title={`确定删除${record.name}吗？`}
                 onConfirm={() => {
-                  Api.dashboard.core.company.assets.delete(record.id).then(() => {
-                    actionRef.current?.reload();
-                    message.success('删除成功');
-                  });
+                  Api.dashboard.core.company.assets
+                    .delete(record.id)
+                    .then(() => {
+                      actionRef.current?.reload();
+                      message.success('删除成功');
+                    });
                 }}
                 okText="删除"
                 okButtonProps={{
@@ -158,14 +163,12 @@ function RouteComponent() {
                 cancelText="取消"
                 key="delete"
               >
-                <Button
-                  size="small"
-                  type="link"
-                  danger
-                >删除</Button>
+                <Button size="small" type="link" danger>
+                  删除
+                </Button>
               </Popconfirm>,
-            ]
-          }
+            ],
+          },
         ]}
       />
     </div>

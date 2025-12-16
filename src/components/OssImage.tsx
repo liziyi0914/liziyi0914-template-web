@@ -1,7 +1,7 @@
 import { Image, Spin } from 'antd';
 import type { ImageProps } from 'antd/es/image';
 import React, { Suspense, useMemo } from 'react';
-import {Api} from "@/lib/api.ts";
+import { Api } from '@/lib/api.ts';
 
 const Component: React.FC<ImageProps> = (props) => {
   const Img = useMemo(() => {

@@ -1,8 +1,8 @@
-import {createFileRoute, useNavigate} from '@tanstack/react-router'
-import {mainAtom} from "@/components/MainFramework.tsx";
-import {Icon} from "@iconify/react";
-import {useSetAtom} from "jotai";
-import {useEffect} from "react";
+import { Icon } from '@iconify/react';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useSetAtom } from 'jotai';
+import { useEffect } from 'react';
+import { mainAtom } from '@/components/MainFramework.tsx';
 
 interface FunctionCardProps {
   icon: string;
@@ -12,7 +12,10 @@ interface FunctionCardProps {
 
 function AppCard({ icon, title, onClick }: FunctionCardProps) {
   return (
-    <div className="py-4 flex flex-col items-center gap-y-2 select-none cursor-pointer" onClick={onClick}>
+    <div
+      className="py-4 flex flex-col items-center gap-y-2 select-none cursor-pointer"
+      onClick={onClick}
+    >
       <Icon icon={icon} className="text-4xl text-blue-600" />
       <div className="text-sm font-medium">{title}</div>
     </div>
@@ -21,7 +24,7 @@ function AppCard({ icon, title, onClick }: FunctionCardProps) {
 
 export const Route = createFileRoute('/_home/')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   const navigate = useNavigate();
@@ -44,14 +47,11 @@ function RouteComponent() {
       <div className="p-6">
         <div className="pb-3">应用与功能</div>
         <div className="grid grid-cols-4">
-          <AppCard
-            icon="ph:signature"
-            title="文件签署"
-          />
+          <AppCard icon="ph:signature" title="文件签署" />
           <AppCard
             icon="lucide:settings"
             title="管理后台"
-            onClick={()=>{
+            onClick={() => {
               navigate({
                 to: '/dashboard/home',
               });

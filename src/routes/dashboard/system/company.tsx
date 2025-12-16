@@ -1,22 +1,30 @@
-import { createFileRoute } from '@tanstack/react-router'
-import {App, Button, Modal, Popconfirm} from "antd";
-import {useRef, useState} from "react";
-import {Api, type ApiResult} from "@/lib/api.ts";
-import {Icon} from "@iconify/react";
-import {BetaSchemaForm, ProForm, ProTable, type ActionType } from "@ant-design/pro-components";
+import {
+  type ActionType,
+  BetaSchemaForm,
+  ProForm,
+  ProTable,
+} from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { createFileRoute } from '@tanstack/react-router';
+import { App, Button, Modal, Popconfirm } from 'antd';
+import { useRef, useState } from 'react';
+import { Api, type ApiResult } from '@/lib/api.ts';
 
 export const Route = createFileRoute('/dashboard/system/company')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const {message} = App.useApp();
+  const { message } = App.useApp();
 
-  const [company, setCompany] = useState<{
-    id: string;
-    companyName: string;
-    companyRegCode: string;
-  } | true>();
+  const [company, setCompany] = useState<
+    | {
+        id: string;
+        companyName: string;
+        companyRegCode: string;
+      }
+    | true
+  >();
 
   const actionRef = useRef<ActionType>(undefined);
 
@@ -24,7 +32,7 @@ function RouteComponent() {
     <div>
       <Modal
         open={!!company}
-        title={company === true ? "添加企业" : "编辑企业"}
+        title={company === true ? '添加企业' : '编辑企业'}
         onCancel={() => {
           setCompany(undefined);
         }}
@@ -32,19 +40,23 @@ function RouteComponent() {
         footer={null}
       >
         <ProForm
-          initialValues={company && typeof company !== 'boolean' && company as any}
+          initialValues={
+            company && typeof company !== 'boolean' && (company as any)
+          }
           onFinish={async (values) => {
-            let resp: ApiResult
-            if (!!values.id) {
+            let resp: ApiResult;
+            if (values.id) {
               resp = await Api.dashboard.system.company.update(values.id, {
                 companyName: values.companyName,
                 companyRegCode: values.companyRegCode,
               });
             } else {
-              resp = await Api.dashboard.system.company.create([{
-                companyName: values.companyName,
-                companyRegCode: values.companyRegCode,
-              }]);
+              resp = await Api.dashboard.system.company.create([
+                {
+                  companyName: values.companyName,
+                  companyRegCode: values.companyRegCode,
+                },
+              ]);
             }
             if (resp.code === 200) {
               message.success('保存成功');
@@ -103,24 +115,13 @@ function RouteComponent() {
           >
             添加
           </Button>,
-          <Button
-            key="import"
-            icon={<Icon icon="bx:import" />}
-            disabled
-          >
+          <Button key="import" icon={<Icon icon="bx:import" />} disabled>
             导入
           </Button>,
-          <Button
-            key="download_import_template"
-            disabled
-          >
+          <Button key="download_import_template" disabled>
             下载导入模板
           </Button>,
-          <Button
-            key="export"
-            icon={<Icon icon="bx:export" />}
-            disabled
-          >
+          <Button key="export" icon={<Icon icon="bx:export" />} disabled>
             导出
           </Button>,
         ]}

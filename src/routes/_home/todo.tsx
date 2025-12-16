@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
-import {mainAtom} from "@/components/MainFramework.tsx";
-import {useSetAtom} from "jotai";
-import {useEffect} from "react";
+import { createFileRoute } from '@tanstack/react-router';
+import { useSetAtom } from 'jotai';
+import { useEffect } from 'react';
+import { mainAtom } from '@/components/MainFramework.tsx';
 
 export const Route = createFileRoute('/_home/todo')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   const setMainFramework = useSetAtom(mainAtom);
@@ -21,5 +21,5 @@ function RouteComponent() {
     }));
   }, []);
 
-  return <div>Hello "/_home/todo"!</div>
+  return <div>Hello "/_home/todo"!</div>;
 }

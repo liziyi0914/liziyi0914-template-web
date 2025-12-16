@@ -1,12 +1,14 @@
-import React, {type PropsWithChildren, useEffect} from "react";
-import {useQuery} from "@tanstack/react-query";
-import {Api} from "@/lib/api.ts";
-import {useNavigate} from "@tanstack/react-router";
-import {Spin} from "antd";
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import { Spin } from 'antd';
+import React, { type PropsWithChildren, useEffect } from 'react';
+import { Api } from '@/lib/api.ts';
 
-const Component: React.FC<PropsWithChildren<{
-  title?: string;
-}>> = (props) => {
+const Component: React.FC<
+  PropsWithChildren<{
+    title?: string;
+  }>
+> = (props) => {
   const navigate = useNavigate();
   const query = useQuery({
     queryKey: ['auth.check'],
@@ -39,15 +41,15 @@ const Component: React.FC<PropsWithChildren<{
           <div className="px-6">
             {query.isLoading && (
               <Spin spinning tip="加载中">
-                <div className="h-24"/>
+                <div className="h-24" />
               </Spin>
             )}
-            {!query.isLoading && (props.children)}
+            {!query.isLoading && props.children}
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Component;

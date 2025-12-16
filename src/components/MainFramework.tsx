@@ -1,8 +1,9 @@
-import React, {type PropsWithChildren} from "react";
-import {NavBar, TabBar} from "antd-mobile";
-import {Icon} from "@iconify/react";
-import {useNavigate} from "@tanstack/react-router";
-import {atom, useAtomValue} from "jotai";
+import { Icon } from '@iconify/react';
+import { useNavigate } from '@tanstack/react-router';
+import { NavBar, TabBar } from 'antd-mobile';
+import { atom, useAtomValue } from 'jotai';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 
 export type MainFrameworkAtom = {
   tabBarVisible: boolean;
@@ -24,8 +25,7 @@ export const mainAtom = atom<MainFrameworkAtom>({
   navbarBackOnClick: () => {},
 });
 
-const Component: React.FC<PropsWithChildren<{
-}>> = (props) => {
+const Component: React.FC<PropsWithChildren<{}>> = (props) => {
   const navigate = useNavigate();
   const frameworkState = useAtomValue(mainAtom);
 
@@ -36,7 +36,7 @@ const Component: React.FC<PropsWithChildren<{
           <div className="border-0 border-b border-gray-200">
             <NavBar
               back={frameworkState.navbarBackVisible ? '' : null}
-              onBack={()=>{
+              onBack={() => {
                 frameworkState.navbarBackOnClick?.();
               }}
             >
@@ -44,21 +44,14 @@ const Component: React.FC<PropsWithChildren<{
             </NavBar>
           </div>
         )}
-        <div className="grow overflow-y-auto h-0">
-          {props.children}
-        </div>
+        <div className="grow overflow-y-auto h-0">{props.children}</div>
         {frameworkState.tabBarVisible && (
           <div className="border-0 border-t border-gray-200">
-            <TabBar
-              safeArea
-              activeKey={frameworkState.activeTab}
-            >
+            <TabBar safeArea activeKey={frameworkState.activeTab}>
               <TabBar.Item
                 key="home"
                 title="首页"
-                icon={(
-                  <Icon icon="material-symbols:home" />
-                )}
+                icon={<Icon icon="material-symbols:home" />}
                 onClick={() => {
                   navigate({
                     to: '/',
@@ -68,9 +61,7 @@ const Component: React.FC<PropsWithChildren<{
               <TabBar.Item
                 key="training"
                 title="培训"
-                icon={(
-                  <Icon icon="ic:round-school" />
-                )}
+                icon={<Icon icon="ic:round-school" />}
                 onClick={() => {
                   navigate({
                     to: '/training',
@@ -80,9 +71,7 @@ const Component: React.FC<PropsWithChildren<{
               <TabBar.Item
                 key="todo"
                 title="待办"
-                icon={(
-                  <Icon icon="material-symbols:event-list-outline" />
-                )}
+                icon={<Icon icon="material-symbols:event-list-outline" />}
                 onClick={() => {
                   navigate({
                     to: '/todo',
@@ -92,9 +81,7 @@ const Component: React.FC<PropsWithChildren<{
               <TabBar.Item
                 key="user"
                 title="个人中心"
-                icon={(
-                  <Icon icon="material-symbols:person" />
-                )}
+                icon={<Icon icon="material-symbols:person" />}
                 onClick={() => {
                   navigate({
                     to: '/user',
@@ -107,6 +94,6 @@ const Component: React.FC<PropsWithChildren<{
       </div>
     </div>
   );
-}
+};
 
 export default Component;

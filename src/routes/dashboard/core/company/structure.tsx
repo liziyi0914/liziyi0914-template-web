@@ -1,19 +1,42 @@
-import { createFileRoute } from '@tanstack/react-router'
-import {App, Button, Divider, Modal, Popconfirm, Result, Spin, Tree, type TreeDataNode} from "antd";
-import {BetaSchemaForm, ModalForm, ProForm, type ProFormColumnsType} from "@ant-design/pro-components";
-import {Icon} from "@iconify/react";
-import {useQuery} from "@tanstack/react-query";
-import {Api} from "@/lib/api.ts";
-import React, {type PropsWithChildren, useEffect, useMemo, useRef, useState} from "react";
-import {convertDepartmentsToTreeData} from "@/lib/functions.tsx";
-import html2canvas from "html2canvas-pro";
+import {
+  BetaSchemaForm,
+  ModalForm,
+  ProForm,
+  type ProFormColumnsType,
+} from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import {
+  App,
+  Button,
+  Divider,
+  Modal,
+  Popconfirm,
+  Result,
+  Spin,
+  Tree,
+  type TreeDataNode,
+} from 'antd';
+import html2canvas from 'html2canvas-pro';
+import React, {
+  type PropsWithChildren,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Api } from '@/lib/api.ts';
+import { convertDepartmentsToTreeData } from '@/lib/functions.tsx';
 
 export const Route = createFileRoute('/dashboard/core/company/structure')({
   component: RouteComponent,
-})
+});
 
-// @ts-ignore
-const editDepartmentSchema: (id?: string) => Array<ProFormColumnsType> = (id?: string) => [
+// @ts-expect-error
+const editDepartmentSchema: (id?: string) => Array<ProFormColumnsType> = (
+  id?: string,
+) => [
   {
     title: 'ID',
     dataIndex: 'id',
@@ -93,7 +116,6 @@ type GraphNodeType = {
   hiddenAll?: boolean;
 };
 
-//first:*:data-children:before:hidden!
 const GraphNode: React.FC<PropsWithChildren<GraphNodeType>> = (props) => {
   const [expand, setExpand] = useState(true);
 
@@ -121,7 +143,7 @@ const GraphNode: React.FC<PropsWithChildren<GraphNodeType>> = (props) => {
     <div className="inline-block relative px-1.5">
       <div className="flex justify-center">
         <div
-          className="inline-block bg-[#00a63e] text-white px-4 py-2 shadow-md rounded-md cursor-pointer select-none"
+          className={`inline-block bg-green-600 text-white px-4 py-2 shadow-md rounded-md ${(props.items?.length ?? 0) > 0 ? 'cursor-pointer hover:bg-green-600/90' : ''} select-none`}
           onClick={() => {
             setExpand(!expand);
           }}
@@ -137,13 +159,10 @@ const GraphNode: React.FC<PropsWithChildren<GraphNodeType>> = (props) => {
       )}
 
       {(props.items?.length ?? 0) > 0 && expand && (
-        <div className="absolute left-1/2 -translate-x-1/2 border h-4 border-gray-500">
-        </div>
+        <div className="absolute left-1/2 -translate-x-1/2 border h-4 border-gray-500"></div>
       )}
 
-      <div
-        className={`pt-8 flex ${before} ${after}`}
-      >
+      <div className={`pt-8 flex ${before} ${after}`}>
         {expand && (
           <>
             {props.items?.map((item, index) => (
@@ -160,7 +179,7 @@ const GraphNode: React.FC<PropsWithChildren<GraphNodeType>> = (props) => {
       </div>
     </div>
   );
-}
+};
 
 const StructureGraph: React.FC<{
   companyName: string;
@@ -176,7 +195,11 @@ const StructureGraph: React.FC<{
     return tree.map((item): TreeNode => {
       return {
         name: item.title as string,
-        items: item.children ? mapTree(item.children.filter(i => `${i.key}`.startsWith('department.'))) : [],
+        items: item.children
+          ? mapTree(
+              item.children.filter((i) => `${i.key}`.startsWith('department.')),
+            )
+          : [],
       };
     });
   };
@@ -185,7 +208,7 @@ const StructureGraph: React.FC<{
     <div>
       <div className="flex gap-x-3">
         <Button
-          onClick={()=>{
+          onClick={() => {
             if (divRef.current) {
               html2canvas(divRef.current, {
                 useCORS: true,
@@ -200,11 +223,11 @@ const StructureGraph: React.FC<{
               });
             }
           }}
-        >导出图片</Button>
+        >
+          导出图片
+        </Button>
       </div>
-      <div
-        className="max-h-[70vh] overflow-auto text-center"
-      >
+      <div className="max-h-[70vh] overflow-auto text-center">
         <div className="inline-block text-start p-3" ref={divRef}>
           <GraphNode
             name={props.companyName}
@@ -218,26 +241,26 @@ const StructureGraph: React.FC<{
 };
 
 function RouteComponent() {
-  const {message} = App.useApp();
+  const { message } = App.useApp();
   const departments = useQuery({
     queryKey: ['dashboard.core.company.structure'],
     queryFn: async () => {
-      let resp = await Api.dashboard.core.company.structure.list();
+      const resp = await Api.dashboard.core.company.structure.list();
       if (resp.code === 200 && resp.data) {
         return resp.data;
       }
       throw new Error(`获取部门列表失败: ${resp.data}`);
-    }
+    },
   });
 
   const [form] = ProForm.useForm();
 
-  const tree = useMemo<TreeDataNode[]>(()=>{
+  const tree = useMemo<TreeDataNode[]>(() => {
     if (!departments.isSuccess || !departments.data) {
       return [];
     }
 
-    let list = departments.data.departments;
+    const list = departments.data.departments;
 
     return convertDepartmentsToTreeData(list);
   }, [departments]);
@@ -247,9 +270,11 @@ function RouteComponent() {
 
   const initialValues = useMemo(() => {
     if (selectedKey && departments.isSuccess && departments.data) {
-      let [type, id] = selectedKey.split('.');
+      const [type, id] = selectedKey.split('.');
       if (type === 'department') {
-        let department = departments.data.departments.filter(i => i.id === id)?.[0];
+        const department = departments.data.departments.filter(
+          (i) => i.id === id,
+        )?.[0];
         if (department) {
           return {
             id: department.id,
@@ -259,11 +284,13 @@ function RouteComponent() {
           };
         }
       } else if (type === 'position') {
-        let department = departments.data.departments
-          .filter(i => (i.positions?.filter(j => j.id === id).length ?? 0) > 0)
-          ?.[0];
+        const department = departments.data.departments.filter(
+          (i) => (i.positions?.filter((j) => j.id === id).length ?? 0) > 0,
+        )?.[0];
         if (department) {
-          let position = department.positions?.filter(i => i.id === id)?.[0];
+          const position = department.positions?.filter(
+            (i) => i.id === id,
+          )?.[0];
           if (position) {
             return {
               id: position.id,
@@ -308,10 +335,7 @@ function RouteComponent() {
               setOpenStructureModal(false);
             }}
           >
-            <StructureGraph
-              companyName={"企业"}
-              tree={tree}
-            />
+            <StructureGraph companyName={'企业'} tree={tree} />
           </Modal>
 
           <div className="flex">
@@ -321,20 +345,23 @@ function RouteComponent() {
                   onClick={() => {
                     setOpenStructureModal(true);
                   }}
-                >架构图</Button>
+                >
+                  架构图
+                </Button>
                 <div className="grow"></div>
                 <ModalForm
                   title="添加部门"
                   modalProps={{
                     destroyOnHidden: true,
                   }}
-                  trigger={(
-                    <Button
-                      icon={<Icon icon="lucide:plus" />}
-                    >添加部门</Button>
-                  )}
+                  trigger={
+                    <Button icon={<Icon icon="lucide:plus" />}>添加部门</Button>
+                  }
                   onFinish={async (values) => {
-                    let resp = await Api.dashboard.core.company.structure.createDepartment(values as any);
+                    const resp =
+                      await Api.dashboard.core.company.structure.createDepartment(
+                        values as any,
+                      );
                     if (resp.code === 200) {
                       message.success('添加部门成功');
                       departments.refetch();
@@ -361,9 +388,9 @@ function RouteComponent() {
                 showIcon
               />
               {tree.length === 0 && (
-                <div
-                  className="text-center text-muted-foreground"
-                >暂无部门</div>
+                <div className="text-center text-muted-foreground">
+                  暂无部门
+                </div>
               )}
             </div>
             <div>
@@ -371,18 +398,22 @@ function RouteComponent() {
             </div>
             <div className="grow">
               {!selectedKey && (
-                <div
-                  className="text-center text-muted-foreground"
-                >请选择部门或岗位</div>
+                <div className="text-center text-muted-foreground">
+                  请选择部门或岗位
+                </div>
               )}
               {selectedKey && (
                 <ProForm
                   form={form}
                   initialValues={initialValues}
                   onFinish={async (values) => {
-                    let [type, id] = selectedKey.split('.');
+                    const [type, id] = selectedKey.split('.');
                     if (type === 'department') {
-                      let resp = await Api.dashboard.core.company.structure.updateDepartment(id, values as any);
+                      const resp =
+                        await Api.dashboard.core.company.structure.updateDepartment(
+                          id,
+                          values as any,
+                        );
                       if (resp.code === 200) {
                         message.success('保存成功');
                         departments.refetch();
@@ -391,7 +422,11 @@ function RouteComponent() {
                       message.error(`保存失败: ${resp.msg}`);
                       return false;
                     } else if (type === 'position') {
-                      let resp = await Api.dashboard.core.company.structure.updatePosition(id, values as any);
+                      const resp =
+                        await Api.dashboard.core.company.structure.updatePosition(
+                          id,
+                          values as any,
+                        );
                       if (resp.code === 200) {
                         message.success('保存成功');
                         departments.refetch();
@@ -414,16 +449,20 @@ function RouteComponent() {
                             modalProps={{
                               destroyOnHidden: true,
                             }}
-                            trigger={(
+                            trigger={
                               <Button
                                 key="createPosition"
                                 icon={<Icon icon="lucide:plus" />}
                               >
                                 添加岗位
                               </Button>
-                            )}
+                            }
                             onFinish={async (values) => {
-                              let resp = await Api.dashboard.core.company.structure.createPosition(selectedKey?.replace('department.', ''), values as any);
+                              const resp =
+                                await Api.dashboard.core.company.structure.createPosition(
+                                  selectedKey?.replace('department.', ''),
+                                  values as any,
+                                );
                               if (resp.code === 200) {
                                 message.success('添加岗位成功');
                                 departments.refetch();
@@ -443,9 +482,12 @@ function RouteComponent() {
                         <Popconfirm
                           title={'确定要删除吗？'}
                           onConfirm={async () => {
-                            let [type, id] = selectedKey.split('.');
+                            const [type, id] = selectedKey.split('.');
                             if (type === 'department') {
-                              let resp = await Api.dashboard.core.company.structure.deleteDepartment(id);
+                              const resp =
+                                await Api.dashboard.core.company.structure.deleteDepartment(
+                                  id,
+                                );
                               if (resp.code === 200) {
                                 message.success('删除部门成功');
                                 departments.refetch();
@@ -454,7 +496,10 @@ function RouteComponent() {
                                 message.error(`删除部门失败: ${resp.msg}`);
                               }
                             } else if (type === 'position') {
-                              let resp = await Api.dashboard.core.company.structure.deletePosition(id);
+                              const resp =
+                                await Api.dashboard.core.company.structure.deletePosition(
+                                  id,
+                                );
                               if (resp.code === 200) {
                                 message.success('删除岗位成功');
                                 departments.refetch();
@@ -469,10 +514,7 @@ function RouteComponent() {
                             danger: true,
                           }}
                         >
-                          <Button
-                            key="delete"
-                            danger
-                          >
+                          <Button key="delete" danger>
                             删除
                           </Button>
                         </Popconfirm>,
@@ -482,7 +524,13 @@ function RouteComponent() {
                 >
                   <BetaSchemaForm
                     layoutType="Embed"
-                    columns={selectedKey?.startsWith('department.') ? editDepartmentSchema(selectedKey.replace('department.', '')) : editPositionSchema}
+                    columns={
+                      selectedKey?.startsWith('department.')
+                        ? editDepartmentSchema(
+                            selectedKey.replace('department.', ''),
+                          )
+                        : editPositionSchema
+                    }
                   />
                 </ProForm>
               )}

@@ -1,10 +1,14 @@
-import axios, {type AxiosRequestConfig, type AxiosResponse} from "axios";
-import { BACKEND_URL } from "@/lib/constants";
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
+import { BACKEND_URL } from '@/lib/constants';
 import type {
-  AssetsInfoVO, CompanyListVO,
+  AssetsInfoVO,
+  CompanyListVO,
   CompanyStructureDepartmentUpdateVO,
-  CompanyStructurePositionUpdateVO, CompanyStructureVO, OSSUploadPresignArgs, UserInfoVO
-} from "@/lib/types.ts";
+  CompanyStructurePositionUpdateVO,
+  CompanyStructureVO,
+  OSSUploadPresignArgs,
+  UserInfoVO,
+} from '@/lib/types.ts';
 
 export interface ApiResult<T = any> {
   code: number;
@@ -153,7 +157,7 @@ export const uploadOss: <T = any>(
       'Content-Type': 'application/octet-stream',
       ...(headers ?? {}),
     },
-    // @ts-ignore
+    // @ts-expect-error
     body: data,
   });
 
@@ -195,7 +199,12 @@ export const Api = {
         method: 'GET',
       });
     },
-    uploadAssets: (name: string, fileType: string, hash: string, suffix: string) => {
+    uploadAssets: (
+      name: string,
+      fileType: string,
+      hash: string,
+      suffix: string,
+    ) => {
       return request<OSSUploadPresignArgs>({
         url: '/common/assets/upload',
         method: 'POST',
@@ -226,15 +235,17 @@ export const Api = {
       });
     },
     getDepartments: () => {
-      return request<{
-        id: string;
-        name: string;
-        parent?: string;
-        positions?: Array<{
+      return request<
+        {
           id: string;
           name: string;
-        }>;
-      }[]>({
+          parent?: string;
+          positions?: Array<{
+            id: string;
+            name: string;
+          }>;
+        }[]
+      >({
         url: '/common/departments',
         method: 'GET',
       });
@@ -242,15 +253,23 @@ export const Api = {
   },
   auth: {
     loginSms: (phone: string, captcha: CaptchaResult) => {
-      return requestWithCaptcha({
-        url: '/auth/login/sms',
-        method: 'POST',
-        data: {
-          phone,
+      return requestWithCaptcha(
+        {
+          url: '/auth/login/sms',
+          method: 'POST',
+          data: {
+            phone,
+          },
         },
-      }, captcha);
+        captcha,
+      );
     },
-    login: (phone?: string, code?: string, token?: string, captcha?: CaptchaResult) => {
+    login: (
+      phone?: string,
+      code?: string,
+      token?: string,
+      captcha?: CaptchaResult,
+    ) => {
       if (!captcha) {
         return request<Array<string> | null | undefined>({
           url: '/auth/login',
@@ -260,14 +279,17 @@ export const Api = {
           },
         });
       }
-      return requestWithCaptcha<Array<string> | null | undefined>({
-        url: '/auth/login',
-        method: 'POST',
-        data: {
-          phone,
-          code,
+      return requestWithCaptcha<Array<string> | null | undefined>(
+        {
+          url: '/auth/login',
+          method: 'POST',
+          data: {
+            phone,
+            code,
+          },
         },
-      }, captcha);
+        captcha,
+      );
     },
     check: () => {
       return request<{
@@ -292,44 +314,55 @@ export const Api = {
       companyRegCode: string,
       name: string,
       idCard: string,
-      captcha: CaptchaResult
+      captcha: CaptchaResult,
     ) => {
-      return requestWithCaptcha({
-        url: '/auth/register',
-        method: 'POST',
-        data: {
-          phone,
-          code,
-          companyId,
-          companyRegCode,
-          name,
-          idCard,
+      return requestWithCaptcha(
+        {
+          url: '/auth/register',
+          method: 'POST',
+          data: {
+            phone,
+            code,
+            companyId,
+            companyRegCode,
+            name,
+            idCard,
+          },
         },
-      }, captcha);
+        captcha,
+      );
     },
     registerSms: (phone: string, captcha: CaptchaResult) => {
-      return requestWithCaptcha({
-        url: '/auth/register/sms',
-        method: 'POST',
-        data: {
-          phone,
+      return requestWithCaptcha(
+        {
+          url: '/auth/register/sms',
+          method: 'POST',
+          data: {
+            phone,
+          },
         },
-      }, captcha);
+        captcha,
+      );
     },
   },
   dashboard: {
     system: {
       company: {
         list: (page: PageQuery) => {
-          return requestPage({
-            url: '/dashboard/system/company/',
-            method: 'POST',
-          }, page);
+          return requestPage(
+            {
+              url: '/dashboard/system/company/',
+              method: 'POST',
+            },
+            page,
+          );
         },
-        create: (list: Array<{
-          companyName: string;
-          companyRegCode?: string;
-        }>) => {
+        create: (
+          list: Array<{
+            companyName: string;
+            companyRegCode?: string;
+          }>,
+        ) => {
           return request({
             url: '/dashboard/system/company/',
             method: 'PUT',
@@ -348,10 +381,13 @@ export const Api = {
             method: 'GET',
           });
         },
-        update: (id: string, data: {
-          companyName: string;
-          companyRegCode?: string;
-        }) => {
+        update: (
+          id: string,
+          data: {
+            companyName: string;
+            companyRegCode?: string;
+          },
+        ) => {
           return request({
             url: `/dashboard/system/company/${id}`,
             method: 'POST',
@@ -367,18 +403,23 @@ export const Api = {
       },
       user: {
         list: (page: PageQuery) => {
-          return requestPage<UserInfoVO>({
-            url: '/dashboard/system/user/',
-            method: 'POST',
-          }, page);
+          return requestPage<UserInfoVO>(
+            {
+              url: '/dashboard/system/user/',
+              method: 'POST',
+            },
+            page,
+          );
         },
-        create: (list: Array<{
-          name: string;
-          phone: string;
-          idCard: string;
-          isBanned: boolean;
-          companies: Array<string>;
-        }>) => {
+        create: (
+          list: Array<{
+            name: string;
+            phone: string;
+            idCard: string;
+            isBanned: boolean;
+            companies: Array<string>;
+          }>,
+        ) => {
           return request({
             url: '/dashboard/system/user/',
             method: 'PUT',
@@ -393,13 +434,16 @@ export const Api = {
             method: 'GET',
           });
         },
-        update: (id: string, data: {
-          name?: string;
-          phone?: string;
-          idCard?: string;
-          isBanned?: boolean;
-          companies?: Array<string>;
-        }) => {
+        update: (
+          id: string,
+          data: {
+            name?: string;
+            phone?: string;
+            idCard?: string;
+            isBanned?: boolean;
+            companies?: Array<string>;
+          },
+        ) => {
           return request({
             url: `/dashboard/system/user/${id}`,
             method: 'POST',
@@ -427,10 +471,13 @@ export const Api = {
         },
         assets: {
           list: (page: PageQuery) => {
-            return requestPage<AssetsInfoVO>({
-              url: '/dashboard/core/company/assets/',
-              method: 'POST',
-            }, page);
+            return requestPage<AssetsInfoVO>(
+              {
+                url: '/dashboard/core/company/assets/',
+                method: 'POST',
+              },
+              page,
+            );
           },
           rename: (id: string, name: string) => {
             return request({
@@ -462,7 +509,10 @@ export const Api = {
               data,
             });
           },
-          updateDepartment: (id: string, data: CompanyStructureDepartmentUpdateVO) => {
+          updateDepartment: (
+            id: string,
+            data: CompanyStructureDepartmentUpdateVO,
+          ) => {
             return request<void>({
               url: `/dashboard/core/company/structure/department/${id}`,
               method: 'POST',
@@ -475,14 +525,20 @@ export const Api = {
               method: 'DELETE',
             });
           },
-          createPosition: (departmentId: string, data: CompanyStructurePositionUpdateVO) => {
+          createPosition: (
+            departmentId: string,
+            data: CompanyStructurePositionUpdateVO,
+          ) => {
             return request<void>({
               url: `/dashboard/core/company/structure/department/${departmentId}/position`,
               method: 'PUT',
               data,
             });
           },
-          updatePosition: (id: string, data: CompanyStructurePositionUpdateVO) => {
+          updatePosition: (
+            id: string,
+            data: CompanyStructurePositionUpdateVO,
+          ) => {
             return request<void>({
               url: `/dashboard/core/company/structure/position/${id}`,
               method: 'POST',

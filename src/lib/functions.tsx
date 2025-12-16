@@ -1,6 +1,6 @@
-import type {TreeDataNode} from "antd";
-import type {CompanyStructureDepartmentVO} from "@/lib/types.ts";
-import {Icon} from "@iconify/react";
+import { Icon } from '@iconify/react';
+import type { TreeDataNode } from 'antd';
+import type { CompanyStructureDepartmentVO } from '@/lib/types.ts';
 
 /**
  * 将 CompanyStructureDepartmentVO 数组转换为 TreeDataNode 树结构
@@ -17,14 +17,19 @@ export function convertDepartmentsToTreeData(
   bannedValues: Array<string> = [],
 ): TreeDataNode[] {
   return departments
-    .filter(department => (department.parent || null) === parentId)
-    .map(department => {
-      const children = convertDepartmentsToTreeData(departments, department.id, allowTypes, bannedValues);
+    .filter((department) => (department.parent || null) === parentId)
+    .map((department) => {
+      const children = convertDepartmentsToTreeData(
+        departments,
+        department.id,
+        allowTypes,
+        bannedValues,
+      );
 
       const node: TreeDataNode = {
         title: department.name,
         key: `department.${department.id}`,
-        // @ts-ignore
+        // @ts-expect-error
         value: department.id,
         icon: (
           <div className="h-full flex justify-center items-center">
@@ -33,18 +38,22 @@ export function convertDepartmentsToTreeData(
         ),
         children: [
           ...(children.length > 0 ? children : []),
-          ...(department.positions?.map(position => ({
+          ...(department.positions?.map((position) => ({
             title: position.name,
             key: `position.${position.id}`,
             value: position.id,
             selectable: allowTypes.includes('position'),
-            disabled: bannedValues.includes(position.id) || !allowTypes.includes('position'),
+            disabled:
+              bannedValues.includes(position.id) ||
+              !allowTypes.includes('position'),
           })) ?? []),
         ],
         selectable: allowTypes.includes('department'),
-        disabled: bannedValues.includes(department.id) || !allowTypes.includes('department'),
+        disabled:
+          bannedValues.includes(department.id) ||
+          !allowTypes.includes('department'),
       };
-      
+
       return node;
     });
 }

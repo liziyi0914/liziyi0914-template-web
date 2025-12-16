@@ -1,17 +1,23 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import {ProForm, ProFormCaptcha, ProFormText} from '@ant-design/pro-components'
-import {Button} from "antd";
-import { Icon } from "@iconify/react";
-import AuthPage from "@/components/AuthPage.tsx";
-import {useRef, useState} from "react";
-import AliyunCaptcha, {type AliyunCaptchaRef} from "@/components/AliyunCaptcha.tsx";
-import {Toast} from "antd-mobile";
-import {Api} from "@/lib/api.ts";
+import {
+  ProForm,
+  ProFormCaptcha,
+  ProFormText,
+} from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { Button } from 'antd';
+import { Toast } from 'antd-mobile';
 import * as jose from 'jose';
+import { useRef, useState } from 'react';
+import AliyunCaptcha, {
+  type AliyunCaptchaRef,
+} from '@/components/AliyunCaptcha.tsx';
+import AuthPage from '@/components/AuthPage.tsx';
+import { Api } from '@/lib/api.ts';
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   const navigate = useNavigate();
@@ -21,14 +27,10 @@ function RouteComponent() {
   const [accounts, setAccounts] = useState<Array<string>>([]);
 
   return (
-    <AuthPage
-      title="万勋"
-    >
+    <AuthPage title="万勋">
       {accounts.length > 0 && (
         <div>
-          <div className="select-none pb-2">
-            请选择登录企业：
-          </div>
+          <div className="select-none pb-2">请选择登录企业：</div>
           <div className="max-h-96 overflow-y-auto flex flex-col gap-y-3">
             {accounts.map((account) => (
               <Button
@@ -36,13 +38,17 @@ function RouteComponent() {
                 block
                 size="large"
                 onClick={async () => {
-                  let toast = Toast.show({
+                  const toast = Toast.show({
                     content: '登录中...',
                     icon: 'loading',
                     duration: 0,
-                  })
+                  });
 
-                  let resp = await Api.auth.login(undefined, undefined, account);
+                  const resp = await Api.auth.login(
+                    undefined,
+                    undefined,
+                    account,
+                  );
 
                   toast.close();
 
@@ -61,7 +67,7 @@ function RouteComponent() {
                   }
                 }}
               >
-                {`${jose.decodeJwt(account)?.['companyName']??'-'}`}
+                {`${jose.decodeJwt(account)?.['companyName'] ?? '-'}`}
               </Button>
             ))}
             <Button
@@ -84,19 +90,24 @@ function RouteComponent() {
             const captcha = await ali.current?.show();
 
             if (captcha?.type === 'Success') {
-              let toast = Toast.show({
+              const toast = Toast.show({
                 content: '登录中...',
                 icon: 'loading',
                 duration: 0,
               });
 
-              const resp = await Api.auth.login(values.phone, values.code, undefined, captcha);
+              const resp = await Api.auth.login(
+                values.phone,
+                values.code,
+                undefined,
+                captcha,
+              );
 
               toast.close();
 
               if (resp.code === 200) {
-                let data = resp.data;
-                let len = data?.length ?? 0;
+                const data = resp.data;
+                const len = data?.length ?? 0;
                 if (len === 0) {
                   Toast.show({
                     content: '登录成功',
@@ -177,16 +188,13 @@ function RouteComponent() {
               const captcha = await ali.current?.show();
 
               if (captcha?.type === 'Success') {
-                let toast = Toast.show({
+                const toast = Toast.show({
                   content: '发送中...',
                   icon: 'loading',
                   duration: 0,
                 });
 
-                const resp = await Api.auth.loginSms(
-                  phone,
-                  captcha,
-                );
+                const resp = await Api.auth.loginSms(phone, captcha);
 
                 toast.close();
 
@@ -209,12 +217,9 @@ function RouteComponent() {
             }}
           />
           <ProForm.Item>
-            <Button
-              block
-              size="large"
-              type="primary"
-              htmlType="submit"
-            >登录</Button>
+            <Button block size="large" type="primary" htmlType="submit">
+              登录
+            </Button>
             <div className="h-3" />
             <Button
               block
@@ -224,7 +229,9 @@ function RouteComponent() {
                   to: '/register',
                 });
               }}
-            >注册</Button>
+            >
+              注册
+            </Button>
           </ProForm.Item>
         </ProForm>
       )}

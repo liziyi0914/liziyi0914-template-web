@@ -1,16 +1,20 @@
-import {createFileRoute, Outlet, useNavigate} from '@tanstack/react-router'
-import DashboardFramework from "@/components/DashboardFramework.tsx";
-import {useEffect} from "react";
-import {Api} from "@/lib/api.ts";
-import {useQuery} from "@tanstack/react-query";
-import {Spin, Watermark} from "antd";
-import {atom, useSetAtom} from "jotai";
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router';
+import { Spin, Watermark } from 'antd';
+import { atom, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
+import DashboardFramework from '@/components/DashboardFramework.tsx';
+import { Api } from '@/lib/api.ts';
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
-})
+});
 
-export const LoginState = atom<{ name: string, idCard: string, companyName: string; }>();
+export const LoginState = atom<{
+  name: string;
+  idCard: string;
+  companyName: string;
+}>();
 
 function RouteComponent() {
   const navigate = useNavigate();
@@ -42,13 +46,13 @@ function RouteComponent() {
           ]}
         >
           <DashboardFramework>
-            <Outlet/>
+            <Outlet />
           </DashboardFramework>
         </Watermark>
       )}
       {query.isLoading && (
         <Spin spinning tip="登录中">
-          <div className="h-[50vh]"/>
+          <div className="h-[50vh]" />
         </Spin>
       )}
     </>

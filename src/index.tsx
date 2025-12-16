@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import { initIcons } from '@/lib/icons.ts';
 import reportWebVitals from '@/reportWebVitals.ts';
+import App from './App';
 
-// @ts-ignore
+// @ts-expect-error
 import '@/assets/fonts/MiSansVF.ttf';
 
 initIcons();
@@ -19,9 +19,9 @@ if (rootEl) {
   );
 }
 
-// @ts-ignore
+// @ts-expect-error
 function sendToAnalytics({ id, name, value }) {
-  // @ts-ignore
+  // @ts-expect-error
   ga('send', 'event', {
     eventCategory: 'Web Vitals',
     eventAction: name,
@@ -40,9 +40,9 @@ import { unstableSetRender } from 'antd-mobile'; // Support since version ^5.40.
 import { createRoot } from 'react-dom/client';
 
 unstableSetRender((node, container) => {
-  // @ts-ignore
+  // @ts-expect-error
   container._reactRoot ||= createRoot(container);
-  // @ts-ignore
+  // @ts-expect-error
   const root = container._reactRoot;
   root.render(node);
   return async () => {

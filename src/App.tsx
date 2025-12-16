@@ -1,11 +1,11 @@
 import './App.css';
+import { ProConfigProvider } from '@ant-design/pro-components';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import { routeTree } from './routeTree.gen.ts';
-import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
+import AssetsPicker from '@/components/AssetsPicker.tsx';
+import DepartmentPicker from '@/components/DepartmentPicker.tsx';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
-import {ProConfigProvider} from "@ant-design/pro-components";
-import AssetsPicker from "@/components/AssetsPicker.tsx";
-import DepartmentPicker from "@/components/DepartmentPicker.tsx";
+import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
+import { routeTree } from './routeTree.gen.ts';
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({

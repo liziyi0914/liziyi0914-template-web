@@ -26,7 +26,7 @@ export type OSSUploadPresignArgs = {
 
 export type CompanyStructureVO = {
   departments: CompanyStructureDepartmentVO[];
-}
+};
 
 export type CompanyStructureDepartmentVO = {
   id: string;
@@ -35,20 +35,20 @@ export type CompanyStructureDepartmentVO = {
   head?: string | null;
   responsibilities?: string | null;
   positions?: CompanyStructurePositionVO[] | null;
-}
+};
 
 export type CompanyStructurePositionVO = {
   id: string;
   name: string;
   description?: string | null;
-}
+};
 
 export type CompanyStructurePositionUpdateVO = {
   name: string;
   description?: string | null;
-}
+};
 
 export type CompanyStructureDepartmentUpdateVO = {
   name: string;
   responsibilities?: string | null;
-}
+};

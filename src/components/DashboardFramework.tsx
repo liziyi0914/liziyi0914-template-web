@@ -1,13 +1,13 @@
-import React, {type PropsWithChildren, useState} from "react";
-import {Button, Card, Dropdown, Modal} from "antd";
-import {PageContainer, ProLayout} from "@ant-design/pro-components";
-import {Icon} from "@iconify/react";
-import {Link, useLocation, useNavigate} from "@tanstack/react-router";
-import {useAtomValue} from "jotai";
-import {LoginState} from "@/routes/dashboard.tsx";
-import {Api} from "@/lib/api.ts";
-import {Toast} from "antd-mobile";
-import * as jose from "jose";
+import { PageContainer, ProLayout } from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import { Button, Card, Dropdown, Modal } from 'antd';
+import { Toast } from 'antd-mobile';
+import * as jose from 'jose';
+import { useAtomValue } from 'jotai';
+import React, { type PropsWithChildren, useState } from 'react';
+import { Api } from '@/lib/api.ts';
+import { LoginState } from '@/routes/dashboard.tsx';
 
 // const Component: React.FC<PropsWithChildren<{
 // }>> = (props) => {
@@ -48,8 +48,7 @@ import * as jose from "jose";
 //   );
 // }
 
-const Component: React.FC<PropsWithChildren<{
-}>> = (props) => {
+const Component: React.FC<PropsWithChildren<{}>> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const loginState = useAtomValue(LoginState);
@@ -74,13 +73,17 @@ const Component: React.FC<PropsWithChildren<{
               block
               size="large"
               onClick={async () => {
-                let toast = Toast.show({
+                const toast = Toast.show({
                   content: '登录中...',
                   icon: 'loading',
                   duration: 0,
-                })
+                });
 
-                let resp = await Api.auth.login(undefined, undefined, company);
+                const resp = await Api.auth.login(
+                  undefined,
+                  undefined,
+                  company,
+                );
 
                 toast.close();
 
@@ -101,7 +104,7 @@ const Component: React.FC<PropsWithChildren<{
                 }
               }}
             >
-              {`${jose.decodeJwt(company)?.['companyName']??'-'}`}
+              {`${jose.decodeJwt(company)?.['companyName'] ?? '-'}`}
             </Button>
           ))}
         </div>
@@ -183,14 +186,15 @@ const Component: React.FC<PropsWithChildren<{
             },
           ],
         }}
-        menu={{
-          // collapsedShowGroupTitle: true,
-        }}
+        menu={
+          {
+            // collapsedShowGroupTitle: true,
+          }
+        }
         layout="mix"
         fixSiderbar={true}
         actionsRender={() => {
-          return [
-          ];
+          return [];
         }}
         avatarProps={{
           src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
@@ -231,7 +235,7 @@ const Component: React.FC<PropsWithChildren<{
                               });
                             }
                           }
-                        })
+                        });
                       },
                     },
                     {
@@ -258,23 +262,17 @@ const Component: React.FC<PropsWithChildren<{
           },
         }}
         menuItemRender={(item, dom) => {
-          return (
-            <Link to={item.path}>
-              {dom}
-            </Link>
-          );
+          return <Link to={item.path}>{dom}</Link>;
         }}
       >
         <div className="grow h-0 overflow-y-auto">
           <PageContainer>
-            <Card>
-              {props.children}
-            </Card>
+            <Card>{props.children}</Card>
           </PageContainer>
         </div>
       </ProLayout>
     </div>
   );
-}
+};
 
 export default Component;

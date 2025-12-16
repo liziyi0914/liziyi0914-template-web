@@ -1,14 +1,14 @@
-import {createFileRoute} from '@tanstack/react-router'
-import {BetaSchemaForm, ProForm} from "@ant-design/pro-components";
-import {Api} from "@/lib/api.ts";
-import {App} from "antd";
+import { BetaSchemaForm, ProForm } from '@ant-design/pro-components';
+import { createFileRoute } from '@tanstack/react-router';
+import { App } from 'antd';
+import { Api } from '@/lib/api.ts';
 
 export const Route = createFileRoute('/dashboard/core/company/info')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  const {message} = App.useApp();
+  const { message } = App.useApp();
   const [form] = ProForm.useForm();
 
   return (
@@ -16,14 +16,14 @@ function RouteComponent() {
       grid
       form={form}
       request={async () => {
-        let resp = await Api.dashboard.core.company.info.get();
+        const resp = await Api.dashboard.core.company.info.get();
         if (resp.code === 200) {
           return resp.data;
         }
-        return {}
+        return {};
       }}
       onFinish={async (values) => {
-        let resp = await Api.dashboard.core.company.info.update(values);
+        const resp = await Api.dashboard.core.company.info.update(values);
         if (resp.code === 200) {
           message.success('保存成功');
         } else {

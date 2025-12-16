@@ -1,17 +1,24 @@
-import {createFileRoute, useNavigate} from '@tanstack/react-router'
-import {ProForm, ProFormCaptcha, ProFormSelect, ProFormText} from '@ant-design/pro-components'
-import {Button} from "antd";
-import { Icon } from "@iconify/react";
-import AuthPage from "@/components/AuthPage.tsx";
-import { Api } from "@/lib/api";
-import {validateIdCard} from "@/lib/functions.tsx";
-import AliyunCaptcha, {type AliyunCaptchaRef} from "@/components/AliyunCaptcha.tsx";
-import {useRef} from "react";
-import { Toast } from "antd-mobile";
+import {
+  ProForm,
+  ProFormCaptcha,
+  ProFormSelect,
+  ProFormText,
+} from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { Button } from 'antd';
+import { Toast } from 'antd-mobile';
+import { useRef } from 'react';
+import AliyunCaptcha, {
+  type AliyunCaptchaRef,
+} from '@/components/AliyunCaptcha.tsx';
+import AuthPage from '@/components/AuthPage.tsx';
+import { Api } from '@/lib/api';
+import { validateIdCard } from '@/lib/functions.tsx';
 
 export const Route = createFileRoute('/register')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   const navigate = useNavigate();
@@ -19,16 +26,14 @@ function RouteComponent() {
   const ali = useRef<AliyunCaptchaRef>(null);
 
   return (
-    <AuthPage
-      title="万勋"
-    >
+    <AuthPage title="万勋">
       <ProForm
         submitter={false}
         onFinish={async (values) => {
           const captcha = await ali.current?.show();
 
           if (captcha?.type === 'Success') {
-            let toast = Toast.show({
+            const toast = Toast.show({
               content: '注册中...',
               icon: 'loading',
               duration: 0,
@@ -81,16 +86,18 @@ function RouteComponent() {
             },
           ]}
           request={async () => {
-            let resp = await Api.common.getCompanies();
+            const resp = await Api.common.getCompanies();
             if (resp.code !== 200) {
               return [];
             }
-            return resp.data?.map(item => {
-              return {
-                label: item.name,
-                value: item.id,
-              };
-            }) ?? [];
+            return (
+              resp.data?.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id,
+                };
+              }) ?? []
+            );
           }}
           showSearch={{
             onSearch: () => {},
@@ -141,8 +148,8 @@ function RouteComponent() {
                   return Promise.reject('身份证号格式错误！');
                 }
                 return Promise.resolve();
-              }
-            }
+              },
+            },
           ]}
         />
         <ProFormText
@@ -201,16 +208,13 @@ function RouteComponent() {
             const captcha = await ali.current?.show();
 
             if (captcha?.type === 'Success') {
-              let toast = Toast.show({
+              const toast = Toast.show({
                 content: '发送中...',
                 icon: 'loading',
                 duration: 0,
               });
 
-              const resp = await Api.auth.registerSms(
-                phone,
-                captcha,
-              );
+              const resp = await Api.auth.registerSms(phone, captcha);
 
               toast.close();
 
@@ -233,12 +237,9 @@ function RouteComponent() {
           }}
         />
         <ProForm.Item>
-          <Button
-            block
-            size="large"
-            type="primary"
-            htmlType="submit"
-          >注册</Button>
+          <Button block size="large" type="primary" htmlType="submit">
+            注册
+          </Button>
           <div className="h-3" />
           <Button
             block
@@ -248,10 +249,12 @@ function RouteComponent() {
                 to: '/login',
               });
             }}
-          >登录</Button>
+          >
+            登录
+          </Button>
         </ProForm.Item>
       </ProForm>
       <AliyunCaptcha ref={ali} />
     </AuthPage>
-  )
+  );
 }

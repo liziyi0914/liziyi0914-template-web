@@ -1,12 +1,18 @@
-import {App, Button, Modal, Popover, Tabs, Upload} from "antd";
-import {Icon} from "@iconify/react";
-import {ProForm, ProFormDependency, ProFormSelect, ProFormText, ProTable} from "@ant-design/pro-components";
-import {useState} from "react";
+import {
+  ProForm,
+  ProFormDependency,
+  ProFormSelect,
+  ProFormText,
+  ProTable,
+} from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { useQuery } from '@tanstack/react-query';
+import { App, Button, Modal, Popover, Tabs, Upload } from 'antd';
 import CryptoJS from 'crypto-js';
-import {Api, uploadOss} from "@/lib/api.ts";
-import type {OSSUploadPresignArgs} from "@/lib/types.ts";
-import OssImage from "@/components/OssImage.tsx";
-import {useQuery} from "@tanstack/react-query";
+import { useState } from 'react';
+import OssImage from '@/components/OssImage.tsx';
+import { Api, uploadOss } from '@/lib/api.ts';
+import type { OSSUploadPresignArgs } from '@/lib/types.ts';
 
 export const UploadAssetsForm: React.FC<{
   onSuccess?: (assetsId: string) => void;
@@ -21,7 +27,7 @@ export const UploadAssetsForm: React.FC<{
           submitText: '上传',
         },
       }}
-      onFinish={async (data)=>{
+      onFinish={async (data) => {
         if (!file) {
           message.error('请选择文件');
           return false;
@@ -34,8 +40,13 @@ export const UploadAssetsForm: React.FC<{
 
         let args: OSSUploadPresignArgs;
         {
-          let suffix = file.name.split('.').reverse()?.[0];
-          let resp = await Api.common.uploadAssets(data.name, data.fileType, hash, suffix);
+          const suffix = file.name.split('.').reverse()?.[0];
+          const resp = await Api.common.uploadAssets(
+            data.name,
+            data.fileType,
+            hash,
+            suffix,
+          );
           if (resp.code !== 200) {
             message.error(`上传失败: ${resp.msg}`);
             return false;
@@ -47,15 +58,11 @@ export const UploadAssetsForm: React.FC<{
           args = resp.data;
         }
 
-        const uploadResp = await uploadOss<string>(
-          args.url,
-          file,
-          {
-            'Content-MD5': hash,
-            'x-oss-callback': args.callback,
-            'x-oss-callback-var': args.callbackVar,
-          },
-        );
+        const uploadResp = await uploadOss<string>(args.url, file, {
+          'Content-MD5': hash,
+          'x-oss-callback': args.callback,
+          'x-oss-callback-var': args.callbackVar,
+        });
 
         if (uploadResp.code !== 200) {
           message.error(uploadResp.msg || '上传失败，请稍后重试');
@@ -96,11 +103,13 @@ export const UploadAssetsForm: React.FC<{
           },
           {
             label: 'Word',
-            value: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            value:
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
           },
           {
             label: 'Excel',
-            value: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            value:
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           },
           {
             label: 'PDF',
@@ -158,8 +167,10 @@ const AssetsTable: React.FC<{
           valueEnum: {
             'image/*': '图片',
             'video/*': '视频',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+              'Word',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+              'Excel',
             'application/pdf': 'PDF',
           },
         },
@@ -167,28 +178,19 @@ const AssetsTable: React.FC<{
           title: '操作',
           valueType: 'option',
           render: (_, record) => [
-            record.fileType==='image/*' ? (
+            record.fileType === 'image/*' ? (
               <Popover
-                content={(
-                  <OssImage
-                    src={record.id}
-                    width={200}
-                  />
-                )}
+                content={<OssImage src={record.id} width={200} />}
                 destroyOnHidden
               >
-                <Button
-                  key="preview"
-                  size="small"
-                  type="link"
-                >预览</Button>
+                <Button key="preview" size="small" type="link">
+                  预览
+                </Button>
               </Popover>
             ) : undefined,
-            <Button
-              key="download"
-              size="small"
-              type="link"
-            >下载</Button>,
+            <Button key="download" size="small" type="link">
+              下载
+            </Button>,
             <Button
               key="choose"
               size="small"
@@ -196,13 +198,15 @@ const AssetsTable: React.FC<{
               onClick={() => {
                 props.onChoose?.(record.id);
               }}
-            >选择</Button>,
-          ]
-        }
+            >
+              选择
+            </Button>,
+          ],
+        },
       ]}
     />
   );
-}
+};
 
 const Component: React.FC<{
   value?: string;
@@ -244,8 +248,8 @@ const Component: React.FC<{
                 <AssetsTable
                   onChoose={(assetsId) => {
                     setOpenModal(false);
-                    console.log(props)
-                    console.log('choose', assetsId)
+                    console.log(props);
+                    console.log('choose', assetsId);
                     props.onChange?.(assetsId);
                   }}
                 />
@@ -258,8 +262,8 @@ const Component: React.FC<{
                 <UploadAssetsForm
                   onSuccess={(assetsId) => {
                     setOpenModal(false);
-                    console.log(props)
-                    console.log('choose', assetsId)
+                    console.log(props);
+                    console.log('choose', assetsId);
                     props.onChange?.(assetsId);
                   }}
                 />
@@ -270,15 +274,11 @@ const Component: React.FC<{
         />
       </Modal>
 
-
       {props.value && (
         <div>
-          {assetsInfo.data?.fileType==='image/*' && (
+          {assetsInfo.data?.fileType === 'image/*' && (
             <div>
-              <OssImage
-                src={props.value}
-                width={200}
-              />
+              <OssImage src={props.value} width={200} />
             </div>
           )}
           <div>{assetsInfo.data?.name}</div>
@@ -286,7 +286,9 @@ const Component: React.FC<{
             onClick={() => {
               setOpenModal(true);
             }}
-          >更换</Button>
+          >
+            更换
+          </Button>
         </div>
       )}
       {!props.value && (
@@ -295,7 +297,9 @@ const Component: React.FC<{
             onClick={() => {
               setOpenModal(true);
             }}
-          >选择资源</Button>
+          >
+            选择资源
+          </Button>
         </div>
       )}
     </>

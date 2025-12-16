@@ -1,8 +1,8 @@
-import React from "react";
-import {TreeSelect} from "antd";
-import {useQuery} from "@tanstack/react-query";
-import {Api} from "@/lib/api.ts";
-import {convertDepartmentsToTreeData} from "@/lib/functions.tsx";
+import { useQuery } from '@tanstack/react-query';
+import { TreeSelect } from 'antd';
+import type React from 'react';
+import { Api } from '@/lib/api.ts';
+import { convertDepartmentsToTreeData } from '@/lib/functions.tsx';
 
 const Component: React.FC<{
   value?: string;
@@ -27,8 +27,14 @@ const Component: React.FC<{
       value={props.value}
       onChange={props.onChange}
       placeholder={props.placeholder}
-      treeData={convertDepartmentsToTreeData(data.data ?? [], null, props.allowTypes, props.bannedValues)}
+      treeData={convertDepartmentsToTreeData(
+        data.data ?? [],
+        null,
+        props.allowTypes,
+        props.bannedValues,
+      )}
       allowClear
+      treeDefaultExpandAll
     />
   );
 };
