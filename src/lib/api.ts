@@ -5,7 +5,7 @@ import type {
   CompanyListVO,
   CompanyStructureDepartmentUpdateVO,
   CompanyStructurePositionUpdateVO,
-  CompanyStructureVO,
+  CompanyStructureVO, EmployeeDataVO, EmployeeSearchResultItem,
   OSSUploadPresignArgs,
   UserInfoVO,
 } from '@/lib/types.ts';
@@ -157,7 +157,6 @@ export const uploadOss: <T = any>(
       'Content-Type': 'application/octet-stream',
       ...(headers ?? {}),
     },
-    // @ts-expect-error
     body: data,
   });
 
@@ -549,6 +548,57 @@ export const Api = {
             return request<void>({
               url: `/dashboard/core/company/structure/position/${id}`,
               method: 'DELETE',
+            });
+          },
+        },
+      },
+      employee: {
+        document: {
+          list: (page: PageQuery) => {
+            return requestPage<EmployeeSearchResultItem>(
+              {
+                url: '/dashboard/core/employee/document/',
+                method: 'POST',
+              },
+              page,
+            );
+          },
+          create: (phone: string, data: Record<string, any>) => {
+            return request({
+              url: `/dashboard/core/employee/document/`,
+              method: 'PUT',
+              data: {
+                phone,
+                data,
+              },
+            });
+          },
+          get: (id: string) => {
+            return request<EmployeeDataVO>({
+              url: `/dashboard/core/employee/document/${id}`,
+              method: 'GET',
+            });
+          },
+          update: (id: string, phone: string, data: Record<string, any>) => {
+            return request({
+              url: `/dashboard/core/employee/document/${id}`,
+              method: 'POST',
+              data: {
+                phone,
+                data,
+              },
+            });
+          },
+          delete: (id: string) => {
+            return request({
+              url: `/dashboard/core/employee/document/${id}`,
+              method: 'DELETE',
+            });
+          },
+          refreshBinding: (id: string) => {
+            return request({
+              url: `/dashboard/core/employee/document/${id}/refreshBinding`,
+              method: 'POST',
             });
           },
         },

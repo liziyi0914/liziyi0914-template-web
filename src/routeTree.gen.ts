@@ -21,6 +21,7 @@ import { Route as HomeTodoRouteImport } from './routes/_home/todo'
 import { Route as HomeTrainingIndexRouteImport } from './routes/_home/training/index'
 import { Route as DashboardSystemUserRouteImport } from './routes/dashboard/system/user'
 import { Route as DashboardSystemCompanyRouteImport } from './routes/dashboard/system/company'
+import { Route as DashboardCoreEmployeeDocumentRouteImport } from './routes/dashboard/core/employee/document'
 import { Route as DashboardCoreCompanyStructureRouteImport } from './routes/dashboard/core/company/structure'
 import { Route as DashboardCoreCompanyInfoRouteImport } from './routes/dashboard/core/company/info'
 import { Route as DashboardCoreCompanyAssetsRouteImport } from './routes/dashboard/core/company/assets'
@@ -84,6 +85,12 @@ const DashboardSystemCompanyRoute = DashboardSystemCompanyRouteImport.update({
   path: '/system/company',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardCoreEmployeeDocumentRoute =
+  DashboardCoreEmployeeDocumentRouteImport.update({
+    id: '/core/employee/document',
+    path: '/core/employee/document',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardCoreCompanyStructureRoute =
   DashboardCoreCompanyStructureRouteImport.update({
     id: '/core/company/structure',
@@ -118,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
   '/dashboard/core/company/info': typeof DashboardCoreCompanyInfoRoute
   '/dashboard/core/company/structure': typeof DashboardCoreCompanyStructureRoute
+  '/dashboard/core/employee/document': typeof DashboardCoreEmployeeDocumentRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
   '/dashboard/core/company/info': typeof DashboardCoreCompanyInfoRoute
   '/dashboard/core/company/structure': typeof DashboardCoreCompanyStructureRoute
+  '/dashboard/core/employee/document': typeof DashboardCoreEmployeeDocumentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -151,6 +160,7 @@ export interface FileRoutesById {
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
   '/dashboard/core/company/info': typeof DashboardCoreCompanyInfoRoute
   '/dashboard/core/company/structure': typeof DashboardCoreCompanyStructureRoute
+  '/dashboard/core/employee/document': typeof DashboardCoreEmployeeDocumentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/dashboard/core/company/assets'
     | '/dashboard/core/company/info'
     | '/dashboard/core/company/structure'
+    | '/dashboard/core/employee/document'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/dashboard/core/company/assets'
     | '/dashboard/core/company/info'
     | '/dashboard/core/company/structure'
+    | '/dashboard/core/employee/document'
   id:
     | '__root__'
     | '/_home'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/dashboard/core/company/assets'
     | '/dashboard/core/company/info'
     | '/dashboard/core/company/structure'
+    | '/dashboard/core/employee/document'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -296,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemCompanyRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/core/employee/document': {
+      id: '/dashboard/core/employee/document'
+      path: '/core/employee/document'
+      fullPath: '/dashboard/core/employee/document'
+      preLoaderRoute: typeof DashboardCoreEmployeeDocumentRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/core/company/structure': {
       id: '/dashboard/core/company/structure'
       path: '/core/company/structure'
@@ -344,6 +364,7 @@ interface DashboardRouteChildren {
   DashboardCoreCompanyAssetsRoute: typeof DashboardCoreCompanyAssetsRoute
   DashboardCoreCompanyInfoRoute: typeof DashboardCoreCompanyInfoRoute
   DashboardCoreCompanyStructureRoute: typeof DashboardCoreCompanyStructureRoute
+  DashboardCoreEmployeeDocumentRoute: typeof DashboardCoreEmployeeDocumentRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -354,6 +375,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardCoreCompanyAssetsRoute: DashboardCoreCompanyAssetsRoute,
   DashboardCoreCompanyInfoRoute: DashboardCoreCompanyInfoRoute,
   DashboardCoreCompanyStructureRoute: DashboardCoreCompanyStructureRoute,
+  DashboardCoreEmployeeDocumentRoute: DashboardCoreEmployeeDocumentRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

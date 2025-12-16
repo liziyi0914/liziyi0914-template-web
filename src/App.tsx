@@ -1,8 +1,8 @@
 import './App.css';
 import { ProConfigProvider } from '@ant-design/pro-components';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import AssetsPicker from '@/components/AssetsPicker.tsx';
-import DepartmentPicker from '@/components/DepartmentPicker.tsx';
+import AssetsPicker, {AssetsPickerView} from '@/components/AssetsPicker.tsx';
+import DepartmentPicker, {DepartmentPickerView} from '@/components/DepartmentPicker.tsx';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
 import { routeTree } from './routeTree.gen.ts';
@@ -32,11 +32,17 @@ const App = () => {
       <ProConfigProvider
         valueTypeMap={{
           assets: {
+            render: (text) => {
+              return <AssetsPickerView value={text} />;
+            },
             renderFormItem: (_, props) => {
               return <AssetsPicker {...props.fieldProps} />;
             },
           },
           department: {
+            render: (text) => {
+              return <DepartmentPickerView value={text} />;
+            },
             renderFormItem: (_, props) => {
               return <DepartmentPicker {...props.fieldProps} />;
             },

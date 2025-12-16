@@ -52,3 +52,41 @@ export type CompanyStructureDepartmentUpdateVO = {
   name: string;
   responsibilities?: string | null;
 };
+
+// EmployeeSearchRequest 类型定义
+export type EmployeeSearchRequest = {
+  id?: string | null;
+  name?: string | null;
+  phone?: string | null;
+  idCard?: string | null;
+  gender?: number | null;
+  careerRole?: string | null;
+  departmentPosition?: string | null;
+  isEmployed?: boolean | null;
+  isRegistered?: boolean | null;
+};
+
+// EmployeeSearchResultItem 类型定义
+export type EmployeeSearchResultItem = {
+  id: string;
+  name?: string | null;
+  phone: string;
+  idCard?: string | null;
+  gender?: number | null;
+  careerRole?: string | null;
+  departmentPosition?: string | null;
+  isEmployed?: boolean | null;
+  isRegistered: boolean;
+};
+
+// EmployeeEditRequest 类型定义
+export type EmployeeEditRequest = {
+  phone: string;
+  data: Record<string, any>; // 对应 Kotlin 中的 JsonNode，可以根据实际 JSON 结构进一步细化
+};
+
+export type EmployeeDataVO = {
+  id: string;
+  phone: string;
+  data: Record<string, any>;
+};

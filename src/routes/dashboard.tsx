@@ -5,9 +5,13 @@ import { atom, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import DashboardFramework from '@/components/DashboardFramework.tsx';
 import { Api } from '@/lib/api.ts';
+import NotFound from "@/components/NotFound.tsx";
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
+  notFoundComponent: () => (
+    <NotFound/>
+  ),
 });
 
 export const LoginState = atom<{

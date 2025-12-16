@@ -9,7 +9,7 @@ import { Icon } from '@iconify/react';
 import { useQuery } from '@tanstack/react-query';
 import { App, Button, Modal, Popover, Tabs, Upload } from 'antd';
 import CryptoJS from 'crypto-js';
-import { useState } from 'react';
+import {useMemo, useState} from 'react';
 import OssImage from '@/components/OssImage.tsx';
 import { Api, uploadOss } from '@/lib/api.ts';
 import type { OSSUploadPresignArgs } from '@/lib/types.ts';
@@ -210,7 +210,7 @@ const AssetsTable: React.FC<{
 
 const Component: React.FC<{
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value?: string) => void;
 }> = (props) => {
   const [openModal, setOpenModal] = useState(false);
 
@@ -248,8 +248,6 @@ const Component: React.FC<{
                 <AssetsTable
                   onChoose={(assetsId) => {
                     setOpenModal(false);
-                    console.log(props);
-                    console.log('choose', assetsId);
                     props.onChange?.(assetsId);
                   }}
                 />
@@ -262,8 +260,6 @@ const Component: React.FC<{
                 <UploadAssetsForm
                   onSuccess={(assetsId) => {
                     setOpenModal(false);
-                    console.log(props);
-                    console.log('choose', assetsId);
                     props.onChange?.(assetsId);
                   }}
                 />
@@ -282,13 +278,23 @@ const Component: React.FC<{
             </div>
           )}
           <div>{assetsInfo.data?.name}</div>
-          <Button
-            onClick={() => {
-              setOpenModal(true);
-            }}
-          >
-            更换
-          </Button>
+          <div className="flex gap-x-3">
+            <Button
+              onClick={() => {
+                setOpenModal(true);
+              }}
+            >
+              更换
+            </Button>
+            <Button
+              danger
+              onClick={() => {
+                props.onChange?.(undefined);
+              }}
+            >
+              删除
+            </Button>
+          </div>
         </div>
       )}
       {!props.value && (
@@ -302,6 +308,37 @@ const Component: React.FC<{
           </Button>
         </div>
       )}
+    </>
+  );
+};
+
+export const AssetsPickerView: React.FC<{
+  value?: string;
+}> = (props) => {
+  const assetsInfo = useQuery({
+    queryKey: ['assetsInfo', props.value],
+    queryFn: async () => {
+      if (!props.value) {
+        throw new Error('未选择资源');
+      }
+      const resp = await Api.common.getAssetsInfo(props.value);
+      if (resp.code !== 200) {
+        throw new Error(resp.msg || '获取资源信息失败');
+      }
+      return resp.data;
+    },
+  });
+
+  const name = useMemo(() => {
+    if (!assetsInfo.data) {
+      return '-';
+    }
+    return assetsInfo.data.name;
+  }, [assetsInfo.data]);
+
+  return (
+    <>
+      {name}
     </>
   );
 };
