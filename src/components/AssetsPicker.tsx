@@ -9,7 +9,7 @@ import { Icon } from '@iconify/react';
 import { useQuery } from '@tanstack/react-query';
 import { App, Button, Modal, Popover, Tabs, Upload } from 'antd';
 import CryptoJS from 'crypto-js';
-import {useMemo, useState} from 'react';
+import { useMemo, useState } from 'react';
 import OssImage from '@/components/OssImage.tsx';
 import { Api, uploadOss } from '@/lib/api.ts';
 import type { OSSUploadPresignArgs } from '@/lib/types.ts';
@@ -336,11 +336,7 @@ export const AssetsPickerView: React.FC<{
     return assetsInfo.data.name;
   }, [assetsInfo.data]);
 
-  return (
-    <>
-      {name}
-    </>
-  );
+  return <>{name}</>;
 };
 
 export default Component;

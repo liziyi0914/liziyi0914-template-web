@@ -1,9 +1,14 @@
-import {type ActionType, BetaSchemaForm, ProForm, ProTable} from '@ant-design/pro-components';
+import {
+  type ActionType,
+  BetaSchemaForm,
+  ProForm,
+  ProTable,
+} from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
-import {App, Button, Modal, Popconfirm, Tabs} from 'antd';
-import {useRef, useState} from "react";
-import {Api, type ApiResult} from "@/lib/api.ts";
-import {Icon} from "@iconify/react";
+import { App, Button, Modal, Popconfirm, Tabs } from 'antd';
+import { useRef, useState } from 'react';
+import { Api, type ApiResult } from '@/lib/api.ts';
 
 export const Route = createFileRoute('/dashboard/core/employee/document')({
   component: RouteComponent,
@@ -12,7 +17,9 @@ export const Route = createFileRoute('/dashboard/core/employee/document')({
 function RouteComponent() {
   const { message } = App.useApp();
   const actionRef = useRef<ActionType>(undefined);
-  const [employee, setEmployee] = useState<{ id?: string; data?: Record<string, any>; } | undefined>(undefined);
+  const [employee, setEmployee] = useState<
+    { id?: string; data?: Record<string, any> } | undefined
+  >(undefined);
 
   return (
     <div>
@@ -30,7 +37,7 @@ function RouteComponent() {
           grid
           initialValues={employee?.data ?? {}}
           onFinish={async (values) => {
-            let phone = values.phone;
+            const phone = values.phone;
             if (!phone) {
               return false;
             }
@@ -40,9 +47,16 @@ function RouteComponent() {
             let resp: ApiResult;
 
             if (employee?.id) {
-              resp = await Api.dashboard.core.employee.document.update(employee.id, phone, values);
+              resp = await Api.dashboard.core.employee.document.update(
+                employee.id,
+                phone,
+                values,
+              );
             } else {
-              resp = await Api.dashboard.core.employee.document.create(phone, values);
+              resp = await Api.dashboard.core.employee.document.create(
+                phone,
+                values,
+              );
             }
 
             if (resp.code === 200) {
@@ -169,13 +183,13 @@ function RouteComponent() {
                     dataIndex: 'educationLevel',
                     valueType: 'select',
                     valueEnum: {
-                      "primarySchool": "小学",
-                      "juniorHighSchool": "初中",
-                      "seniorHighSchool": "高中",
-                      "juniorCollege": "专科",
-                      "undergraduate": "本科",
-                      "graduate": "研究生",
-                      "secondaryVocationalSchool": "中专"
+                      primarySchool: '小学',
+                      juniorHighSchool: '初中',
+                      seniorHighSchool: '高中',
+                      juniorCollege: '专科',
+                      undergraduate: '本科',
+                      graduate: '研究生',
+                      secondaryVocationalSchool: '中专',
                     },
                     colProps: {
                       span: 12,
@@ -378,7 +392,7 @@ function RouteComponent() {
                     colProps: {
                       span: 12,
                     },
-                  }
+                  },
                 ]}
               />
             </div>
@@ -441,7 +455,8 @@ function RouteComponent() {
                                       vehicleAdministrator: '车辆管理人员',
                                       driver: '驾驶员',
                                       principalInCharge: '主要负责人',
-                                      vehicleStaffAdministrator: '车辆人员管理员',
+                                      vehicleStaffAdministrator:
+                                        '车辆人员管理员',
                                       generalStaff: '普通员工',
                                     },
                                     colProps: {
@@ -506,13 +521,13 @@ function RouteComponent() {
                                     dataIndex: 'educationLevel',
                                     valueType: 'select',
                                     valueEnum: {
-                                      "primarySchool": "小学",
-                                      "juniorHighSchool": "初中",
-                                      "seniorHighSchool": "高中",
-                                      "juniorCollege": "专科",
-                                      "undergraduate": "本科",
-                                      "graduate": "研究生",
-                                      "secondaryVocationalSchool": "中专"
+                                      primarySchool: '小学',
+                                      juniorHighSchool: '初中',
+                                      seniorHighSchool: '高中',
+                                      juniorCollege: '专科',
+                                      undergraduate: '本科',
+                                      graduate: '研究生',
+                                      secondaryVocationalSchool: '中专',
                                     },
                                     colProps: {
                                       span: 12,
@@ -770,7 +785,8 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'safetyManagementQualificationCertificate',
+                                    dataIndex:
+                                      'safetyManagementQualificationCertificate',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -791,7 +807,8 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'registeredSafetyEngineerCertificate',
+                                    dataIndex:
+                                      'registeredSafetyEngineerCertificate',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -845,7 +862,8 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'professionalQualificationCertificate',
+                                    dataIndex:
+                                      'professionalQualificationCertificate',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -866,7 +884,8 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'occupationalHazardsNotificationLetter',
+                                    dataIndex:
+                                      'occupationalHazardsNotificationLetter',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -953,7 +972,8 @@ function RouteComponent() {
                                 columns={[
                                   {
                                     title: '文件',
-                                    dataIndex: 'safetyManagementQualificationCertificate',
+                                    dataIndex:
+                                      'safetyManagementQualificationCertificate',
                                     valueType: 'assets',
                                     colProps: {
                                       span: 12,
@@ -1084,7 +1104,10 @@ function RouteComponent() {
                   type="link"
                   size="small"
                   onClick={async () => {
-                    let resp = await Api.dashboard.core.employee.document.refreshBinding(record.id);
+                    const resp =
+                      await Api.dashboard.core.employee.document.refreshBinding(
+                        record.id,
+                      );
                     if (resp.code === 200) {
                       message.success(`刷新成功`);
                       actionRef.current?.reload();
@@ -1097,7 +1120,7 @@ function RouteComponent() {
                   刷新绑定
                 </Button>
               </>
-            )
+            ),
           },
           {
             title: '操作',
@@ -1110,7 +1133,9 @@ function RouteComponent() {
                   onClick={async () => {
                     const loading = message.loading(`加载中...`, 0);
 
-                    let resp = await Api.dashboard.core.employee.document.get(record.id);
+                    const resp = await Api.dashboard.core.employee.document.get(
+                      record.id,
+                    );
 
                     loading();
 
@@ -1133,7 +1158,10 @@ function RouteComponent() {
                 <Popconfirm
                   title={`确定删除${record.phone}？`}
                   onConfirm={async () => {
-                    let resp = await Api.dashboard.core.employee.document.delete(record.id);
+                    const resp =
+                      await Api.dashboard.core.employee.document.delete(
+                        record.id,
+                      );
                     if (resp.code === 200) {
                       message.success('删除成功');
                       actionRef.current?.reload();
@@ -1147,14 +1175,12 @@ function RouteComponent() {
                     danger: true,
                   }}
                 >
-                  <Button
-                    type="link"
-                    size="small"
-                    danger
-                  >删除</Button>
+                  <Button type="link" size="small" danger>
+                    删除
+                  </Button>
                 </Popconfirm>
               </>
-            )
+            ),
           },
         ]}
       />

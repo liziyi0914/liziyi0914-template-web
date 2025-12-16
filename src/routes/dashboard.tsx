@@ -4,14 +4,12 @@ import { Spin, Watermark } from 'antd';
 import { atom, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import DashboardFramework from '@/components/DashboardFramework.tsx';
+import NotFound from '@/components/NotFound.tsx';
 import { Api } from '@/lib/api.ts';
-import NotFound from "@/components/NotFound.tsx";
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
-  notFoundComponent: () => (
-    <NotFound/>
-  ),
+  notFoundComponent: () => <NotFound />,
 });
 
 export const LoginState = atom<{

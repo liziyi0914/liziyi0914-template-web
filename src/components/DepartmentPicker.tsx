@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { TreeSelect } from 'antd';
-import React, {useMemo} from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { Api } from '@/lib/api.ts';
 import { convertDepartmentsToTreeData } from '@/lib/functions.tsx';
 
@@ -56,7 +57,7 @@ export const DepartmentPickerView: React.FC<{
   });
 
   const display = useMemo(() => {
-    if(!props.value) {
+    if (!props.value) {
       return '-';
     }
 
@@ -64,11 +65,11 @@ export const DepartmentPickerView: React.FC<{
       return '-';
     }
 
-    for (let item of data.data) {
+    for (const item of data.data) {
       if (item.id === props.value) {
         return item.name;
       }
-      for (let pos of item.positions ?? []) {
+      for (const pos of item.positions ?? []) {
         if (pos.id === props.value) {
           return `${item.name} - ${pos.name}`;
         }
@@ -78,9 +79,7 @@ export const DepartmentPickerView: React.FC<{
     return '-';
   }, [data, props.value]);
 
-  return (
-    <>{display}</>
-  );
+  return <>{display}</>;
 };
 
 export default Component;

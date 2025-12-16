@@ -5,7 +5,9 @@ import type {
   CompanyListVO,
   CompanyStructureDepartmentUpdateVO,
   CompanyStructurePositionUpdateVO,
-  CompanyStructureVO, EmployeeDataVO, EmployeeSearchResultItem,
+  CompanyStructureVO,
+  EmployeeDataVO,
+  EmployeeSearchResultItem,
   OSSUploadPresignArgs,
   UserInfoVO,
 } from '@/lib/types.ts';
