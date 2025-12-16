@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import {App, Button, Divider, Popconfirm, Result, Spin, Tree, type TreeDataNode} from "antd";
+import {App, Button, Divider, Modal, Popconfirm, Result, Spin, Tree, type TreeDataNode} from "antd";
 import {BetaSchemaForm, ModalForm, ProForm, type ProFormColumnsType} from "@ant-design/pro-components";
 import {Icon} from "@iconify/react";
 import {useQuery} from "@tanstack/react-query";
 import {Api} from "@/lib/api.ts";
-import {useEffect, useMemo, useState} from "react";
+import React, {type PropsWithChildren, useEffect, useMemo, useRef, useState} from "react";
 import {convertDepartmentsToTreeData} from "@/lib/functions.tsx";
+import html2canvas from "html2canvas-pro";
 
 export const Route = createFileRoute('/dashboard/core/company/structure')({
   component: RouteComponent,
@@ -84,6 +85,138 @@ const editPositionSchema: Array<ProFormColumnsType> = [
   },
 ];
 
+type GraphNodeType = {
+  name: string;
+  items?: Array<GraphNodeType>;
+  hiddenLeft?: boolean;
+  hiddenRight?: boolean;
+  hiddenAll?: boolean;
+};
+
+//first:*:data-children:before:hidden!
+const GraphNode: React.FC<PropsWithChildren<GraphNodeType>> = (props) => {
+  const [expand, setExpand] = useState(true);
+
+  const before = useMemo(() => {
+    if (props.hiddenAll) {
+      return '';
+    }
+    if (props.hiddenLeft) {
+      return 'before:border-r before:border-gray-500 before:absolute before:left-0 before:-top-4 before:w-1/2 before:h-4';
+    }
+    return 'before:border-t before:border-r before:border-gray-500 before:absolute before:left-0 before:-top-4 before:w-1/2 before:h-4';
+  }, [props]);
+
+  const after = useMemo(() => {
+    if (props.hiddenAll) {
+      return '';
+    }
+    if (props.hiddenRight) {
+      return 'after:border-l after:border-gray-500 after:absolute after:right-0 after:-top-4 after:w-1/2 after:h-4';
+    }
+    return 'after:border-t after:border-l after:border-gray-500 after:absolute after:right-0 after:-top-4 after:w-1/2 after:h-4';
+  }, [props]);
+
+  return (
+    <div className="inline-block relative px-1.5">
+      <div className="flex justify-center">
+        <div
+          className="inline-block bg-[#00a63e] text-white px-4 py-2 shadow-md rounded-md cursor-pointer select-none"
+          onClick={() => {
+            setExpand(!expand);
+          }}
+        >
+          {props.name}
+        </div>
+      </div>
+
+      {(props.items?.length ?? 0) > 0 && !expand && (
+        <div className="absolute left-1/2 pt-1 -translate-x-1/2 text-lg text-gray-400">
+          <Icon icon="prime:plus-circle" />
+        </div>
+      )}
+
+      {(props.items?.length ?? 0) > 0 && expand && (
+        <div className="absolute left-1/2 -translate-x-1/2 border h-4 border-gray-500">
+        </div>
+      )}
+
+      <div
+        className={`pt-8 flex ${before} ${after}`}
+      >
+        {expand && (
+          <>
+            {props.items?.map((item, index) => (
+              <GraphNode
+                key={index}
+                name={item.name}
+                items={item.items}
+                hiddenLeft={index === 0}
+                hiddenRight={index === props.items!.length - 1}
+              />
+            ))}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const StructureGraph: React.FC<{
+  companyName: string;
+  tree: TreeDataNode[];
+}> = (props) => {
+  const divRef = useRef<HTMLDivElement>(null);
+
+  type TreeNode = {
+    name: string;
+    items?: TreeNode[];
+  };
+  const mapTree = (tree: TreeDataNode[]) => {
+    return tree.map((item): TreeNode => {
+      return {
+        name: item.title as string,
+        items: item.children ? mapTree(item.children.filter(i => `${i.key}`.startsWith('department.'))) : [],
+      };
+    });
+  };
+
+  return (
+    <div>
+      <div className="flex gap-x-3">
+        <Button
+          onClick={()=>{
+            if (divRef.current) {
+              html2canvas(divRef.current, {
+                useCORS: true,
+                scale: 10,
+              }).then((canvas) => {
+                const image = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'structure.png';
+                link.href = image;
+                link.click();
+                link.remove();
+              });
+            }
+          }}
+        >导出图片</Button>
+      </div>
+      <div
+        className="max-h-[70vh] overflow-auto text-center"
+      >
+        <div className="inline-block text-start p-3" ref={divRef}>
+          <GraphNode
+            name={props.companyName}
+            hiddenAll={true}
+            items={mapTree(props.tree)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function RouteComponent() {
   const {message} = App.useApp();
   const departments = useQuery({
@@ -97,6 +230,8 @@ function RouteComponent() {
     }
   });
 
+  const [form] = ProForm.useForm();
+
   const tree = useMemo<TreeDataNode[]>(()=>{
     if (!departments.isSuccess || !departments.data) {
       return [];
@@ -108,9 +243,7 @@ function RouteComponent() {
   }, [departments]);
 
   const [selectedKey, setSelectedKey] = useState<string>();
-  // const [, setInitialValues] = useState<any>();
-
-  const [form] = ProForm.useForm();
+  const [openStructureModal, setOpenStructureModal] = useState(false);
 
   const initialValues = useMemo(() => {
     if (selectedKey && departments.isSuccess && departments.data) {
@@ -165,10 +298,30 @@ function RouteComponent() {
       )}
       {departments.isSuccess && (
         <div>
+          <Modal
+            open={openStructureModal}
+            title="架构图"
+            destroyOnHidden
+            width="80vw"
+            footer={null}
+            onCancel={() => {
+              setOpenStructureModal(false);
+            }}
+          >
+            <StructureGraph
+              companyName={"企业"}
+              tree={tree}
+            />
+          </Modal>
+
           <div className="flex">
             <div className="w-72">
               <div className="pb-3 flex gap-x-2">
-                <Button>生成架构图</Button>
+                <Button
+                  onClick={() => {
+                    setOpenStructureModal(true);
+                  }}
+                >架构图</Button>
                 <div className="grow"></div>
                 <ModalForm
                   title="添加部门"
