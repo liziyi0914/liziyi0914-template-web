@@ -630,6 +630,28 @@ function RouteComponent() {
                                       span: 12,
                                     },
                                   },
+                                  {
+                                    valueType: 'ai',
+                                    fieldProps: {
+                                      assets: 'idCardFile',
+                                      columns: [
+                                        {
+                                          title: '身份证号',
+                                          dataIndex: 'idCard',
+                                          valueType: 'text',
+                                        },
+                                        {
+                                          title: '性别',
+                                          dataIndex: 'gender',
+                                          valueType: 'select',
+                                          valueEnum: {
+                                            '0': '男',
+                                            '1': '女',
+                                          },
+                                        },
+                                      ],
+                                    },
+                                  },
                                 ]}
                               />
                             </div>

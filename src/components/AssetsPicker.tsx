@@ -135,7 +135,7 @@ export const UploadAssetsForm: React.FC<{
       <ProFormSelect
         name="fileType"
         label="文件类型"
-        initialValue={fileType?.[0]}
+        initialValue={fileType?.[0]?.value}
         options={fileType}
         rules={[
           {
@@ -268,6 +268,7 @@ const Component: React.FC<{
         return resp.data;
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const [libCache, setLibCache] = useState(props.value);
@@ -407,6 +408,7 @@ export const AssetsPickerView: React.FC<{
         return resp.data;
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const name = useMemo(() => {

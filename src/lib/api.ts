@@ -11,6 +11,7 @@ import type {
   OSSUploadPresignArgs,
   UserInfoVO,
 } from '@/lib/types.ts';
+import type {ProFormColumnsType} from "@ant-design/pro-components";
 
 export interface ApiResult<T = any> {
   code: number;
@@ -249,6 +250,17 @@ export const Api = {
       >({
         url: '/common/departments',
         method: 'GET',
+      });
+    },
+    requestAiInForm: (prompts: string, assets: string, columns: ProFormColumnsType[]) => {
+      return request<Record<string, any>>({
+        url: '/common/ai/form',
+        method: 'POST',
+        data: {
+          prompts,
+          assets,
+          columns,
+        },
       });
     },
   },

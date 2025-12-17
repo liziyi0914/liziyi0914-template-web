@@ -8,6 +8,7 @@ import DepartmentPicker, {
 import { ThemeProvider } from '@/components/theme-provider.tsx';
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
 import { routeTree } from './routeTree.gen.ts';
+import AiFormItem from "@/components/AiFormItem.tsx";
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({
@@ -47,6 +48,11 @@ const App = () => {
             },
             renderFormItem: (_, props) => {
               return <DepartmentPicker {...props.fieldProps} />;
+            },
+          },
+          ai: {
+            renderFormItem: (_, props) => {
+              return <AiFormItem {...props.fieldProps} />;
             },
           },
         }}

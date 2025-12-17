@@ -100,6 +100,7 @@ function RouteComponent() {
                     actionRef.current?.reload();
                     return true;
                   }
+                  message.error(`重命名失败: ${resp.msg}`);
                   return false;
                 }}
               >
