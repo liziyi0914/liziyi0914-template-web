@@ -5,6 +5,7 @@ import {useCallback} from "react";
 import * as XLSX from 'xlsx';
 import {day} from "@/lib/utils.ts";
 import * as _ from 'lodash';
+import {ProTable} from "@ant-design/pro-components";
 
 const columns2headInfo = (columns: ColumnsType[]) => {
   let headers: Array<Array<string | undefined>> = [[]];
@@ -188,6 +189,19 @@ const formatData = (columns: ColumnsType[], data: Record<string, any>) => {
           [key]: d,
         });
       }
+      case 'date': {
+        try {
+          let t = day(value);
+          if (t.isValid()) {
+            return _.assign(result, {
+              [key]: t.format('YYYY-MM-DD'),
+            });
+          }
+        } catch (e) {
+        }
+
+        return result;
+      }
       case 'select': {
         let valueEnum = typeof column.valueEnum === 'function' ? column.valueEnum(data) : column.valueEnum;
         if (valueEnum) {
@@ -282,18 +296,35 @@ function Component<T = Record<string, any>>(props: {
         dataList.push(formatData(head.mappings, data));
       }
 
-      let counts = await props.onImport(dataList as any);
+      modal.confirm({
+        title: `确定要导入 ${dataList.length} 条数据吗？`,
+        width: '100vw',
+        content: (
+          <div>
+            <ProTable
+              columns={head.mappings as any}
+              scroll={{ x: 'max-content' }}
+              dataSource={dataList}
+              pagination={false}
+            />
+          </div>
+        ),
+        okText: '确定',
+        onOk: async () => {
+          let counts = await props.onImport(dataList as any);
 
-      modal.info({
-        content: `成功导入 ${counts.success} 条数据, 失败 ${counts.failure} 条数据`,
-        onOk: () => {
-          props.afterImport?.();
+          modal.info({
+            content: `成功导入 ${counts.success} 条数据, 失败 ${counts.failure} 条数据`,
+            onOk: () => {
+              props.afterImport?.();
+            },
+            onCancel: () => {
+              props.afterImport?.();
+            },
+            maskClosable: true,
+          });
         },
-        onCancel: () => {
-          props.afterImport?.();
-        },
-        maskClosable: true,
-      });
+      })
     } catch (e) {
       loading();
 
