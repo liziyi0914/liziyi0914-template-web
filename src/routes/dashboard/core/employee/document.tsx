@@ -251,6 +251,13 @@ const columns: ColumnsType[] = [
               assets: 'idCardFile',
               columns: [
                 {
+                  title: '姓名',
+                  dataIndex: 'name',
+                  colProps: {
+                    span: 12,
+                  },
+                },
+                {
                   title: '身份证号',
                   dataIndex: 'idCard',
                   valueType: 'text',

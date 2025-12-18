@@ -6,7 +6,7 @@ import type {
   CompanyListVO,
   CompanyStructureDepartmentUpdateVO,
   CompanyStructurePositionUpdateVO,
-  CompanyStructureVO,
+  CompanyStructureVO, DepartmentInfoVO,
   EmployeeDataVO,
   EmployeeSearchResultItem,
   OSSUploadPresignArgs,
@@ -237,17 +237,7 @@ export const Api = {
       });
     },
     getDepartments: () => {
-      return request<
-        {
-          id: string;
-          name: string;
-          parent?: string;
-          positions?: Array<{
-            id: string;
-            name: string;
-          }>;
-        }[]
-      >({
+      return request<DepartmentInfoVO[]>({
         url: '/common/departments',
         method: 'GET',
       });
@@ -473,7 +463,10 @@ export const Api = {
       company: {
         info: {
           get: () => {
-            return request({
+            return request<{
+              companyName: string;
+              data: any;
+            }>({
               url: '/dashboard/core/company/info/',
               method: 'GET',
             });

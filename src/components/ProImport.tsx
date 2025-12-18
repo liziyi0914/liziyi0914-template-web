@@ -1,11 +1,12 @@
 import {App, Button, Upload} from "antd";
 import {Icon} from "@iconify/react";
-import type {ColumnsType} from "@/lib/types.ts";
+import type {ColumnsType, DepartmentInfoVO} from "@/lib/types.ts";
 import {useCallback} from "react";
 import * as XLSX from 'xlsx';
 import {day} from "@/lib/utils.ts";
 import * as _ from 'lodash';
 import {ProTable} from "@ant-design/pro-components";
+import {Api} from "@/lib/api.ts";
 
 const columns2headInfo = (columns: ColumnsType[]) => {
   let headers: Array<Array<string | undefined>> = [[]];
@@ -148,7 +149,15 @@ const columns2sheet = (ws: XLSX.WorkSheet, columns: ColumnsType[]) => {
   XLSX.utils.decode_range('');
 };
 
-const formatData = (columns: ColumnsType[], data: Record<string, any>) => {
+const formatData = async (columns: ColumnsType[], data: Record<string, any>) => {
+  let departments: DepartmentInfoVO[] = [];
+  if (columns.filter(i => i.valueType === 'department').length > 0) {
+    let resp = await Api.common.getDepartments();
+    if (resp.code === 200 && resp.data) {
+      departments = resp.data;
+    }
+  }
+
   return _.reduce(data, (result, value, key) => {
     let column = columns.filter(c => c.dataIndex === key)?.[0];
 
@@ -202,6 +211,19 @@ const formatData = (columns: ColumnsType[], data: Record<string, any>) => {
 
         return result;
       }
+      case 'dateTime': {
+        try {
+          let t = day(value);
+          if (t.isValid()) {
+            return _.assign(result, {
+              [key]: t.format('YYYY-MM-DD HH:mm:ss'),
+            });
+          }
+        } catch (e) {
+        }
+
+        return result;
+      }
       case 'select': {
         let valueEnum = typeof column.valueEnum === 'function' ? column.valueEnum(data) : column.valueEnum;
         if (valueEnum) {
@@ -223,6 +245,29 @@ const formatData = (columns: ColumnsType[], data: Record<string, any>) => {
         }
 
         return result;
+      }
+      case 'department': {
+        let parts = `${value}`.split('-').map(i => i.trim());
+
+        let department: DepartmentInfoVO | undefined;
+        let position: (DepartmentInfoVO['positions'] extends Array<infer T> | undefined ? T : undefined) | undefined;
+
+        if (parts.length >= 1) {
+          department = departments.filter(i => i.name === parts[0])?.[0];
+        } else {
+          return result;
+        }
+
+        if (parts.length >= 2 && department) {
+          position = department.positions?.filter(i => i.name === parts[1])?.[0];
+          return _.assign(result, {
+            [key]: `${position?.id}`,
+          });
+        } else {
+          return _.assign(result, {
+            [key]: `${department?.id}`,
+          });
+        }
       }
       default: {
         return _.assign(result, {
@@ -293,7 +338,7 @@ function Component<T = Record<string, any>>(props: {
         for (let j = 0; j < row.length; j++) {
           data[`${head.mappings[j].dataIndex ?? '?'}`] = row[j];
         }
-        dataList.push(formatData(head.mappings, data));
+        dataList.push(await formatData(head.mappings, data));
       }
 
       if (dataList.length === 0) {

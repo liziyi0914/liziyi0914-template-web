@@ -115,3 +115,13 @@ export type EmployeeDataVO = {
   phone: string;
   data: Record<string, any>;
 };
+
+export type DepartmentInfoVO = {
+  id: string;
+  name: string;
+  parent?: string;
+  positions?: Array<{
+    id: string;
+    name: string;
+  }>;
+};

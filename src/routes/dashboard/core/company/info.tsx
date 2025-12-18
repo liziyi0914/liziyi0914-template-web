@@ -17,13 +17,20 @@ function RouteComponent() {
       form={form}
       request={async () => {
         const resp = await Api.dashboard.core.company.info.get();
-        if (resp.code === 200) {
-          return resp.data;
+        if (resp.code === 200 && resp.data) {
+          return {
+            ...resp.data.data,
+            companyName: resp.data.companyName,
+          };
         }
         return {};
       }}
       onFinish={async (values) => {
-        const resp = await Api.dashboard.core.company.info.update(values);
+        let v = values;
+        delete v.companyName;
+        const resp = await Api.dashboard.core.company.info.update({
+          data: v,
+        });
         if (resp.code === 200) {
           message.success('保存成功');
         } else {
@@ -105,7 +112,7 @@ function RouteComponent() {
           {
             title: '经营许可证有效期',
             dataIndex: 'businessPermitExpiry',
-            valueType: 'date',
+            valueType: 'validDateRange',
             colProps: {
               span: 12,
             },
@@ -194,6 +201,80 @@ function RouteComponent() {
             valueType: '#assets',
             colProps: {
               span: 12,
+            },
+          },
+          {
+            valueType: '#ai',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              label: '营业执照',
+              assets: 'businessLicenseFile',
+              columns: [
+                {
+                  title: '企业类型',
+                  dataIndex: 'companyType',
+                  colProps: {
+                    span: 12,
+                  },
+                },
+                {
+                  title: '法人姓名',
+                  dataIndex: 'legalRepresentativeName',
+                  colProps: {
+                    span: 12,
+                  },
+                },
+                {
+                  title: '社会信用代码',
+                  dataIndex: 'socialCreditCode',
+                  colProps: {
+                    span: 12,
+                  },
+                },
+                {
+                  title: '企业地址',
+                  dataIndex: 'companyAddress',
+                  colProps: {
+                    span: 24,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            valueType: '#ai',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              label: '经营许可证',
+              assets: 'businessPermitFile',
+              columns: [
+                {
+                  title: '经营许可证号',
+                  dataIndex: 'businessPermitNumber',
+                  colProps: {
+                    span: 12,
+                  },
+                },
+                {
+                  title: '经营许可范围',
+                  dataIndex: 'businessScope',
+                  colProps: {
+                    span: 12,
+                  },
+                },
+                {
+                  title: '经营许可证有效期',
+                  dataIndex: 'businessPermitExpiry',
+                  valueType: 'validDateRange',
+                  colProps: {
+                    span: 12,
+                  },
+                },
+              ],
             },
           },
         ]}
