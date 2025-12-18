@@ -631,6 +631,14 @@ function RouteComponent() {
                                     },
                                   },
                                   {
+                                    title: '有效期',
+                                    dataIndex: 'idCardValidDate',
+                                    valueType: 'validDateRange',
+                                    colProps: {
+                                      span: 12,
+                                    },
+                                  },
+                                  {
                                     valueType: 'ai',
                                     fieldProps: {
                                       assets: 'idCardFile',
@@ -648,6 +656,11 @@ function RouteComponent() {
                                             '0': '男',
                                             '1': '女',
                                           },
+                                        },
+                                        {
+                                          title: '有效期',
+                                          dataIndex: 'idCardValidDate',
+                                          valueType: 'validDateRange',
                                         },
                                       ],
                                     },

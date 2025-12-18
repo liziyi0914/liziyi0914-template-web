@@ -1,14 +1,15 @@
 import './App.css';
 import { ProConfigProvider } from '@ant-design/pro-components';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import AssetsPicker, { AssetsPickerView } from '@/components/AssetsPicker.tsx';
+import AssetsPicker, { AssetsPickerView } from '@/components/formItem/AssetsPicker.tsx';
 import DepartmentPicker, {
   DepartmentPickerView,
-} from '@/components/DepartmentPicker.tsx';
+} from '@/components/formItem/DepartmentPicker.tsx';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
 import { routeTree } from './routeTree.gen.ts';
-import AiFormItem from "@/components/AiFormItem.tsx";
+import AiFormItem from "@/components/formItem/AiFormItem.tsx";
+import ValidDateRange, {ValidDateRangeView} from "@/components/formItem/ValidDateRange.tsx";
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({
@@ -49,6 +50,14 @@ const App = () => {
             renderFormItem: (_, props) => {
               return <DepartmentPicker {...props.fieldProps} />;
             },
+          },
+          validDateRange: {
+            render: (text) => {
+              return <ValidDateRangeView value={text} />;
+            },
+            renderFormItem: (_, props) => {
+              return <ValidDateRange {...props.fieldProps} />;
+            }
           },
           ai: {
             renderFormItem: (_, props) => {

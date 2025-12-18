@@ -1,9 +1,14 @@
 import {App, Button} from "antd";
 import {Icon} from "@iconify/react";
-import {ModalForm, ProForm, type ProFormColumnsType, ProFormTextArea} from "@ant-design/pro-components";
-import {useCallback} from "react";
+import {
+  ModalForm,
+  ProDescriptions,
+  ProForm,
+  type ProFormColumnsType,
+  ProFormTextArea
+} from "@ant-design/pro-components";
+import {useCallback, useState} from "react";
 import {Api} from "@/lib/api.ts";
-import * as _ from 'lodash';
 
 const Component: React.FC<{
   label?: string;
@@ -12,6 +17,8 @@ const Component: React.FC<{
 }> = (props) => {
   const { message, modal } = App.useApp();
   const form = ProForm.useFormInstance();
+
+  const [lockModal, setLockModal] = useState(false);
 
   const fetchAi = useCallback(async (prompts: string)=>{
     if (!props.assets) {
@@ -62,15 +69,12 @@ const Component: React.FC<{
       modal.confirm({
         title: '确定填入以下内容：',
         content: (
-          <div className="flex flex-col gap-y-1">
-            {_.keys(result).map(k => (
-              <div key={k} className="flex px-3 py-1 rounded-md hover:bg-gray-500/10 transform duration-100 ease-in-out">
-                <div className="font-semibold">{props.columns?.filter(i => i.dataIndex === k)?.[0]?.title?.toString() ?? k}</div>
-                <div className="pr-4">:</div>
-                <div>{display[k]}</div>
-              </div>
-            ))}
-          </div>
+          <ProDescriptions
+            dataSource={result}
+            column={1}
+            columns={props.columns as any ?? []}
+          >
+          </ProDescriptions>
         ),
         onOk: async () => {
           form.setFieldsValue(result);
@@ -89,18 +93,44 @@ const Component: React.FC<{
     <ModalForm
       title={props.label ?? 'AI填写'}
       onFinish={async (values) => {
-        return await fetchAi(values?.prompts ?? '');
+        setLockModal(true);
+        let resp = await fetchAi(values?.prompts ?? '');
+        setLockModal(false);
+        return resp;
       }}
       trigger={(
         <Button
           icon={<Icon icon="octicon:sparkles-fill-24" />}
         >{props.label ?? 'AI填写'}</Button>
       )}
+      submitter={{
+        searchConfig: {
+        },
+        resetButtonProps: {
+          className: 'hidden',
+        },
+        render: (props) => {
+          return [
+            <Button
+              key="submit"
+              type="primary"
+              htmlType="submit"
+              loading={lockModal}
+              onClick={()=>{
+                props.submit();
+              }}
+            >提交</Button>,
+          ];
+        }
+      }}
       modalProps={{
         destroyOnHidden: true,
+        closable: !lockModal,
+        maskClosable: !lockModal,
       }}
     >
       <ProFormTextArea
+        disabled={lockModal}
         name="prompts"
         label="提示词"
         placeholder="请输入"

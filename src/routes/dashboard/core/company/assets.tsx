@@ -8,7 +8,7 @@ import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { App, Button, Modal, Popconfirm, Popover } from 'antd';
 import { useRef, useState } from 'react';
-import { UploadAssetsForm } from '@/components/AssetsPicker.tsx';
+import { UploadAssetsForm } from '@/components/formItem/AssetsPicker.tsx';
 import OssImage from '@/components/OssImage.tsx';
 import { Api } from '@/lib/api.ts';
 
