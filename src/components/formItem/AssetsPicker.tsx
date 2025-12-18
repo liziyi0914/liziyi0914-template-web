@@ -9,7 +9,7 @@ import { Icon } from '@iconify/react';
 import { useQuery } from '@tanstack/react-query';
 import { App, Button, Modal, Popover, Tabs, Upload } from 'antd';
 import CryptoJS from 'crypto-js';
-import {useEffect, useMemo, useState} from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import OssImage from '@/components/OssImage.tsx';
 import { Api, uploadOss } from '@/lib/api.ts';
 import type { OSSUploadPresignArgs } from '@/lib/types.ts';
@@ -19,8 +19,7 @@ const fileTypeMap = {
   'video/*': '视频',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
     'Word',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-    'Excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel',
   'application/pdf': 'PDF',
 };
 
@@ -31,7 +30,7 @@ export const UploadAssetsForm: React.FC<{
   const { message } = App.useApp();
   const [file, setFile] = useState<File>();
 
-  const fileType = useMemo(()=> {
+  const fileType = useMemo(() => {
     const base = [
       {
         label: '图片',
@@ -61,7 +60,9 @@ export const UploadAssetsForm: React.FC<{
       return base;
     }
 
-    return base.filter((item) => props.allowFileTypes?.includes(item.value as any));
+    return base.filter((item) =>
+      props.allowFileTypes?.includes(item.value as any),
+    );
   }, [props.allowFileTypes]);
 
   return (
@@ -179,7 +180,9 @@ const AssetsTable: React.FC<{
   allowFileTypes?: Array<keyof typeof fileTypeMap>;
 }> = (props) => {
   const { message } = App.useApp();
-  const [selectedRowKeys, setSelectedRowKeys] = useState(props.value?.split(';') ?? []);
+  const [selectedRowKeys, setSelectedRowKeys] = useState(
+    props.value?.split(';') ?? [],
+  );
 
   useEffect(() => {
     props.onChange?.(selectedRowKeys?.join(';'));
@@ -199,7 +202,12 @@ const AssetsTable: React.FC<{
             }
           }
 
-          if (props.allowFileTypes && rows.filter((row) => !props.allowFileTypes?.includes(row.fileType as any)).length > 0) {
+          if (
+            props.allowFileTypes &&
+            rows.filter(
+              (row) => !props.allowFileTypes?.includes(row.fileType as any),
+            ).length > 0
+          ) {
             message.error('不可选择此文件类型');
             return;
           }
@@ -259,7 +267,9 @@ const Component: React.FC<{
         throw new Error('未选择资源');
       }
 
-      let awaits = await Promise.all(props.value.split(';').map(Api.common.getAssetsInfo));
+      const awaits = await Promise.all(
+        props.value.split(';').map(Api.common.getAssetsInfo),
+      );
 
       return awaits.map((resp) => {
         if (resp.code !== 200) {
@@ -274,7 +284,7 @@ const Component: React.FC<{
   const [libCache, setLibCache] = useState(props.value);
 
   const cacheFileList = useMemo(() => {
-    return assetsInfoList.data?.map(info => {
+    return assetsInfoList.data?.map((info) => {
       if (!info) {
         return <div>资源获取失败</div>;
       }
@@ -352,9 +362,7 @@ const Component: React.FC<{
 
       {props.value && (
         <div>
-          <div>
-            {cacheFileList}
-          </div>
+          <div>{cacheFileList}</div>
           <div className="flex gap-x-3">
             <Button
               onClick={() => {
@@ -399,7 +407,9 @@ export const AssetsPickerView: React.FC<{
         throw new Error('未选择资源');
       }
 
-      let awaits = await Promise.all(props.value.split(';').map(Api.common.getAssetsInfo));
+      const awaits = await Promise.all(
+        props.value.split(';').map(Api.common.getAssetsInfo),
+      );
 
       return awaits.map((resp) => {
         if (resp.code !== 200) {
@@ -416,8 +426,8 @@ export const AssetsPickerView: React.FC<{
       return '-';
     }
     return assetsInfoList.data
-      .map(i => i?.name)
-      .filter(i => !!i)
+      .map((i) => i?.name)
+      .filter((i) => !!i)
       .join('、');
   }, [assetsInfoList.data]);
 

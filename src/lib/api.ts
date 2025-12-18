@@ -1,3 +1,4 @@
+import type { ProFormColumnsType } from '@ant-design/pro-components';
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { BACKEND_URL } from '@/lib/constants';
 import type {
@@ -11,7 +12,6 @@ import type {
   OSSUploadPresignArgs,
   UserInfoVO,
 } from '@/lib/types.ts';
-import type {ProFormColumnsType} from "@ant-design/pro-components";
 
 export interface ApiResult<T = any> {
   code: number;
@@ -252,7 +252,11 @@ export const Api = {
         method: 'GET',
       });
     },
-    requestAiInForm: (prompts: string, assets: string, columns: ProFormColumnsType[]) => {
+    requestAiInForm: (
+      prompts: string,
+      assets: string,
+      columns: ProFormColumnsType[],
+    ) => {
       return request<Record<string, any>>({
         url: '/common/ai/form',
         method: 'POST',

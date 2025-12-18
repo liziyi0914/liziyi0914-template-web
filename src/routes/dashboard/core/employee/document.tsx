@@ -1,14 +1,10 @@
-import {
-  type ActionType,
-  ProForm,
-  ProTable,
-} from '@ant-design/pro-components';
+import { type ActionType, ProForm, ProTable } from '@ant-design/pro-components';
 import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { App, Button, Modal, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
+import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
 import { Api, type ApiResult } from '@/lib/api.ts';
-import GroupedEmbedSchemaForm from "@/components/GroupedEmbedSchemaForm.tsx";
 
 export const Route = createFileRoute('/dashboard/core/employee/document')({
   component: RouteComponent,
@@ -130,8 +126,7 @@ function RouteComponent() {
                             vehicleAdministrator: '车辆管理人员',
                             driver: '驾驶员',
                             principalInCharge: '主要负责人',
-                            vehicleStaffAdministrator:
-                              '车辆人员管理员',
+                            vehicleStaffAdministrator: '车辆人员管理员',
                             generalStaff: '普通员工',
                           },
                           colProps: {
@@ -457,7 +452,8 @@ function RouteComponent() {
                       columns: [
                         {
                           title: '文件',
-                          dataIndex: 'safetyManagementQualificationCertificateFile',
+                          dataIndex:
+                            'safetyManagementQualificationCertificateFile',
                           valueType: 'assets',
                           colProps: {
                             span: 12,
@@ -534,7 +530,8 @@ function RouteComponent() {
                       columns: [
                         {
                           title: '文件',
-                          dataIndex: 'occupationalHazardsNotificationLetterFile',
+                          dataIndex:
+                            'occupationalHazardsNotificationLetterFile',
                           valueType: 'assets',
                           colProps: {
                             span: 12,
@@ -588,7 +585,6 @@ function RouteComponent() {
                   ],
                 },
 
-
                 {
                   valueType: '#tabGroup',
                   group: {
@@ -605,7 +601,8 @@ function RouteComponent() {
                       columns: [
                         {
                           title: '文件',
-                          dataIndex: 'safetyManagementQualificationCertificateFile',
+                          dataIndex:
+                            'safetyManagementQualificationCertificateFile',
                           valueType: 'assets',
                           colProps: {
                             span: 12,
