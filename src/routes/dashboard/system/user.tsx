@@ -207,13 +207,6 @@ function RouteComponent() {
             onImport={async (list) => {
               let li = list.filter(i => i?.name && i?.phone && i?.idCard);
 
-              if (li.length === 0) {
-                return {
-                  success: 0,
-                  failure: list.length,
-                };
-              }
-
               let resp = await Api.dashboard.system.user.create(li.map(i => ({
                 name: i.name,
                 phone: i.phone,

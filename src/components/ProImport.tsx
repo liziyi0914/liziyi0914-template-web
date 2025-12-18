@@ -296,6 +296,13 @@ function Component<T = Record<string, any>>(props: {
         dataList.push(formatData(head.mappings, data));
       }
 
+      if (dataList.length === 0) {
+        loading();
+
+        message.error('导入失败: 数据为空');
+        return;
+      }
+
       modal.confirm({
         title: `确定要导入 ${dataList.length} 条数据吗？`,
         width: '100vw',

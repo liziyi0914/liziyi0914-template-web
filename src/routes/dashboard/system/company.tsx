@@ -131,13 +131,6 @@ function RouteComponent() {
             onImport={async (list) => {
               let li = list.filter(i => !!i?.companyName);
 
-              if (li.length === 0) {
-                return {
-                  success: 0,
-                  failure: list.length,
-                };
-              }
-
               let resp = await Api.dashboard.system.company.create(li.map(i => ({
                 companyName: i.companyName,
                 companyRegCode: i?.['companyRegCode'],
