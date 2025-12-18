@@ -1,3 +1,14 @@
+import type {ProFormColumnsType} from "@ant-design/pro-components";
+
+export type FormFieldType = 'text' | 'group' | 'formList' | 'formSet' | 'divider' | 'dependency' | '#tabGroup' | 'assets' | 'department' | 'validDateRange' | 'ai';
+export type ColumnsType<T = any, ValueType = FormFieldType> = Omit<ProFormColumnsType<T, ValueType>, 'columns'> & {
+  columns?: ColumnsType<T, ValueType | FormFieldType>[];
+  group?: {
+    title?: string;
+    id?: string;
+  };
+};
+
 export type CompanyListVO = {
   id: string;
   name: string;
