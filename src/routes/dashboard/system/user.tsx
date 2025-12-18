@@ -10,6 +10,7 @@ import { App, Button, Modal } from 'antd';
 import { useRef, useState } from 'react';
 import { Api, type ApiResult } from '@/lib/api.ts';
 import type { UserInfoVO } from '@/lib/types.ts';
+import ProImport from "@/components/ProImport.tsx";
 
 export const Route = createFileRoute('/dashboard/system/user')({
   component: RouteComponent,
@@ -156,12 +157,87 @@ function RouteComponent() {
           >
             添加
           </Button>,
-          <Button key="import" icon={<Icon icon="bx:import" />} disabled>
-            导入
-          </Button>,
-          <Button key="download_import_template" disabled>
-            下载导入模板
-          </Button>,
+          <ProImport
+            title="用户"
+            columns={[
+              {
+                title: '姓名',
+                dataIndex: 'name',
+                formItemProps: {
+                  required: true,
+                  rules: [
+                    {
+                      required: true,
+                      message: '姓名不能为空',
+                    },
+                  ],
+                },
+              },
+              {
+                title: '手机号',
+                dataIndex: 'phone',
+                formItemProps: {
+                  required: true,
+                  rules: [
+                    {
+                      required: true,
+                      message: '手机号不能为空',
+                    },
+                  ],
+                },
+              },
+              {
+                title: '身份证',
+                dataIndex: 'idCard',
+                formItemProps: {
+                  required: true,
+                  rules: [
+                    {
+                      required: true,
+                      message: '身份证不能为空',
+                    },
+                  ],
+                },
+              },
+              {
+                title: '企业',
+                dataIndex: 'company',
+              },
+            ]}
+            onImport={async (list) => {
+              let li = list.filter(i => i?.name && i?.phone && i?.idCard);
+
+              if (li.length === 0) {
+                return {
+                  success: 0,
+                  failure: list.length,
+                };
+              }
+
+              let resp = await Api.dashboard.system.user.create(li.map(i => ({
+                name: i.name,
+                phone: i.phone,
+                idCard: i.idCard,
+                isBanned: false,
+                companies: i?.['company'] ? [i['company']] : [],
+              })));
+
+              if (resp.code === 200 && resp.data) {
+                return {
+                  success: resp.data,
+                  failure: list.length - resp.data,
+                };
+              } else {
+                return {
+                  success: 0,
+                  failure: list.length,
+                };
+              }
+            }}
+            afterImport={() => {
+              actionRef.current?.reload();
+            }}
+          />,
           <Button key="export" icon={<Icon icon="bx:export" />} disabled>
             导出
           </Button>,

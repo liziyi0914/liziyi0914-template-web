@@ -183,7 +183,7 @@ function RouteComponent() {
           {
             title: '营业执照',
             dataIndex: 'businessLicenseFile',
-            valueType: 'assets',
+            valueType: '#assets',
             colProps: {
               span: 12,
             },
@@ -191,7 +191,7 @@ function RouteComponent() {
           {
             title: '经营许可证',
             dataIndex: 'businessPermitFile',
-            valueType: 'assets',
+            valueType: '#assets',
             colProps: {
               span: 12,
             },

@@ -7,11 +7,11 @@ export type FormFieldType =
   | 'formSet'
   | 'divider'
   | 'dependency'
-  | '#tabGroup'
-  | 'assets'
+  | '$tabGroup'
+  | '#ai'
+  | '#assets'
   | 'department'
-  | 'validDateRange'
-  | 'ai';
+  | 'validDateRange';
 export type ColumnsType<T = any, ValueType = FormFieldType> = Omit<
   ProFormColumnsType<T, ValueType>,
   'columns'

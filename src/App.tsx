@@ -39,7 +39,7 @@ const App = () => {
     <ThemeProvider>
       <ProConfigProvider
         valueTypeMap={{
-          assets: {
+          '#assets': {
             render: (text) => {
               return <AssetsPickerView value={text} />;
             },
@@ -63,7 +63,7 @@ const App = () => {
               return <ValidDateRange {...props.fieldProps} />;
             },
           },
-          ai: {
+          '#ai': {
             renderFormItem: (_, props) => {
               return <AiFormItem {...props.fieldProps} />;
             },

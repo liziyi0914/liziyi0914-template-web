@@ -9,7 +9,7 @@ import type { ColumnsType } from '@/lib/types.ts';
 const flattenColumns = (columns: ColumnsType[]): ColumnsType[] => {
   return _.uniqBy(
     columns.flatMap((column) => {
-      if (column.valueType === '#tabGroup') {
+      if (column.valueType === '$tabGroup') {
         return [...flattenColumns(column.columns ?? [])];
       }
       return column;
@@ -37,7 +37,7 @@ const TabsSchemaForm: React.FC<{
                   layoutType="Embed"
                   columns={
                     column.columns?.filter(
-                      (column) => column.valueType !== '#tabGroup',
+                      (column) => column.valueType !== '$tabGroup',
                     ) ?? []
                   }
                 />
@@ -45,7 +45,7 @@ const TabsSchemaForm: React.FC<{
               <TabsSchemaForm
                 columns={
                   column.columns?.filter(
-                    (column) => column.valueType === '#tabGroup',
+                    (column) => column.valueType === '$tabGroup',
                   ) ?? []
                 }
                 tabPlacement={props.tabPlacement === 'top' ? 'start' : 'top'}

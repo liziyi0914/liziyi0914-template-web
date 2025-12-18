@@ -437,7 +437,7 @@ export const Api = {
             companies: Array<string>;
           }>,
         ) => {
-          return request({
+          return request<number>({
             url: '/dashboard/system/user/',
             method: 'PUT',
             data: {
