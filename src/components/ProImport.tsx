@@ -1,12 +1,12 @@
-import {App, Button, Upload} from "antd";
-import {Icon} from "@iconify/react";
-import type {ColumnsType, DepartmentInfoVO} from "@/lib/types.ts";
-import {useCallback} from "react";
-import * as XLSX from 'xlsx';
-import {day} from "@/lib/utils.ts";
+import { ProTable } from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { App, Button, Upload } from 'antd';
 import * as _ from 'lodash';
-import {ProTable} from "@ant-design/pro-components";
-import {Api} from "@/lib/api.ts";
+import { useCallback } from 'react';
+import * as XLSX from 'xlsx';
+import { Api } from '@/lib/api.ts';
+import type { ColumnsType, DepartmentInfoVO } from '@/lib/types.ts';
+import { day } from '@/lib/utils.ts';
 
 const columns2headInfo = (columns: ColumnsType[]) => {
   let headers: Array<Array<string | undefined>> = [[]];
@@ -15,11 +15,11 @@ const columns2headInfo = (columns: ColumnsType[]) => {
   columns.forEach((column) => {
     switch (column.valueType) {
       case '$tabGroup': {
-        let label = column.group?.title ?? '-';
-        let inner = columns2headInfo(column.columns ?? []);
-        let children = inner.headers;
+        const label = column.group?.title ?? '-';
+        const inner = columns2headInfo(column.columns ?? []);
+        const children = inner.headers;
 
-        let w = Math.max(1, inner.headers[0].length);
+        const w = Math.max(1, inner.headers[0].length);
 
         if (children[0].length === 0) {
           return;
@@ -27,7 +27,10 @@ const columns2headInfo = (columns: ColumnsType[]) => {
 
         children.forEach((child, i) => {
           if (headers.length <= i + 1) {
-            let base: Array<string | undefined> = '1'.repeat(headers[0].length).split('').map(() => undefined);
+            let base: Array<string | undefined> = '1'
+              .repeat(headers[0].length)
+              .split('')
+              .map(() => undefined);
             base = base.concat(child);
             headers = headers.concat([base]);
           } else {
@@ -36,7 +39,12 @@ const columns2headInfo = (columns: ColumnsType[]) => {
         });
 
         headers[0].push(label);
-        headers[0] = headers[0].concat('1'.repeat(w - 1).split('').map(() => undefined));
+        headers[0] = headers[0].concat(
+          '1'
+            .repeat(w - 1)
+            .split('')
+            .map(() => undefined),
+        );
 
         mappings = mappings.concat(inner.mappings);
 
@@ -63,7 +71,9 @@ const columns2headInfo = (columns: ColumnsType[]) => {
   };
 };
 
-function mergeCells(rows: Array<Array<string | null | undefined>>): Array<{ s: { c: number; r: number; }, e: { c: number; r: number; } }> {
+function mergeCells(
+  rows: Array<Array<string | null | undefined>>,
+): Array<{ s: { c: number; r: number }; e: { c: number; r: number } }> {
   if (rows.length === 0 || rows[0].length === 0) {
     return [];
   }
@@ -71,8 +81,13 @@ function mergeCells(rows: Array<Array<string | null | undefined>>): Array<{ s: {
   const totalRows = rows.length;
   const totalCols = rows[0].length;
   // 创建 visited 矩阵，标记已处理的单元格
-  const visited: boolean[][] = Array.from({ length: totalRows }, () => new Array(totalCols).fill(false));
-  const mergeAreas: Array<{ s: { c: number; r: number; }, e: { c: number; r: number; } }> = [];
+  const visited: boolean[][] = Array.from({ length: totalRows }, () =>
+    new Array(totalCols).fill(false),
+  );
+  const mergeAreas: Array<{
+    s: { c: number; r: number };
+    e: { c: number; r: number };
+  }> = [];
 
   for (let i = 0; i < totalRows; i++) {
     for (let j = 0; j < totalCols; j++) {
@@ -83,8 +98,16 @@ function mergeCells(rows: Array<Array<string | null | undefined>>): Array<{ s: {
 
       // 操作1: 尝试向右下合并（至少2x2的矩形）
       if (i + 1 < totalRows && j + 1 < totalCols) {
-        if (!visited[i][j + 1] && !visited[i + 1][j] && !visited[i + 1][j + 1]) {
-          if (rows[i][j + 1] == null && rows[i + 1][j] == null && rows[i + 1][j + 1] == null) {
+        if (
+          !visited[i][j + 1] &&
+          !visited[i + 1][j] &&
+          !visited[i + 1][j + 1]
+        ) {
+          if (
+            rows[i][j + 1] == null &&
+            rows[i + 1][j] == null &&
+            rows[i + 1][j + 1] == null
+          ) {
             // 合并2x2区域
             mergeAreas.push({ s: { c: j, r: i }, e: { c: j + 1, r: i + 1 } });
             // 标记整个2x2区域为已访问
@@ -104,7 +127,8 @@ function mergeCells(rows: Array<Array<string | null | undefined>>): Array<{ s: {
         rightCount++;
         col++;
       }
-      if (rightCount >= 1) { // 至少合并2列（当前列+至少1个空列）
+      if (rightCount >= 1) {
+        // 至少合并2列（当前列+至少1个空列）
         mergeAreas.push({ s: { c: j, r: i }, e: { c: j + rightCount, r: i } });
         // 标记合并的单元格
         for (let c = j; c <= j + rightCount; c++) {
@@ -120,7 +144,8 @@ function mergeCells(rows: Array<Array<string | null | undefined>>): Array<{ s: {
         downCount++;
         row++;
       }
-      if (downCount >= 1) { // 至少合并2行（当前行+至少1个空行）
+      if (downCount >= 1) {
+        // 至少合并2行（当前行+至少1个空行）
         mergeAreas.push({ s: { c: j, r: i }, e: { c: j, r: i + downCount } });
         // 标记合并的单元格
         for (let r = i; r <= i + downCount; r++) {
@@ -138,7 +163,7 @@ function mergeCells(rows: Array<Array<string | null | undefined>>): Array<{ s: {
 }
 
 const columns2sheet = (ws: XLSX.WorkSheet, columns: ColumnsType[]) => {
-  let result = columns2headInfo(columns);
+  const result = columns2headInfo(columns);
 
   XLSX.utils.sheet_add_aoa(ws, result.headers);
 
@@ -149,244 +174,262 @@ const columns2sheet = (ws: XLSX.WorkSheet, columns: ColumnsType[]) => {
   XLSX.utils.decode_range('');
 };
 
-const formatData = async (columns: ColumnsType[], data: Record<string, any>) => {
+const formatData = async (
+  columns: ColumnsType[],
+  data: Record<string, any>,
+) => {
   let departments: DepartmentInfoVO[] = [];
-  if (columns.filter(i => i.valueType === 'department').length > 0) {
-    let resp = await Api.common.getDepartments();
+  if (columns.filter((i) => i.valueType === 'department').length > 0) {
+    const resp = await Api.common.getDepartments();
     if (resp.code === 200 && resp.data) {
       departments = resp.data;
     }
   }
 
-  return _.reduce(data, (result, value, key) => {
-    let column = columns.filter(c => c.dataIndex === key)?.[0];
+  return _.reduce(
+    data,
+    (result, value, key) => {
+      const column = columns.filter((c) => c.dataIndex === key)?.[0];
 
-    if (!column) {
-      return result;
-    }
+      if (!column) {
+        return result;
+      }
 
-    switch (column.valueType) {
-      case 'validDateRange': {
-        let parts = `${value}`.split('~').map(i => i.trim());
-        let d: string[] = [];
+      switch (column.valueType) {
+        case 'validDateRange': {
+          const parts = `${value}`.split('~').map((i) => i.trim());
+          const d: string[] = [];
 
-        if (parts.length >= 1) {
-          try {
-            let t = day(parts[0]);
-            if (t.isValid()) {
-              d.push(t.format('YYYY-MM-DD'));
-            }
-          } catch (e) {
-          }
-        }
-
-        if (parts.length >= 2) {
-          if (parts[1] === '#LONG' || parts[1] === '长期') {
-            d.push('#LONG');
-          } else {
+          if (parts.length >= 1) {
             try {
-              let t = day(parts[1]);
+              const t = day(parts[0]);
               if (t.isValid()) {
                 d.push(t.format('YYYY-MM-DD'));
               }
-            } catch (e) {
+            } catch (e) {}
+          }
+
+          if (parts.length >= 2) {
+            if (parts[1] === '#LONG' || parts[1] === '长期') {
+              d.push('#LONG');
+            } else {
+              try {
+                const t = day(parts[1]);
+                if (t.isValid()) {
+                  d.push(t.format('YYYY-MM-DD'));
+                }
+              } catch (e) {}
             }
           }
-        }
 
-        return _.assign(result, {
-          [key]: d,
-        });
-      }
-      case 'date': {
-        try {
-          let t = day(value);
-          if (t.isValid()) {
-            return _.assign(result, {
-              [key]: t.format('YYYY-MM-DD'),
-            });
-          }
-        } catch (e) {
+          return _.assign(result, {
+            [key]: d,
+          });
         }
+        case 'date': {
+          try {
+            const t = day(value);
+            if (t.isValid()) {
+              return _.assign(result, {
+                [key]: t.format('YYYY-MM-DD'),
+              });
+            }
+          } catch (e) {}
 
-        return result;
-      }
-      case 'dateTime': {
-        try {
-          let t = day(value);
-          if (t.isValid()) {
-            return _.assign(result, {
-              [key]: t.format('YYYY-MM-DD HH:mm:ss'),
-            });
-          }
-        } catch (e) {
+          return result;
         }
+        case 'dateTime': {
+          try {
+            const t = day(value);
+            if (t.isValid()) {
+              return _.assign(result, {
+                [key]: t.format('YYYY-MM-DD HH:mm:ss'),
+              });
+            }
+          } catch (e) {}
 
-        return result;
-      }
-      case 'select': {
-        let valueEnum = typeof column.valueEnum === 'function' ? column.valueEnum(data) : column.valueEnum;
-        if (valueEnum) {
-          for (let entry of Object.entries(valueEnum)) {
-            let enumK = entry[0];
-            let enumV = entry[1];
-            if (typeof enumV === 'string') {
-              if (enumV === value) {
+          return result;
+        }
+        case 'select': {
+          const valueEnum =
+            typeof column.valueEnum === 'function'
+              ? column.valueEnum(data)
+              : column.valueEnum;
+          if (valueEnum) {
+            for (const entry of Object.entries(valueEnum)) {
+              const enumK = entry[0];
+              const enumV = entry[1];
+              if (typeof enumV === 'string') {
+                if (enumV === value) {
+                  return _.assign(result, {
+                    [key]: enumK,
+                  });
+                }
+              } else if (enumV?.text === value) {
                 return _.assign(result, {
                   [key]: enumK,
                 });
               }
-            } else if (enumV?.text === value) {
-              return _.assign(result, {
-                [key]: enumK,
-              });
             }
           }
-        }
 
-        return result;
-      }
-      case 'department': {
-        let parts = `${value}`.split('-').map(i => i.trim());
-
-        let department: DepartmentInfoVO | undefined;
-        let position: (DepartmentInfoVO['positions'] extends Array<infer T> | undefined ? T : undefined) | undefined;
-
-        if (parts.length >= 1) {
-          department = departments.filter(i => i.name === parts[0])?.[0];
-        } else {
           return result;
         }
+        case 'department': {
+          const parts = `${value}`.split('-').map((i) => i.trim());
 
-        if (parts.length >= 2 && department) {
-          position = department.positions?.filter(i => i.name === parts[1])?.[0];
+          let department: DepartmentInfoVO | undefined;
+          let position:
+            | (DepartmentInfoVO['positions'] extends Array<infer T> | undefined
+                ? T
+                : undefined)
+            | undefined;
+
+          if (parts.length >= 1) {
+            department = departments.filter((i) => i.name === parts[0])?.[0];
+          } else {
+            return result;
+          }
+
+          if (parts.length >= 2 && department) {
+            position = department.positions?.filter(
+              (i) => i.name === parts[1],
+            )?.[0];
+            return _.assign(result, {
+              [key]: `${position?.id}`,
+            });
+          } else {
+            return _.assign(result, {
+              [key]: `${department?.id}`,
+            });
+          }
+        }
+        default: {
           return _.assign(result, {
-            [key]: `${position?.id}`,
-          });
-        } else {
-          return _.assign(result, {
-            [key]: `${department?.id}`,
+            [key]: `${value}`,
           });
         }
       }
-      default: {
-        return _.assign(result, {
-          [key]: `${value}`,
-        });
-      }
-    }
-  }, {});
+    },
+    {},
+  );
 };
 
 function Component<T = Record<string, any>>(props: {
   title?: string;
   columns: ColumnsType[];
-  onImport: (data: Array<T>) => Promise<{ success: number; failure: number; }>;
+  onImport: (data: Array<T>) => Promise<{ success: number; failure: number }>;
   afterImport?: () => void;
 }) {
   const { message, modal } = App.useApp();
 
   const downloadImportTemplate = useCallback(() => {
-    let book = XLSX.utils.book_new();
-    let sheet = XLSX.utils.sheet_new();
+    const book = XLSX.utils.book_new();
+    const sheet = XLSX.utils.sheet_new();
 
     columns2sheet(sheet, props.columns);
 
     XLSX.utils.book_append_sheet(book, sheet, 'import');
 
-    let now = day().format('YYYYMMDDHHmmss');
+    const now = day().format('YYYYMMDDHHmmss');
 
-    XLSX.writeFile(book, `${props.title ? `${props.title} - ` : ''}导入模板${now}.xlsx`);
+    XLSX.writeFile(
+      book,
+      `${props.title ? `${props.title} - ` : ''}导入模板${now}.xlsx`,
+    );
   }, [props.title, props.columns]);
 
-  const importTemplate = useCallback(async (file: File) => {
-    let loading = message.loading('导入中', 0);
+  const importTemplate = useCallback(
+    async (file: File) => {
+      const loading = message.loading('导入中', 0);
 
-    try {
-      let buffer = await file.arrayBuffer();
-      let book = XLSX.read(buffer);
+      try {
+        const buffer = await file.arrayBuffer();
+        const book = XLSX.read(buffer);
 
-      if (book.SheetNames.length === 0) {
-        loading();
+        if (book.SheetNames.length === 0) {
+          loading();
 
-        message.error('没有找到Sheet');
-        return;
-      }
-
-      let sheet = book.Sheets[book.SheetNames[0]];
-
-      let head = columns2headInfo(props.columns);
-
-      let start = head.headers.length;
-
-      let json = XLSX.utils.sheet_to_json<any[]>(sheet, {
-        header: 1,
-      });
-
-      if (json.length < head.headers.length) {
-        loading();
-
-        message.error('导入失败: 数据为空');
-        return;
-      }
-
-      let dataList: Array<Record<string, any>> = [];
-
-      for (let i = start; i < json.length; i++) {
-        let row = json[i];
-        let data: Record<string, any> = {};
-        for (let j = 0; j < row.length; j++) {
-          data[`${head.mappings[j].dataIndex ?? '?'}`] = row[j];
+          message.error('没有找到Sheet');
+          return;
         }
-        dataList.push(await formatData(head.mappings, data));
-      }
 
-      if (dataList.length === 0) {
+        const sheet = book.Sheets[book.SheetNames[0]];
+
+        const head = columns2headInfo(props.columns);
+
+        const start = head.headers.length;
+
+        const json = XLSX.utils.sheet_to_json<any[]>(sheet, {
+          header: 1,
+        });
+
+        if (json.length < head.headers.length) {
+          loading();
+
+          message.error('导入失败: 数据为空');
+          return;
+        }
+
+        const dataList: Array<Record<string, any>> = [];
+
+        for (let i = start; i < json.length; i++) {
+          const row = json[i];
+          const data: Record<string, any> = {};
+          for (let j = 0; j < row.length; j++) {
+            data[`${head.mappings[j].dataIndex ?? '?'}`] = row[j];
+          }
+          dataList.push(await formatData(head.mappings, data));
+        }
+
+        if (dataList.length === 0) {
+          loading();
+
+          message.error('导入失败: 数据为空');
+          return;
+        }
+
+        modal.confirm({
+          title: `确定要导入 ${dataList.length} 条数据吗？`,
+          width: '100vw',
+          content: (
+            <div>
+              <ProTable
+                columns={head.mappings as any}
+                scroll={{ x: 'max-content' }}
+                dataSource={dataList}
+                pagination={false}
+              />
+            </div>
+          ),
+          okText: '确定',
+          onOk: async () => {
+            const counts = await props.onImport(dataList as any);
+
+            modal.info({
+              content: `成功导入 ${counts.success} 条数据, 失败 ${counts.failure} 条数据`,
+              onOk: () => {
+                props.afterImport?.();
+              },
+              onCancel: () => {
+                props.afterImport?.();
+              },
+              maskClosable: true,
+            });
+          },
+        });
+      } catch (e) {
         loading();
 
-        message.error('导入失败: 数据为空');
+        console.log(e);
+        message.error('导入失败');
         return;
       }
 
-      modal.confirm({
-        title: `确定要导入 ${dataList.length} 条数据吗？`,
-        width: '100vw',
-        content: (
-          <div>
-            <ProTable
-              columns={head.mappings as any}
-              scroll={{ x: 'max-content' }}
-              dataSource={dataList}
-              pagination={false}
-            />
-          </div>
-        ),
-        okText: '确定',
-        onOk: async () => {
-          let counts = await props.onImport(dataList as any);
-
-          modal.info({
-            content: `成功导入 ${counts.success} 条数据, 失败 ${counts.failure} 条数据`,
-            onOk: () => {
-              props.afterImport?.();
-            },
-            onCancel: () => {
-              props.afterImport?.();
-            },
-            maskClosable: true,
-          });
-        },
-      })
-    } catch (e) {
       loading();
-
-      console.log(e);
-      message.error('导入失败');
-      return;
-    }
-
-    loading();
-  }, [props.columns]);
+    },
+    [props.columns],
+  );
 
   return [
     <Upload
@@ -397,16 +440,13 @@ function Component<T = Record<string, any>>(props: {
         return false;
       }}
     >
-      <Button
-        key="import"
-        icon={<Icon icon="bx:import" />}
-      >
+      <Button key="import" icon={<Icon icon="bx:import" />}>
         导入
       </Button>
     </Upload>,
     <Button
       key="download_import_template"
-      onClick={()=>{
+      onClick={() => {
         downloadImportTemplate();
       }}
     >

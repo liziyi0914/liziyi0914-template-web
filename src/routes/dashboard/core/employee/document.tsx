@@ -4,9 +4,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { App, Button, Modal, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
 import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
+import ProImport from '@/components/ProImport.tsx';
 import { Api, type ApiResult } from '@/lib/api.ts';
-import ProImport from "@/components/ProImport.tsx";
-import type {ColumnsType} from "@/lib/types.ts";
+import type { ColumnsType } from '@/lib/types.ts';
 
 export const Route = createFileRoute('/dashboard/core/employee/document')({
   component: RouteComponent,
@@ -401,8 +401,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex:
-              'safetyManagementQualificationCertificateFile',
+            dataIndex: 'safetyManagementQualificationCertificateFile',
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -479,8 +478,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex:
-              'occupationalHazardsNotificationLetterFile',
+            dataIndex: 'occupationalHazardsNotificationLetterFile',
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -549,8 +547,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex:
-              'safetyManagementQualificationCertificateFile',
+            dataIndex: 'safetyManagementQualificationCertificateFile',
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -638,9 +635,7 @@ function RouteComponent() {
           }}
         >
           <div className="pb-6 grow">
-            <GroupedEmbedSchemaForm
-              columns={columns}
-            />
+            <GroupedEmbedSchemaForm columns={columns} />
           </div>
         </ProForm>
       </Modal>
@@ -661,19 +656,23 @@ function RouteComponent() {
             title="人员档案"
             columns={columns}
             onImport={async (rows) => {
-              let counts = {
+              const counts = {
                 success: 0,
                 failure: 0,
               };
               for (let i = 0; i < rows.length; i++) {
-                let row = rows[i];
+                const row = rows[i];
                 if (row?.['phone']) {
-                  let phone = row.phone;
+                  const phone = row.phone;
 
-                  let data = row;
+                  const data = row;
                   delete data.phone;
 
-                  const resp = await Api.dashboard.core.employee.document.create(phone, data);
+                  const resp =
+                    await Api.dashboard.core.employee.document.create(
+                      phone,
+                      data,
+                    );
 
                   if (resp.code === 200) {
                     counts.success++;

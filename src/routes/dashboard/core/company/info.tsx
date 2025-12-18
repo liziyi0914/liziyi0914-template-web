@@ -26,7 +26,7 @@ function RouteComponent() {
         return {};
       }}
       onFinish={async (values) => {
-        let v = values;
+        const v = values;
         delete v.companyName;
         const resp = await Api.dashboard.core.company.info.update({
           data: v,

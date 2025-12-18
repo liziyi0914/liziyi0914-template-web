@@ -8,9 +8,9 @@ import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { App, Button, Modal } from 'antd';
 import { useRef, useState } from 'react';
+import ProImport from '@/components/ProImport.tsx';
 import { Api, type ApiResult } from '@/lib/api.ts';
 import type { UserInfoVO } from '@/lib/types.ts';
-import ProImport from "@/components/ProImport.tsx";
 
 export const Route = createFileRoute('/dashboard/system/user')({
   component: RouteComponent,
@@ -205,15 +205,17 @@ function RouteComponent() {
               },
             ]}
             onImport={async (list) => {
-              let li = list.filter(i => i?.name && i?.phone && i?.idCard);
+              const li = list.filter((i) => i?.name && i?.phone && i?.idCard);
 
-              let resp = await Api.dashboard.system.user.create(li.map(i => ({
-                name: i.name,
-                phone: i.phone,
-                idCard: i.idCard,
-                isBanned: false,
-                companies: i?.['company'] ? [i['company']] : [],
-              })));
+              const resp = await Api.dashboard.system.user.create(
+                li.map((i) => ({
+                  name: i.name,
+                  phone: i.phone,
+                  idCard: i.idCard,
+                  isBanned: false,
+                  companies: i?.['company'] ? [i['company']] : [],
+                })),
+              );
 
               if (resp.code === 200 && resp.data) {
                 return {

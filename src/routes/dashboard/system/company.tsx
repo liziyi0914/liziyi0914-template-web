@@ -8,8 +8,8 @@ import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { App, Button, Modal, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
+import ProImport from '@/components/ProImport.tsx';
 import { Api, type ApiResult } from '@/lib/api.ts';
-import ProImport from "@/components/ProImport.tsx";
 
 export const Route = createFileRoute('/dashboard/system/company')({
   component: RouteComponent,
@@ -129,12 +129,14 @@ function RouteComponent() {
               },
             ]}
             onImport={async (list) => {
-              let li = list.filter(i => !!i?.companyName);
+              const li = list.filter((i) => !!i?.companyName);
 
-              let resp = await Api.dashboard.system.company.create(li.map(i => ({
-                companyName: i.companyName,
-                companyRegCode: i?.['companyRegCode'],
-              })));
+              const resp = await Api.dashboard.system.company.create(
+                li.map((i) => ({
+                  companyName: i.companyName,
+                  companyRegCode: i?.['companyRegCode'],
+                })),
+              );
 
               if (resp.code === 200 && resp.data) {
                 return {
