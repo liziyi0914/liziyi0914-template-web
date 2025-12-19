@@ -4,7 +4,6 @@ import { initIcons } from '@/lib/icons.ts';
 import reportWebVitals from '@/reportWebVitals.ts';
 import App from './App';
 
-// @ts-expect-error
 import '@/assets/fonts/MiSansVF.ttf';
 
 initIcons();

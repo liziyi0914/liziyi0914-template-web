@@ -6,6 +6,7 @@ import { Toast } from 'antd-mobile';
 import * as jose from 'jose';
 import { useAtomValue } from 'jotai';
 import React, { type PropsWithChildren, useState } from 'react';
+import { useTheme } from '@/components/theme-provider.tsx';
 import { Api } from '@/lib/api.ts';
 import { LoginState } from '@/routes/dashboard.tsx';
 
@@ -52,6 +53,7 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const loginState = useAtomValue(LoginState);
+  const themeCfg = useTheme();
 
   const [companies, setCompanies] = useState<string[]>();
 
@@ -135,6 +137,10 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
                   path: 'user',
                   name: '用户',
                 },
+                {
+                  path: 'template',
+                  name: '模板',
+                },
               ],
             },
             {
@@ -194,7 +200,57 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
         layout="mix"
         fixSiderbar={true}
         actionsRender={() => {
-          return [];
+          return [
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: 'system',
+                    icon: <Icon icon="icon-park-outline:dark-mode" />,
+                    label: '跟随系统',
+                    onClick: () => {
+                      themeCfg.setTheme('system');
+                    },
+                  },
+                  {
+                    key: 'light',
+                    icon: (
+                      <Icon icon="material-symbols:light-mode-outline-rounded" />
+                    ),
+                    label: '白天模式',
+                    onClick: () => {
+                      themeCfg.setTheme('light');
+                    },
+                  },
+                  {
+                    key: 'dark',
+                    icon: (
+                      <Icon icon="material-symbols:dark-mode-outline-rounded" />
+                    ),
+                    label: '黑夜模式',
+                    onClick: () => {
+                      themeCfg.setTheme('dark');
+                    },
+                  },
+                ],
+              }}
+            >
+              <Button
+                type="text"
+                icon={
+                  <Icon
+                    icon={
+                      themeCfg.theme === 'system'
+                        ? 'icon-park-outline:dark-mode'
+                        : themeCfg.theme === 'light'
+                          ? 'material-symbols:light-mode-outline-rounded'
+                          : 'material-symbols:dark-mode-outline-rounded'
+                    }
+                  />
+                }
+              />
+            </Dropdown>,
+          ];
         }}
         avatarProps={{
           src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',

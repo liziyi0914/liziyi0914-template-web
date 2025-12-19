@@ -20,6 +20,7 @@ import { Route as HomeUserRouteImport } from './routes/_home/user'
 import { Route as HomeTodoRouteImport } from './routes/_home/todo'
 import { Route as HomeTrainingIndexRouteImport } from './routes/_home/training/index'
 import { Route as DashboardSystemUserRouteImport } from './routes/dashboard/system/user'
+import { Route as DashboardSystemTemplateRouteImport } from './routes/dashboard/system/template'
 import { Route as DashboardSystemCompanyRouteImport } from './routes/dashboard/system/company'
 import { Route as DashboardCoreEmployeeDocumentRouteImport } from './routes/dashboard/core/employee/document'
 import { Route as DashboardCoreCompanyStructureRouteImport } from './routes/dashboard/core/company/structure'
@@ -80,6 +81,11 @@ const DashboardSystemUserRoute = DashboardSystemUserRouteImport.update({
   path: '/system/user',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSystemTemplateRoute = DashboardSystemTemplateRouteImport.update({
+  id: '/system/template',
+  path: '/system/template',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSystemCompanyRoute = DashboardSystemCompanyRouteImport.update({
   id: '/system/company',
   path: '/system/company',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/': typeof HomeIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
+  '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
   '/training': typeof HomeTrainingIndexRoute
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/': typeof HomeIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
+  '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
   '/training': typeof HomeTrainingIndexRoute
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/_home/': typeof HomeIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
+  '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
   '/_home/training/': typeof HomeTrainingIndexRoute
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard/'
     | '/dashboard/system/company'
+    | '/dashboard/system/template'
     | '/dashboard/system/user'
     | '/training'
     | '/dashboard/core/company/assets'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/system/company'
+    | '/dashboard/system/template'
     | '/dashboard/system/user'
     | '/training'
     | '/dashboard/core/company/assets'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/_home/'
     | '/dashboard/'
     | '/dashboard/system/company'
+    | '/dashboard/system/template'
     | '/dashboard/system/user'
     | '/_home/training/'
     | '/dashboard/core/company/assets'
@@ -302,6 +314,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemUserRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/system/template': {
+      id: '/dashboard/system/template'
+      path: '/system/template'
+      fullPath: '/dashboard/system/template'
+      preLoaderRoute: typeof DashboardSystemTemplateRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/system/company': {
       id: '/dashboard/system/company'
       path: '/system/company'
@@ -360,6 +379,7 @@ interface DashboardRouteChildren {
   DashboardHomeRoute: typeof DashboardHomeRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardSystemCompanyRoute: typeof DashboardSystemCompanyRoute
+  DashboardSystemTemplateRoute: typeof DashboardSystemTemplateRoute
   DashboardSystemUserRoute: typeof DashboardSystemUserRoute
   DashboardCoreCompanyAssetsRoute: typeof DashboardCoreCompanyAssetsRoute
   DashboardCoreCompanyInfoRoute: typeof DashboardCoreCompanyInfoRoute
@@ -371,6 +391,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardHomeRoute: DashboardHomeRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardSystemCompanyRoute: DashboardSystemCompanyRoute,
+  DashboardSystemTemplateRoute: DashboardSystemTemplateRoute,
   DashboardSystemUserRoute: DashboardSystemUserRoute,
   DashboardCoreCompanyAssetsRoute: DashboardCoreCompanyAssetsRoute,
   DashboardCoreCompanyInfoRoute: DashboardCoreCompanyInfoRoute,
