@@ -28,6 +28,8 @@ import React, {
 } from 'react';
 import { Api } from '@/lib/api.ts';
 import { convertDepartmentsToTreeData } from '@/lib/functions.tsx';
+import {useAtomValue} from "jotai";
+import {LoginState} from "@/routes/dashboard.tsx";
 
 export const Route = createFileRoute('/dashboard/core/company/structure')({
   component: RouteComponent,
@@ -109,6 +111,7 @@ const editPositionSchema: Array<ProFormColumnsType> = [
 ];
 
 type GraphNodeType = {
+  id?: string;
   name: string;
   items?: Array<GraphNodeType>;
   hiddenLeft?: boolean;
@@ -139,11 +142,43 @@ const GraphNode: React.FC<PropsWithChildren<GraphNodeType>> = (props) => {
     return 'after:border-t after:border-l after:border-gray-500 after:absolute after:right-0 after:-top-4 after:w-1/2 after:h-4';
   }, [props]);
 
+  const bg = useMemo(() => {
+    if (!props.id) {
+      return 'bg-violet-600';
+    }
+
+    if (props.id.startsWith('department.')) {
+      return 'bg-green-600';
+    } else if (props.id.startsWith('position.')) {
+      return 'bg-blue-600';
+    } else if (props.id.startsWith('employee.')) {
+      return 'bg-yellow-600';
+    }
+
+    return 'bg-gray-600';
+  }, [props]);
+
+  const bgHover = useMemo(() => {
+    if (!props.id) {
+      return 'hover:bg-violet-600/90';
+    }
+
+    if (props.id.startsWith('department.')) {
+      return 'hover:bg-green-600/90';
+    } else if (props.id.startsWith('position.')) {
+      return 'hover:bg-blue-600/90';
+    } else if (props.id.startsWith('employee.')) {
+      return 'hover:bg-yellow-600/90';
+    }
+
+    return 'hover:bg-gray-600/90';
+  }, [props]);
+
   return (
     <div className="inline-block relative px-1.5">
       <div className="flex justify-center">
         <div
-          className={`inline-block bg-green-600 text-white px-4 py-2 shadow-md rounded-md ${(props.items?.length ?? 0) > 0 ? 'cursor-pointer hover:bg-green-600/90' : ''} select-none`}
+          className={`inline-block ${bg} text-white px-4 py-2 shadow-md rounded-md ${(props.items?.length ?? 0) > 0 ? `cursor-pointer ${bgHover}` : ''} select-none`}
           onClick={() => {
             setExpand(!expand);
           }}
@@ -168,6 +203,7 @@ const GraphNode: React.FC<PropsWithChildren<GraphNodeType>> = (props) => {
             {props.items?.map((item, index) => (
               <GraphNode
                 key={index}
+                id={item.id}
                 name={item.name}
                 items={item.items}
                 hiddenLeft={index === 0}
@@ -187,61 +223,97 @@ const StructureGraph: React.FC<{
 }> = (props) => {
   const divRef = useRef<HTMLDivElement>(null);
 
-  type TreeNode = {
-    name: string;
-    items?: TreeNode[];
-  };
-  const mapTree = (tree: TreeDataNode[]) => {
-    return tree.map((item): TreeNode => {
-      return {
+  const mapTree = async (tree: TreeDataNode[]) => {
+    let list: GraphNodeType[] = [];
+
+    for (let item of tree) {
+      let children = item.children
+        ? await mapTree(item.children)
+        : [];
+
+      if (`${item.key}`.startsWith('position.')) {
+        let resp = await Api.dashboard.core.company.structure.listPositionEmployees(`${item.key}`.substring('position.'.length));
+        if (resp.code === 200 && resp.data) {
+          children = [
+            ...children,
+            ...resp.data.map((item) => {
+              return {
+                id: `employee.${item.id}`,
+                name: item.name ?? item.phone,
+              };
+            }),
+          ];
+        }
+      }
+
+      list.push({
+        id: item.key as string,
         name: item.title as string,
-        items: item.children
-          ? mapTree(
-              item.children.filter((i) => `${i.key}`.startsWith('department.')),
-            )
-          : [],
-      };
-    });
+        items: children,
+      });
+    }
+
+    return list;
   };
+
+  const tree = useQuery({
+    queryKey: ['dashboard.core.company.structure.tree'],
+    queryFn: async () => {
+      return await mapTree(props.tree);
+    },
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <div>
-      <div className="flex gap-x-3">
-        <Button
-          onClick={() => {
-            if (divRef.current) {
-              html2canvas(divRef.current, {
-                useCORS: true,
-                scale: 10,
-              }).then((canvas) => {
-                const image = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = 'structure.png';
-                link.href = image;
-                link.click();
-                link.remove();
-              });
-            }
-          }}
-        >
-          导出图片
-        </Button>
-      </div>
-      <div className="max-h-[70vh] overflow-auto text-center">
-        <div className="inline-block text-start p-3" ref={divRef}>
-          <GraphNode
-            name={props.companyName}
-            hiddenAll={true}
-            items={mapTree(props.tree)}
-          />
-        </div>
-      </div>
+      {tree.isLoading && (
+        <Spin spinning tip="加载中">
+          <div className="h-32" />
+        </Spin>
+      )}
+      {tree.isSuccess && tree.data && (
+        <>
+          <div>
+            <div className="flex gap-x-3">
+              <Button
+                onClick={() => {
+                  if (divRef.current) {
+                    html2canvas(divRef.current, {
+                      useCORS: true,
+                      scale: 10,
+                    }).then((canvas) => {
+                      const image = canvas.toDataURL('image/png');
+                      const link = document.createElement('a');
+                      link.download = 'structure.png';
+                      link.href = image;
+                      link.click();
+                      link.remove();
+                    });
+                  }
+                }}
+              >
+                导出图片
+              </Button>
+            </div>
+            <div className="max-h-[70vh] overflow-auto text-center">
+              <div className="inline-block text-start p-3" ref={divRef}>
+                <GraphNode
+                  name={props.companyName}
+                  hiddenAll={true}
+                  items={tree.data}
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 function RouteComponent() {
   const { message } = App.useApp();
+  const loginState = useAtomValue(LoginState);
   const departments = useQuery({
     queryKey: ['dashboard.core.company.structure'],
     queryFn: async () => {
@@ -335,7 +407,7 @@ function RouteComponent() {
               setOpenStructureModal(false);
             }}
           >
-            <StructureGraph companyName={'企业'} tree={tree} />
+            <StructureGraph companyName={loginState?.companyName ?? ''} tree={tree} />
           </Modal>
 
           <div className="flex">

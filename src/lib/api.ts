@@ -609,6 +609,19 @@ export const Api = {
               method: 'DELETE',
             });
           },
+          listPositionEmployees: (id: string) => {
+            return request<Array<{
+              id: string;
+              name?: string;
+              phone: string;
+              careerRole?: string;
+            }>>(
+              {
+                url: `/dashboard/core/company/structure/position/${id}/employee`,
+                method: 'GET',
+              },
+            );
+          },
         },
       },
       employee: {
