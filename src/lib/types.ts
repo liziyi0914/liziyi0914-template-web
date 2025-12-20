@@ -16,7 +16,7 @@ export type ColumnsType<T = any, ValueType = FormFieldType> = Omit<
   ProFormColumnsType<T, ValueType>,
   'columns'
 > & {
-  columns?: ColumnsType<T, ValueType | FormFieldType>[];
+  columns?: ColumnsType<T, ValueType | FormFieldType>[] | ((values: any) => ColumnsType<T, ValueType | FormFieldType>[]);
   group?: {
     title?: string;
     id?: string;
@@ -124,4 +124,19 @@ export type DepartmentInfoVO = {
     id: string;
     name: string;
   }>;
+};
+
+export type TemplateInfoVO = {
+  id: string;
+  name: string;
+  type: string;
+  identifier: string;
+  assets: string;
+};
+
+export type TemplateUpdateRequest = {
+  name: string;
+  type: string;
+  identifier: string;
+  assets: string;
 };

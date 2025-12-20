@@ -6,11 +6,11 @@ import {
 } from '@ant-design/pro-components';
 import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
-import { App, Button, Modal } from 'antd';
+import {App, Button, Modal, Popconfirm} from 'antd';
 import { useRef, useState } from 'react';
-import ProImport from '@/components/ProImport.tsx';
 import { Api, type ApiResult } from '@/lib/api.ts';
-import type { UserInfoVO } from '@/lib/types.ts';
+import type {TemplateInfoVO} from '@/lib/types.ts';
+import {templateIdentifierMap} from "@/components/ProExport.tsx";
 
 export const Route = createFileRoute('/dashboard/system/template')({
   component: RouteComponent,
@@ -19,47 +19,45 @@ export const Route = createFileRoute('/dashboard/system/template')({
 function RouteComponent() {
   const { message } = App.useApp();
 
-  const [user, setUser] = useState<UserInfoVO | true>();
+  const [template, setTemplate] = useState<TemplateInfoVO | true>();
 
   const actionRef = useRef<ActionType>(undefined);
 
   return (
     <div>
       <Modal
-        open={!!user}
-        title={user === true ? '添加模板' : '编辑模板'}
+        open={!!template}
+        title={template === true ? '添加模板' : '编辑模板'}
         onCancel={() => {
-          setUser(undefined);
+          setTemplate(undefined);
         }}
         destroyOnHidden
         footer={null}
       >
         <ProForm
-          initialValues={user && typeof user !== 'boolean' && (user as any)}
+          initialValues={template && typeof template !== 'boolean' && (template as any)}
           onFinish={async (values) => {
             let resp: ApiResult;
             if (values.id) {
-              resp = await Api.dashboard.system.user.update(values.id, {
+              resp = await Api.dashboard.system.template.update(values.id, {
                 name: values.name,
-                phone: values.phone,
-                idCard: values.idCard,
-                isBanned: values.isBanned,
-                companies: values.companies,
+                type: values.type,
+                identifier: values.identifier,
+                assets: values.assets,
               });
             } else {
-              resp = await Api.dashboard.system.user.create([
+              resp = await Api.dashboard.system.template.create([
                 {
                   name: values.name,
-                  phone: values.phone,
-                  idCard: values.idCard,
-                  isBanned: values.isBanned,
-                  companies: values.companies,
+                  type: values.type,
+                  identifier: values.identifier,
+                  assets: values.assets,
                 },
               ]);
             }
             if (resp.code === 200) {
               message.success('保存成功');
-              setUser(undefined);
+              setTemplate(undefined);
               actionRef.current?.reload();
             } else {
               message.error(`保存失败: ${resp.msg}`);
@@ -78,67 +76,80 @@ function RouteComponent() {
                 },
               },
               {
-                title: '姓名',
+                title: '名称',
                 dataIndex: 'name',
                 formItemProps: {
                   required: true,
                   rules: [
                     {
+                      message: '请输入名称',
                       required: true,
-                      message: '姓名不能为空',
                     },
                   ],
                 },
               },
               {
-                title: '手机号',
-                dataIndex: 'phone',
+                title: '标识符',
+                dataIndex: 'identifier',
+                valueEnum: templateIdentifierMap,
                 formItemProps: {
                   required: true,
                   rules: [
                     {
+                      message: '请选择标识符',
                       required: true,
-                      message: '手机号不能为空',
                     },
                   ],
                 },
               },
               {
-                title: '身份证',
-                dataIndex: 'idCard',
-                formItemProps: {
-                  required: true,
-                  rules: [
-                    {
-                      required: true,
-                      message: '身份证不能为空',
-                    },
-                  ],
-                },
-              },
-              {
-                title: '封禁',
-                dataIndex: 'isBanned',
-                valueType: 'switch',
-              },
-              {
-                title: '公司',
-                dataIndex: 'companies',
+                title: '类型',
+                dataIndex: 'type',
                 valueType: 'select',
-                fieldProps: {
-                  mode: 'multiple',
+                valueEnum: {
+                  'excel.row': 'Excel行',
+                  'excel.file': 'Excel文件',
+                  'word.file': 'Word文件',
                 },
-                request: async () => {
-                  const resp = await Api.common.getCompanies();
-                  if (resp.code === 200) {
-                    return (
-                      resp.data?.map((item) => ({
-                        label: item.name,
-                        value: item.id,
-                      })) ?? []
-                    );
-                  }
-                  return [];
+                initialValue: 'excel.row',
+                formItemProps: {
+                  required: true,
+                  rules: [
+                    {
+                      message: '请选择类型',
+                      required: true,
+                    },
+                  ],
+                },
+              },
+              {
+                valueType: 'dependency',
+                fieldProps: {
+                  name: ['type'],
+                },
+                columns: (record) => {
+                  return [
+                    {
+                      title: '资源',
+                      dataIndex: 'assets',
+                      valueType: '#assets',
+                      formItemProps: {
+                        required: true,
+                        rules: [
+                          {
+                            message: '请选择资源',
+                            required: true,
+                          },
+                        ],
+                      },
+                      fieldProps: {
+                        allowFileTypes: record?.['type'] ? (
+                          record?.['type']?.startsWith('excel.') ? ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] :
+                            (record?.['type']?.startsWith('word.') ? ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] : [])
+                        ) : [],
+                      },
+                    },
+                  ];
                 },
               },
             ]}
@@ -152,7 +163,7 @@ function RouteComponent() {
             key="add"
             icon={<Icon icon="lucide:plus" />}
             onClick={() => {
-              setUser(true);
+              setTemplate(true);
             }}
           >
             添加
@@ -164,8 +175,23 @@ function RouteComponent() {
             dataIndex: 'id',
           },
           {
-            title: '标识符',
+            title: '名称',
             dataIndex: 'name',
+          },
+          {
+            title: '标识符',
+            dataIndex: 'identifier',
+            valueEnum: templateIdentifierMap,
+          },
+          {
+            title: '类型',
+            dataIndex: 'type',
+            valueType: 'select',
+            valueEnum: {
+              'excel.row': 'Excel行',
+              'excel.file': 'Excel文件',
+              'word.file': 'Word文件',
+            },
           },
           {
             title: '资源',
@@ -176,30 +202,43 @@ function RouteComponent() {
           {
             title: '操作',
             valueType: 'option',
-            render: (_, record) => [
+            render: (_, record, __, action) => [
               <Button
                 key="edit"
                 type="link"
                 size="small"
                 onClick={() => {
-                  setUser(record as any);
+                  setTemplate(record as any);
                 }}
               >
                 编辑
               </Button>,
+              <Popconfirm
+                title={`确定要删除${record.name}吗？`}
+                onConfirm={async () => {
+                  await Api.dashboard.system.template.delete(record.id);
+                  action?.reload();
+                }}
+                okButtonProps={{
+                  danger: true,
+                }}
+                okText="确定"
+                cancelText="取消"
+              >
+                <Button
+                  key="delete"
+                  type="link"
+                  size="small"
+                  danger
+                >
+                  删除
+                </Button>
+              </Popconfirm>,
             ],
           },
         ]}
         request={async (params) => {
-          const resp = await Api.dashboard.system.user.list(params);
-          return {
-            ...resp,
-            data:
-              resp.data?.map((item) => ({
-                ...item,
-                companies: item.companies?.map((item) => item.id),
-              })) ?? [],
-          };
+          return await Api.dashboard.system.template.list(params);
         }}
       />
     </div>

@@ -30,10 +30,10 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
   const frameworkState = useAtomValue(mainAtom);
 
   return (
-    <div className="flex justify-center bg-blue-100">
+    <div className="flex justify-center bg-blue-100 dark:bg-blue-950">
       <div className="max-w-xl w-screen h-screen flex flex-col shadow-lg bg-white">
         {frameworkState.navbarVisible && (
-          <div className="border-0 border-b border-gray-200">
+          <div className="border-0 border-b border-gray-200 dark:border-gray-700">
             <NavBar
               back={frameworkState.navbarBackVisible ? '' : null}
               onBack={() => {
@@ -44,9 +44,9 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
             </NavBar>
           </div>
         )}
-        <div className="grow overflow-y-auto h-0">{props.children}</div>
+        <div className="grow overflow-y-auto h-0 bg-card">{props.children}</div>
         {frameworkState.tabBarVisible && (
-          <div className="border-0 border-t border-gray-200">
+          <div className="border-0 border-t border-gray-200 dark:border-gray-700">
             <TabBar safeArea activeKey={frameworkState.activeTab}>
               <TabBar.Item
                 key="home"

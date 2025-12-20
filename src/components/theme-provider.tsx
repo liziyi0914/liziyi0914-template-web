@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -11,12 +11,10 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  realTheme: 'light' | 'dark';
 };
 
 const initialState: ThemeProviderState = {
   theme: 'system',
-  realTheme: 'light',
   setTheme: () => null,
 };
 
@@ -50,21 +48,12 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  const realTheme = useMemo(() => {
-    return theme === 'system'
-      ? window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
-      : theme;
-  }, [theme]);
-
   const value = {
     theme,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
-    realTheme,
   };
 
   return (

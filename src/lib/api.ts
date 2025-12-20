@@ -10,7 +10,7 @@ import type {
   DepartmentInfoVO,
   EmployeeDataVO,
   EmployeeSearchResultItem,
-  OSSUploadPresignArgs,
+  OSSUploadPresignArgs, TemplateInfoVO, TemplateUpdateRequest,
   UserInfoVO,
 } from '@/lib/types.ts';
 
@@ -258,6 +258,12 @@ export const Api = {
         },
       });
     },
+    getTemplates: (identifier: string) => {
+      return request<TemplateInfoVO[]>({
+        url: `/common/templates/${identifier}`,
+        method: 'GET',
+      });
+    },
   },
   auth: {
     loginSms: (phone: string, captcha: CaptchaResult) => {
@@ -459,6 +465,50 @@ export const Api = {
           });
         },
       },
+      template: {
+        list: (page: PageQuery) => {
+          return requestPage(
+            {
+              url: '/dashboard/system/template/',
+              method: 'POST',
+            },
+            page,
+          );
+        },
+        create: (
+          list: Array<TemplateUpdateRequest>,
+        ) => {
+          return request({
+            url: '/dashboard/system/template/',
+            method: 'PUT',
+            data: {
+              list,
+            },
+          });
+        },
+        get: (id: string) => {
+          return request<TemplateInfoVO>({
+            url: `/dashboard/system/template/${id}`,
+            method: 'GET',
+          });
+        },
+        update: (
+          id: string,
+          data: TemplateUpdateRequest,
+        ) => {
+          return request({
+            url: `/dashboard/system/template/${id}`,
+            method: 'POST',
+            data,
+          });
+        },
+        delete: (id: string) => {
+          return request({
+            url: `/dashboard/system/template/${id}`,
+            method: 'DELETE',
+          });
+        },
+      },
     },
     core: {
       company: {
@@ -566,6 +616,12 @@ export const Api = {
       },
       employee: {
         document: {
+          getIds: () => {
+            return request<Array<string>>({
+              url: '/dashboard/core/employee/document/ids',
+              method: 'GET',
+            });
+          },
           list: (page: PageQuery) => {
             return requestPage<EmployeeSearchResultItem>(
               {

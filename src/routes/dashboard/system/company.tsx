@@ -201,13 +201,10 @@ function RouteComponent() {
               >
                 <Button
                   disabled={record.companyName === '系统管理员'}
-                  key="edit"
+                  key="delete"
                   type="link"
                   size="small"
                   danger
-                  onClick={() => {
-                    action?.reload();
-                  }}
                 >
                   删除
                 </Button>

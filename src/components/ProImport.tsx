@@ -1,12 +1,11 @@
 import { ProTable } from '@ant-design/pro-components';
 import { Icon } from '@iconify/react';
 import { App, Button, Upload } from 'antd';
-import * as _ from 'lodash';
 import { useCallback } from 'react';
 import * as XLSX from 'xlsx';
-import { Api } from '@/lib/api.ts';
-import type { ColumnsType, DepartmentInfoVO } from '@/lib/types.ts';
+import type { ColumnsType } from '@/lib/types.ts';
 import { day } from '@/lib/utils.ts';
+import {json2column} from "@/lib/columnConverter.ts";
 
 const columns2headInfo = (columns: ColumnsType[]) => {
   let headers: Array<Array<string | undefined>> = [[]];
@@ -16,7 +15,8 @@ const columns2headInfo = (columns: ColumnsType[]) => {
     switch (column.valueType) {
       case '$tabGroup': {
         const label = column.group?.title ?? '-';
-        const inner = columns2headInfo(column.columns ?? []);
+        let columns = typeof column.columns === 'function' ? column.columns({}) : column.columns;
+        const inner = columns2headInfo(columns ?? []);
         const children = inner.headers;
 
         const w = Math.max(1, inner.headers[0].length);
@@ -174,147 +174,6 @@ const columns2sheet = (ws: XLSX.WorkSheet, columns: ColumnsType[]) => {
   XLSX.utils.decode_range('');
 };
 
-const formatData = async (
-  columns: ColumnsType[],
-  data: Record<string, any>,
-) => {
-  let departments: DepartmentInfoVO[] = [];
-  if (columns.filter((i) => i.valueType === 'department').length > 0) {
-    const resp = await Api.common.getDepartments();
-    if (resp.code === 200 && resp.data) {
-      departments = resp.data;
-    }
-  }
-
-  return _.reduce(
-    data,
-    (result, value, key) => {
-      const column = columns.filter((c) => c.dataIndex === key)?.[0];
-
-      if (!column) {
-        return result;
-      }
-
-      switch (column.valueType) {
-        case 'validDateRange': {
-          const parts = `${value}`.split('~').map((i) => i.trim());
-          const d: string[] = [];
-
-          if (parts.length >= 1) {
-            try {
-              const t = day(parts[0]);
-              if (t.isValid()) {
-                d.push(t.format('YYYY-MM-DD'));
-              }
-            } catch (e) {}
-          }
-
-          if (parts.length >= 2) {
-            if (parts[1] === '#LONG' || parts[1] === '长期') {
-              d.push('#LONG');
-            } else {
-              try {
-                const t = day(parts[1]);
-                if (t.isValid()) {
-                  d.push(t.format('YYYY-MM-DD'));
-                }
-              } catch (e) {}
-            }
-          }
-
-          return _.assign(result, {
-            [key]: d,
-          });
-        }
-        case 'date': {
-          try {
-            const t = day(value);
-            if (t.isValid()) {
-              return _.assign(result, {
-                [key]: t.format('YYYY-MM-DD'),
-              });
-            }
-          } catch (e) {}
-
-          return result;
-        }
-        case 'dateTime': {
-          try {
-            const t = day(value);
-            if (t.isValid()) {
-              return _.assign(result, {
-                [key]: t.format('YYYY-MM-DD HH:mm:ss'),
-              });
-            }
-          } catch (e) {}
-
-          return result;
-        }
-        case 'select': {
-          const valueEnum =
-            typeof column.valueEnum === 'function'
-              ? column.valueEnum(data)
-              : column.valueEnum;
-          if (valueEnum) {
-            for (const entry of Object.entries(valueEnum)) {
-              const enumK = entry[0];
-              const enumV = entry[1];
-              if (typeof enumV === 'string') {
-                if (enumV === value) {
-                  return _.assign(result, {
-                    [key]: enumK,
-                  });
-                }
-              } else if (enumV?.text === value) {
-                return _.assign(result, {
-                  [key]: enumK,
-                });
-              }
-            }
-          }
-
-          return result;
-        }
-        case 'department': {
-          const parts = `${value}`.split('-').map((i) => i.trim());
-
-          let department: DepartmentInfoVO | undefined;
-          let position:
-            | (DepartmentInfoVO['positions'] extends Array<infer T> | undefined
-                ? T
-                : undefined)
-            | undefined;
-
-          if (parts.length >= 1) {
-            department = departments.filter((i) => i.name === parts[0])?.[0];
-          } else {
-            return result;
-          }
-
-          if (parts.length >= 2 && department) {
-            position = department.positions?.filter(
-              (i) => i.name === parts[1],
-            )?.[0];
-            return _.assign(result, {
-              [key]: `${position?.id}`,
-            });
-          } else {
-            return _.assign(result, {
-              [key]: `${department?.id}`,
-            });
-          }
-        }
-        default: {
-          return _.assign(result, {
-            [key]: `${value}`,
-          });
-        }
-      }
-    },
-    {},
-  );
-};
-
 function Component<T = Record<string, any>>(props: {
   title?: string;
   columns: ColumnsType[];
@@ -379,7 +238,7 @@ function Component<T = Record<string, any>>(props: {
           for (let j = 0; j < row.length; j++) {
             data[`${head.mappings[j].dataIndex ?? '?'}`] = row[j];
           }
-          dataList.push(await formatData(head.mappings, data));
+          dataList.push(await json2column(head.mappings, data));
         }
 
         if (dataList.length === 0) {

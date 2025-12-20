@@ -160,7 +160,7 @@ export const UploadAssetsForm: React.FC<{
                 setFile(undefined);
               }}
             >
-              <div className="flex justify-center text-4xl text-black/50">
+              <div className="flex justify-center text-4xl text-muted-foreground/50 pb-3">
                 <Icon icon="lucide:upload" />
               </div>
               <div className="font-semibold">点击或将文件拖拽至此处上传</div>
@@ -241,7 +241,26 @@ const AssetsTable: React.FC<{
                 </Button>
               </Popover>
             ) : undefined,
-            <Button key="download" size="small" type="link">
+            <Button
+              key="download"
+              size="small"
+              type="link"
+              onClick={async () => {
+                const resp = await Api.common.getAssetsLink(record.id);
+                if (resp.code === 200 && resp.data) {
+                  const url = resp.data;
+                  const a = document.createElement('a');
+                  a.target = '_blank';
+                  a.href = url;
+                  a.download = record.name;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  message.success('下载成功');
+                } else {
+                  message.error('下载失败');
+                }
+              }}
+            >
               下载
             </Button>,
           ],

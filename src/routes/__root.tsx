@@ -5,7 +5,13 @@ import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { App, ConfigProvider, theme } from 'antd';
 import NotFound from '@/components/NotFound.tsx';
-import { useTheme } from '@/components/theme-provider.tsx';
+import {ThemeProvider, useTheme} from '@/components/theme-provider.tsx';
+import {useMemo} from "react";
+import {ProConfigProvider} from "@ant-design/pro-components";
+import AssetsPicker, {AssetsPickerView} from "@/components/formItem/AssetsPicker.tsx";
+import DepartmentPicker, {DepartmentPickerView} from "@/components/formItem/DepartmentPicker.tsx";
+import ValidDateRange, {ValidDateRangeView} from "@/components/formItem/ValidDateRange.tsx";
+import AiFormItem from "@/components/formItem/AiFormItem.tsx";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -14,20 +20,65 @@ interface MyRouterContext {
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => {
     const themeCfg = useTheme();
+    const currentTheme = useMemo(() => {
+      return themeCfg.theme === 'system'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : themeCfg.theme;
+    }, [themeCfg.theme]);
+
+    console.log(currentTheme)
 
     return (
       <>
         <ConfigProvider
           theme={{
             algorithm:
-              themeCfg.realTheme === 'light'
+              currentTheme === 'light'
                 ? theme.defaultAlgorithm
                 : theme.darkAlgorithm,
           }}
         >
-          <App>
-            <Outlet />
-          </App>
+          <ThemeProvider>
+            <ProConfigProvider
+              valueTypeMap={{
+                '#assets': {
+                  render: (text) => {
+                    return <AssetsPickerView value={text} />;
+                  },
+                  renderFormItem: (_, props) => {
+                    return <AssetsPicker {...props.fieldProps} />;
+                  },
+                },
+                department: {
+                  render: (text) => {
+                    return <DepartmentPickerView value={text} />;
+                  },
+                  renderFormItem: (_, props) => {
+                    return <DepartmentPicker {...props.fieldProps} />;
+                  },
+                },
+                validDateRange: {
+                  render: (text) => {
+                    return <ValidDateRangeView value={text} />;
+                  },
+                  renderFormItem: (_, props) => {
+                    return <ValidDateRange {...props.fieldProps} />;
+                  },
+                },
+                '#ai': {
+                  renderFormItem: (_, props) => {
+                    return <AiFormItem {...props.fieldProps} />;
+                  },
+                },
+              }}
+            >
+              <App>
+                <Outlet />
+              </App>
+            </ProConfigProvider>
+          </ThemeProvider>
         </ConfigProvider>
         {import.meta.env.DEV && (
           <TanStackDevtools

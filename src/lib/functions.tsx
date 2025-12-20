@@ -1,6 +1,8 @@
 import { Icon } from '@iconify/react';
 import type { TreeDataNode } from 'antd';
 import type { CompanyStructureDepartmentVO } from '@/lib/types.ts';
+import axios from "axios";
+import {instance} from "@/lib/api.ts";
 
 /**
  * 将 CompanyStructureDepartmentVO 数组转换为 TreeDataNode 树结构
@@ -134,4 +136,112 @@ export function validateUnifiedSocialCreditCode(code: string): boolean {
 
   // 比较计算出的校验码与实际第18位
   return code[17] === checkChar;
+}
+
+export function download(url: string, filename?: string, jsDownload?: boolean) {
+  if (jsDownload) {
+    new Promise(async () => {
+      const response = await axios.get(url, {
+        responseType: 'blob',
+      });
+
+      let name = filename;
+      if (!name) {
+        name = 'download';
+        const disposition = response.headers['content-disposition'];
+
+        if (disposition) {
+          const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(
+            disposition,
+          );
+          if (matches && matches[1]) {
+            name = matches[1].replace(/['"]/g, '');
+          }
+
+          if (disposition.includes('filename*=UTF-8')) {
+            const utf8Match = /filename\*=UTF-8''(.+)/i.exec(disposition);
+            if (utf8Match && utf8Match[1]) {
+              name = decodeURIComponent(utf8Match[1]);
+            }
+          }
+        }
+      }
+
+      const blob = new Blob([response.data], {
+        type: response.data.type,
+      });
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      download(downloadUrl, filename);
+
+      // 4. 清理
+      window.URL.revokeObjectURL(downloadUrl);
+    }).then();
+    return;
+  }
+
+  const link = document.createElement('a');
+  link.href = url;
+  if (filename) {
+    link.download = filename;
+  }
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+export async function runTemplate(templateId: string, list: Array<Record<string, any>>) {
+  try {
+    const response = await instance.post(
+      `/common/templates/${templateId}`,
+      {
+        list: list,
+      },
+      {
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (response.headers['content-type'] === 'application/json') {
+      console.error('模板执行失败', response);
+      throw new Error('模板执行失败');
+    }
+
+    // 处理文件名（兼容多种格式）
+    let filename = 'download';
+    const disposition = response.headers['content-disposition'];
+
+    if (disposition) {
+      const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(
+        disposition,
+      );
+      if (matches && matches[1]) {
+        filename = matches[1].replace(/['"]/g, '');
+      }
+
+      if (disposition.includes('filename*=UTF-8')) {
+        const utf8Match = /filename\*=UTF-8''(.+)/i.exec(disposition);
+        if (utf8Match && utf8Match[1]) {
+          filename = decodeURIComponent(utf8Match[1]);
+        }
+      }
+    }
+
+    // 3. 创建 Blob URL 并触发下载
+    const blob = new Blob([response.data], {
+      type: response.data.type,
+    });
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    download(downloadUrl, filename);
+
+    // 4. 清理
+    window.URL.revokeObjectURL(downloadUrl);
+  } catch (error) {
+    console.error('下载文件失败:', error);
+    throw new Error(`下载文件失败: ${(error as Error).message}`);
+  }
 }
