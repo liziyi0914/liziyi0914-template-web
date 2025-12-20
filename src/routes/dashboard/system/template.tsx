@@ -6,11 +6,11 @@ import {
 } from '@ant-design/pro-components';
 import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
-import {App, Button, Modal, Popconfirm} from 'antd';
+import { App, Button, Modal, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
+import { templateIdentifierMap } from '@/components/ProExport.tsx';
 import { Api, type ApiResult } from '@/lib/api.ts';
-import type {TemplateInfoVO} from '@/lib/types.ts';
-import {templateIdentifierMap} from "@/components/ProExport.tsx";
+import type { TemplateInfoVO } from '@/lib/types.ts';
 
 export const Route = createFileRoute('/dashboard/system/template')({
   component: RouteComponent,
@@ -35,7 +35,9 @@ function RouteComponent() {
         footer={null}
       >
         <ProForm
-          initialValues={template && typeof template !== 'boolean' && (template as any)}
+          initialValues={
+            template && typeof template !== 'boolean' && (template as any)
+          }
           onFinish={async (values) => {
             let resp: ApiResult;
             if (values.id) {
@@ -143,10 +145,17 @@ function RouteComponent() {
                         ],
                       },
                       fieldProps: {
-                        allowFileTypes: record?.['type'] ? (
-                          record?.['type']?.startsWith('excel.') ? ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] :
-                            (record?.['type']?.startsWith('word.') ? ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] : [])
-                        ) : [],
+                        allowFileTypes: record?.['type']
+                          ? record?.['type']?.startsWith('excel.')
+                            ? [
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                              ]
+                            : record?.['type']?.startsWith('word.')
+                              ? [
+                                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                ]
+                              : []
+                          : [],
                       },
                     },
                   ];
@@ -225,12 +234,7 @@ function RouteComponent() {
                 okText="确定"
                 cancelText="取消"
               >
-                <Button
-                  key="delete"
-                  type="link"
-                  size="small"
-                  danger
-                >
+                <Button key="delete" type="link" size="small" danger>
                   删除
                 </Button>
               </Popconfirm>,

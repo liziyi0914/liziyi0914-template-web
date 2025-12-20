@@ -1,14 +1,24 @@
-import type {ColumnsType, DepartmentInfoVO} from "@/lib/types.ts";
 import * as _ from 'lodash';
-import {day} from "@/lib/utils.ts";
-import {Api} from "@/lib/api.ts";
+import { Api } from '@/lib/api.ts';
+import type { ColumnsType, DepartmentInfoVO } from '@/lib/types.ts';
+import { day } from '@/lib/utils.ts';
 
-function flattenColumns(columns: Array<ColumnsType>, data: any): Array<ColumnsType> {
+function flattenColumns(
+  columns: Array<ColumnsType>,
+  data: any,
+): Array<ColumnsType> {
   const result: Array<ColumnsType> = [];
 
   columns.forEach((column) => {
     if (column.columns) {
-      result.push(...flattenColumns(typeof column.columns === 'function' ? column.columns(data) : column.columns, data));
+      result.push(
+        ...flattenColumns(
+          typeof column.columns === 'function'
+            ? column.columns(data)
+            : column.columns,
+          data,
+        ),
+      );
     } else {
       result.push(column);
     }
@@ -18,11 +28,15 @@ function flattenColumns(columns: Array<ColumnsType>, data: any): Array<ColumnsTy
 }
 
 export function genColumnsKVMap(columns: Array<ColumnsType>) {
-  let flattedColumns = flattenColumns(columns, {});
+  const flattedColumns = flattenColumns(columns, {});
 
-  return flattedColumns.filter((column) => !!column.dataIndex && !`${column.valueType}`.startsWith?.('#'))
+  return flattedColumns
+    .filter(
+      (column) =>
+        !!column.dataIndex && !`${column.valueType}`.startsWith?.('#'),
+    )
     .map((column) => {
-      let dataIndex = column.dataIndex as _.PropertyPath;
+      const dataIndex = column.dataIndex as _.PropertyPath;
 
       let id = '';
       if (Array.isArray(dataIndex)) {
@@ -35,13 +49,16 @@ export function genColumnsKVMap(columns: Array<ColumnsType>) {
         id: id,
         name: column.title,
       };
-    })
+    });
 }
 
-export async function column2json(columns: Array<ColumnsType>, data: Record<string, any>) {
-  let flattedColumns = flattenColumns(columns, data);
+export async function column2json(
+  columns: Array<ColumnsType>,
+  data: Record<string, any>,
+) {
+  const flattedColumns = flattenColumns(columns, data);
 
-  let result: Record<string, any> = {};
+  const result: Record<string, any> = {};
 
   let departments: DepartmentInfoVO[] = [];
   if (columns.filter((i) => i.valueType === 'department').length > 0) {
@@ -54,7 +71,7 @@ export async function column2json(columns: Array<ColumnsType>, data: Record<stri
   flattedColumns
     .filter((column) => !!column.dataIndex)
     .forEach((column) => {
-      let dataIndex = column.dataIndex as _.PropertyPath;
+      const dataIndex = column.dataIndex as _.PropertyPath;
 
       let value = _.get(data, dataIndex, undefined);
 
@@ -64,25 +81,25 @@ export async function column2json(columns: Array<ColumnsType>, data: Record<stri
 
       switch (column.valueType) {
         case 'validDateRange': {
-          let parts = Array.isArray(value) ? value : [];
+          const parts = Array.isArray(value) ? value : [];
 
           if (parts.length === 0) {
             value = '';
           } else if (parts.length === 1) {
-            let d1s = `${parts[0]}`.trim();
-            let d1 = day(d1s);
+            const d1s = `${parts[0]}`.trim();
+            const d1 = day(d1s);
 
             value = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
           } else if (parts.length === 2) {
             let d1s = `${parts[0]}`.trim();
-            let d1 = day(d1s);
+            const d1 = day(d1s);
             d1s = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
 
             let d2s = `${parts[1]}`.trim();
             if (d2s === '#LONG' || d2s === '长期') {
               value = `${d1s} ~ 长期`;
             } else {
-              let d2 = day(d2s);
+              const d2 = day(d2s);
               if (d2.isValid()) {
                 d2s = d2.format('YYYY-MM-DD');
                 value = `${d1s} ~ ${d2s}`;
@@ -121,8 +138,8 @@ export async function column2json(columns: Array<ColumnsType>, data: Record<stri
               : column.valueEnum;
 
           if (valueEnum) {
-            // @ts-ignore
-            let enumV = valueEnum?.[`${value}`];
+            // @ts-expect-error
+            const enumV = valueEnum?.[`${value}`];
             value = enumV?.['text'] ?? enumV;
           } else {
             value = undefined;
@@ -130,14 +147,14 @@ export async function column2json(columns: Array<ColumnsType>, data: Record<stri
           break;
         }
         case 'department': {
-          let v = undefined;
-          for (let department of departments) {
+          let v;
+          for (const department of departments) {
             if (department.id === `${value}`) {
               v = department.name;
               break;
             }
 
-            for (let position of (department.positions ?? [])) {
+            for (const position of department.positions ?? []) {
               if (position.id === `${value}`) {
                 v = `${department.name} - ${position.name}`;
                 break;
@@ -163,10 +180,13 @@ export async function column2json(columns: Array<ColumnsType>, data: Record<stri
   return result;
 }
 
-export async function json2column(columns: Array<ColumnsType>, data: Record<string, any>) {
-  let flattedColumns = flattenColumns(columns, data);
+export async function json2column(
+  columns: Array<ColumnsType>,
+  data: Record<string, any>,
+) {
+  const flattedColumns = flattenColumns(columns, data);
 
-  let result: Record<string, any> = {};
+  const result: Record<string, any> = {};
 
   let departments: DepartmentInfoVO[] = [];
   if (columns.filter((i) => i.valueType === 'department').length > 0) {
@@ -179,7 +199,7 @@ export async function json2column(columns: Array<ColumnsType>, data: Record<stri
   flattedColumns
     .filter((column) => !!column.dataIndex)
     .forEach((column) => {
-      let dataIndex = column.dataIndex as _.PropertyPath;
+      const dataIndex = column.dataIndex as _.PropertyPath;
 
       let value = _.get(data, dataIndex, undefined);
 
@@ -244,7 +264,7 @@ export async function json2column(columns: Array<ColumnsType>, data: Record<stri
               ? column.valueEnum(data)
               : column.valueEnum;
           if (valueEnum) {
-            let v = undefined;
+            let v;
             for (const entry of Object.entries(valueEnum)) {
               const enumK = entry[0];
               const enumV = entry[1];
@@ -267,8 +287,8 @@ export async function json2column(columns: Array<ColumnsType>, data: Record<stri
           let department: DepartmentInfoVO | undefined;
           let position:
             | (DepartmentInfoVO['positions'] extends Array<infer T> | undefined
-            ? T
-            : undefined)
+                ? T
+                : undefined)
             | undefined;
 
           if (parts.length >= 1) {

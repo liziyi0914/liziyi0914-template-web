@@ -10,7 +10,9 @@ import type {
   DepartmentInfoVO,
   EmployeeDataVO,
   EmployeeSearchResultItem,
-  OSSUploadPresignArgs, TemplateInfoVO, TemplateUpdateRequest,
+  OSSUploadPresignArgs,
+  TemplateInfoVO,
+  TemplateUpdateRequest,
   UserInfoVO,
 } from '@/lib/types.ts';
 
@@ -475,9 +477,7 @@ export const Api = {
             page,
           );
         },
-        create: (
-          list: Array<TemplateUpdateRequest>,
-        ) => {
+        create: (list: Array<TemplateUpdateRequest>) => {
           return request({
             url: '/dashboard/system/template/',
             method: 'PUT',
@@ -492,10 +492,7 @@ export const Api = {
             method: 'GET',
           });
         },
-        update: (
-          id: string,
-          data: TemplateUpdateRequest,
-        ) => {
+        update: (id: string, data: TemplateUpdateRequest) => {
           return request({
             url: `/dashboard/system/template/${id}`,
             method: 'POST',

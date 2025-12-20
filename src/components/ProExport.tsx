@@ -1,13 +1,14 @@
-import React, {useCallback, useState} from "react";
-import {App, Button, Modal} from "antd";
-import {Icon} from "@iconify/react";
-import type {Key} from "@ant-design/pro-components";
-import {runTemplate} from "@/lib/functions.tsx";
-import type {ColumnsType, TemplateInfoVO} from "@/lib/types.ts";
-import {Api} from "@/lib/api.ts";
-import {column2json, genColumnsKVMap} from "@/lib/columnConverter.ts";
-import * as XLSX from "xlsx";
-import {day} from "@/lib/utils.ts";
+import type { Key } from '@ant-design/pro-components';
+import { Icon } from '@iconify/react';
+import { App, Button, Modal } from 'antd';
+import type React from 'react';
+import { useCallback, useState } from 'react';
+import * as XLSX from 'xlsx';
+import { Api } from '@/lib/api.ts';
+import { column2json, genColumnsKVMap } from '@/lib/columnConverter.ts';
+import { runTemplate } from '@/lib/functions.tsx';
+import type { ColumnsType, TemplateInfoVO } from '@/lib/types.ts';
+import { day } from '@/lib/utils.ts';
 
 export const templateIdentifierMap = {
   'core.employee.document': '人员档案',
@@ -22,63 +23,64 @@ const Component: React.FC<{
   columns: Array<ColumnsType>;
 }> = (props) => {
   const { message, modal } = App.useApp();
-  const [ templates, setTemplates ] = useState<Array<TemplateInfoVO>>();
+  const [templates, setTemplates] = useState<Array<TemplateInfoVO>>();
 
-  const run = useCallback(async (templateId: string) => {
-    const m = modal.info({
-      title: '导出',
-      content: (
-        <div>
-          获取数据中……
-        </div>
-      ),
-      footer: false,
-      closable: false,
-      maskClosable: false,
-    });
-
-    try {
-      let rows = [];
-      let keys = props.keys;
-
-      if (keys.length === 0) {
-        keys = await props.fetchAllIds();
-      }
-
-      for (let i = 0; i < keys.length; i++) {
-        m.update({
-          content: (
-            <div>
-              获取数据中……（{i}/{keys.length}）
-            </div>
-          ),
-        });
-
-        let row = await props.fetchData(keys[i]);
-        if (row) {
-          rows.push(await column2json(props.columns, row));
-        }
-      }
-
-      m.update({
-        content: (
-          <div>
-            正在处理数据中……
-          </div>
-        ),
+  const run = useCallback(
+    async (templateId: string) => {
+      const m = modal.info({
+        title: '导出',
+        content: <div>获取数据中……</div>,
+        footer: false,
+        closable: false,
+        maskClosable: false,
       });
 
-      await runTemplate(templateId, rows);
+      try {
+        const rows = [];
+        let keys = props.keys;
 
-      m.destroy();
+        if (keys.length === 0) {
+          keys = await props.fetchAllIds();
+        }
 
-      message.success('导出成功');
-    } catch (e) {
-      m.destroy();
-      console.error(e);
-      message.error('导出失败');
-    }
-  }, [props.identifier, props.keys, props.fetchData, props.fetchAllIds, props.columns]);
+        for (let i = 0; i < keys.length; i++) {
+          m.update({
+            content: (
+              <div>
+                获取数据中……（{i}/{keys.length}）
+              </div>
+            ),
+          });
+
+          const row = await props.fetchData(keys[i]);
+          if (row) {
+            rows.push(await column2json(props.columns, row));
+          }
+        }
+
+        m.update({
+          content: <div>正在处理数据中……</div>,
+        });
+
+        await runTemplate(templateId, rows);
+
+        m.destroy();
+
+        message.success('导出成功');
+      } catch (e) {
+        m.destroy();
+        console.error(e);
+        message.error('导出失败');
+      }
+    },
+    [
+      props.identifier,
+      props.keys,
+      props.fetchData,
+      props.fetchAllIds,
+      props.columns,
+    ],
+  );
 
   return (
     <>
@@ -118,17 +120,14 @@ const Component: React.FC<{
 
             const now = day().format('YYYYMMDDHHmmss');
 
-            XLSX.writeFile(
-              book,
-              `导出参数${now}.xlsx`,
-            );
+            XLSX.writeFile(book, `导出参数${now}.xlsx`);
 
             return;
           }
 
-          let loading = message.loading('获取模板列表...', 0);
+          const loading = message.loading('获取模板列表...', 0);
 
-          let resp = await Api.common.getTemplates(props.identifier);
+          const resp = await Api.common.getTemplates(props.identifier);
 
           loading();
 

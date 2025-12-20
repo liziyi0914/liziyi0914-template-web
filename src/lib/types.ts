@@ -16,7 +16,9 @@ export type ColumnsType<T = any, ValueType = FormFieldType> = Omit<
   ProFormColumnsType<T, ValueType>,
   'columns'
 > & {
-  columns?: ColumnsType<T, ValueType | FormFieldType>[] | ((values: any) => ColumnsType<T, ValueType | FormFieldType>[]);
+  columns?:
+    | ColumnsType<T, ValueType | FormFieldType>[]
+    | ((values: any) => ColumnsType<T, ValueType | FormFieldType>[]);
   group?: {
     title?: string;
     id?: string;

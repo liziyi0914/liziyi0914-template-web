@@ -1,13 +1,18 @@
-import {type ActionType, type Key, ProForm, ProTable} from '@ant-design/pro-components';
+import {
+  type ActionType,
+  type Key,
+  ProForm,
+  ProTable,
+} from '@ant-design/pro-components';
 import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { App, Button, Modal, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
 import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
+import ProExport from '@/components/ProExport.tsx';
 import ProImport from '@/components/ProImport.tsx';
 import { Api, type ApiResult } from '@/lib/api.ts';
-import type {ColumnsType, EmployeeDataVO} from '@/lib/types.ts';
-import ProExport from "@/components/ProExport.tsx";
+import type { ColumnsType, EmployeeDataVO } from '@/lib/types.ts';
 
 export const Route = createFileRoute('/dashboard/core/employee/document')({
   component: RouteComponent,
@@ -703,11 +708,13 @@ function RouteComponent() {
             identifier="core.employee.document"
             keys={(selectedRows?.length ?? 0) === 0 ? [] : selectedRows}
             fetchAllIds={async () => {
-              let resp = await Api.dashboard.core.employee.document.getIds();
+              const resp = await Api.dashboard.core.employee.document.getIds();
               return resp.data ?? [];
             }}
             fetchData={async (key) => {
-              let resp = await Api.dashboard.core.employee.document.get(`${key}`);
+              const resp = await Api.dashboard.core.employee.document.get(
+                `${key}`,
+              );
               let data: EmployeeDataVO | any | undefined = resp.data;
 
               if (data) {

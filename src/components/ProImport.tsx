@@ -3,9 +3,9 @@ import { Icon } from '@iconify/react';
 import { App, Button, Upload } from 'antd';
 import { useCallback } from 'react';
 import * as XLSX from 'xlsx';
+import { json2column } from '@/lib/columnConverter.ts';
 import type { ColumnsType } from '@/lib/types.ts';
 import { day } from '@/lib/utils.ts';
-import {json2column} from "@/lib/columnConverter.ts";
 
 const columns2headInfo = (columns: ColumnsType[]) => {
   let headers: Array<Array<string | undefined>> = [[]];
@@ -15,7 +15,10 @@ const columns2headInfo = (columns: ColumnsType[]) => {
     switch (column.valueType) {
       case '$tabGroup': {
         const label = column.group?.title ?? '-';
-        let columns = typeof column.columns === 'function' ? column.columns({}) : column.columns;
+        const columns =
+          typeof column.columns === 'function'
+            ? column.columns({})
+            : column.columns;
         const inner = columns2headInfo(columns ?? []);
         const children = inner.headers;
 

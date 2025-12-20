@@ -1,17 +1,23 @@
+import { ProConfigProvider } from '@ant-design/pro-components';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { App, ConfigProvider, theme } from 'antd';
+import { useMemo } from 'react';
+import AiFormItem from '@/components/formItem/AiFormItem.tsx';
+import AssetsPicker, {
+  AssetsPickerView,
+} from '@/components/formItem/AssetsPicker.tsx';
+import DepartmentPicker, {
+  DepartmentPickerView,
+} from '@/components/formItem/DepartmentPicker.tsx';
+import ValidDateRange, {
+  ValidDateRangeView,
+} from '@/components/formItem/ValidDateRange.tsx';
 import NotFound from '@/components/NotFound.tsx';
-import {ThemeProvider, useTheme} from '@/components/theme-provider.tsx';
-import {useMemo} from "react";
-import {ProConfigProvider} from "@ant-design/pro-components";
-import AssetsPicker, {AssetsPickerView} from "@/components/formItem/AssetsPicker.tsx";
-import DepartmentPicker, {DepartmentPickerView} from "@/components/formItem/DepartmentPicker.tsx";
-import ValidDateRange, {ValidDateRangeView} from "@/components/formItem/ValidDateRange.tsx";
-import AiFormItem from "@/components/formItem/AiFormItem.tsx";
+import { ThemeProvider, useTheme } from '@/components/theme-provider.tsx';
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -28,7 +34,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         : themeCfg.theme;
     }, [themeCfg.theme]);
 
-    console.log(currentTheme)
+    console.log(currentTheme);
 
     return (
       <>

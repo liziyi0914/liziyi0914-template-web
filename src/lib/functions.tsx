@@ -1,8 +1,8 @@
 import { Icon } from '@iconify/react';
 import type { TreeDataNode } from 'antd';
+import axios from 'axios';
+import { instance } from '@/lib/api.ts';
 import type { CompanyStructureDepartmentVO } from '@/lib/types.ts';
-import axios from "axios";
-import {instance} from "@/lib/api.ts";
 
 /**
  * 将 CompanyStructureDepartmentVO 数组转换为 TreeDataNode 树结构
@@ -190,7 +190,10 @@ export function download(url: string, filename?: string, jsDownload?: boolean) {
   document.body.removeChild(link);
 }
 
-export async function runTemplate(templateId: string, list: Array<Record<string, any>>) {
+export async function runTemplate(
+  templateId: string,
+  list: Array<Record<string, any>>,
+) {
   try {
     const response = await instance.post(
       `/common/templates/${templateId}`,
