@@ -21,6 +21,7 @@ const Component: React.FC<{
   fetchAllIds: () => Promise<Array<Key>>;
   fetchData: (key: Key) => Promise<any | undefined | null>;
   columns: Array<ColumnsType>;
+  extraData: () => Promise<any | undefined | null>;
 }> = (props) => {
   const { message, modal } = App.useApp();
   const [templates, setTemplates] = useState<Array<TemplateInfoVO>>();
@@ -34,6 +35,8 @@ const Component: React.FC<{
         closable: false,
         maskClosable: false,
       });
+
+      let extra = await props.extraData();
 
       try {
         const rows = [];
@@ -52,8 +55,12 @@ const Component: React.FC<{
             ),
           });
 
-          const row = await props.fetchData(keys[i]);
+          let row = await props.fetchData(keys[i]);
           if (row) {
+            row = {
+              ...extra,
+              ...row,
+            };
             rows.push(await column2json(props.columns, row));
           }
         }

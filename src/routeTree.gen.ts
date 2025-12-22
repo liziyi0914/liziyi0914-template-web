@@ -22,6 +22,7 @@ import { Route as HomeTrainingIndexRouteImport } from './routes/_home/training/i
 import { Route as DashboardSystemUserRouteImport } from './routes/dashboard/system/user'
 import { Route as DashboardSystemTemplateRouteImport } from './routes/dashboard/system/template'
 import { Route as DashboardSystemCompanyRouteImport } from './routes/dashboard/system/company'
+import { Route as DashboardCoreVehicleRouteImport } from './routes/dashboard/core/vehicle'
 import { Route as DashboardCoreEmployeeDocumentRouteImport } from './routes/dashboard/core/employee/document'
 import { Route as DashboardCoreCompanyStructureRouteImport } from './routes/dashboard/core/company/structure'
 import { Route as DashboardCoreCompanyInfoRouteImport } from './routes/dashboard/core/company/info'
@@ -91,6 +92,11 @@ const DashboardSystemCompanyRoute = DashboardSystemCompanyRouteImport.update({
   path: '/system/company',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardCoreVehicleRoute = DashboardCoreVehicleRouteImport.update({
+  id: '/core/vehicle',
+  path: '/core/vehicle',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardCoreEmployeeDocumentRoute =
   DashboardCoreEmployeeDocumentRouteImport.update({
     id: '/core/employee/document',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/home': typeof DashboardHomeRoute
   '/': typeof HomeIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/core/vehicle': typeof DashboardCoreVehicleRoute
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
   '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/dashboard/home': typeof DashboardHomeRoute
   '/': typeof HomeIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/core/vehicle': typeof DashboardCoreVehicleRoute
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
   '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/dashboard/home': typeof DashboardHomeRoute
   '/_home/': typeof HomeIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/core/vehicle': typeof DashboardCoreVehicleRoute
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
   '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/dashboard/home'
     | '/'
     | '/dashboard/'
+    | '/dashboard/core/vehicle'
     | '/dashboard/system/company'
     | '/dashboard/system/template'
     | '/dashboard/system/user'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/dashboard/home'
     | '/'
     | '/dashboard'
+    | '/dashboard/core/vehicle'
     | '/dashboard/system/company'
     | '/dashboard/system/template'
     | '/dashboard/system/user'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/dashboard/home'
     | '/_home/'
     | '/dashboard/'
+    | '/dashboard/core/vehicle'
     | '/dashboard/system/company'
     | '/dashboard/system/template'
     | '/dashboard/system/user'
@@ -328,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemCompanyRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/core/vehicle': {
+      id: '/dashboard/core/vehicle'
+      path: '/core/vehicle'
+      fullPath: '/dashboard/core/vehicle'
+      preLoaderRoute: typeof DashboardCoreVehicleRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/core/employee/document': {
       id: '/dashboard/core/employee/document'
       path: '/core/employee/document'
@@ -378,6 +397,7 @@ const HomeRouteWithChildren = HomeRoute._addFileChildren(HomeRouteChildren)
 interface DashboardRouteChildren {
   DashboardHomeRoute: typeof DashboardHomeRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardCoreVehicleRoute: typeof DashboardCoreVehicleRoute
   DashboardSystemCompanyRoute: typeof DashboardSystemCompanyRoute
   DashboardSystemTemplateRoute: typeof DashboardSystemTemplateRoute
   DashboardSystemUserRoute: typeof DashboardSystemUserRoute
@@ -390,6 +410,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardHomeRoute: DashboardHomeRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardCoreVehicleRoute: DashboardCoreVehicleRoute,
   DashboardSystemCompanyRoute: DashboardSystemCompanyRoute,
   DashboardSystemTemplateRoute: DashboardSystemTemplateRoute,
   DashboardSystemUserRoute: DashboardSystemUserRoute,

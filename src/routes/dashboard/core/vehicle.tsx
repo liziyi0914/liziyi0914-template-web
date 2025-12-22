@@ -4,18 +4,17 @@ import {
   ProForm,
   ProTable,
 } from '@ant-design/pro-components';
-import { Icon } from '@iconify/react';
-import { createFileRoute } from '@tanstack/react-router';
-import { App, Button, Modal, Popconfirm } from 'antd';
-import { useRef, useState } from 'react';
+import {Icon} from '@iconify/react';
+import {createFileRoute} from '@tanstack/react-router';
+import {App, Button, Modal, Popconfirm} from 'antd';
+import {useRef, useState} from 'react';
 import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
 import ProExport from '@/components/ProExport.tsx';
 import ProImport from '@/components/ProImport.tsx';
-import { Api, type ApiResult } from '@/lib/api.ts';
-import type { ColumnsType, EmployeeDataVO } from '@/lib/types.ts';
-import {companyInfoExportColumns} from "@/routes/dashboard/core/company/info.tsx";
+import {Api, type ApiResult} from '@/lib/api.ts';
+import type {ColumnsType, EmployeeDataVO} from '@/lib/types.ts';
 
-export const Route = createFileRoute('/dashboard/core/employee/document')({
+export const Route = createFileRoute('/dashboard/core/vehicle')({
   component: RouteComponent,
 });
 
@@ -584,7 +583,7 @@ const columns: ColumnsType[] = [
 ];
 
 function RouteComponent() {
-  const { message } = App.useApp();
+  const {message} = App.useApp();
   const actionRef = useRef<ActionType>(undefined);
   const [employee, setEmployee] = useState<
     { id?: string; data?: Record<string, any> } | undefined
@@ -643,7 +642,7 @@ function RouteComponent() {
           }}
         >
           <div className="pb-6 grow">
-            <GroupedEmbedSchemaForm columns={columns} />
+            <GroupedEmbedSchemaForm columns={columns}/>
           </div>
         </ProForm>
       </Modal>
@@ -661,7 +660,7 @@ function RouteComponent() {
         toolBarRender={() => [
           <Button
             key="add"
-            icon={<Icon icon="lucide:plus" />}
+            icon={<Icon icon="lucide:plus"/>}
             onClick={() => {
               setEmployee({});
             }}
@@ -705,10 +704,7 @@ function RouteComponent() {
           />,
           <ProExport
             key="export"
-            columns={[
-              ...companyInfoExportColumns,
-              ...columns,
-            ]}
+            columns={columns}
             identifier="core.employee.document"
             keys={(selectedRows?.length ?? 0) === 0 ? [] : selectedRows}
             fetchAllIds={async () => {
@@ -731,14 +727,6 @@ function RouteComponent() {
 
               return data;
             }}
-            extraData={async () => {
-              let resp = await Api.dashboard.core.company.info.get();
-
-              return resp?.data ? {
-                ...resp.data.data,
-                companyName: resp.data.companyName,
-              } : {};
-            }}
           />,
         ]}
         columns={[
@@ -750,90 +738,73 @@ function RouteComponent() {
             search: false,
           },
           {
-            title: '手机号',
-            dataIndex: 'phone',
+            title: "档案编号",
+            dataIndex: "archiveId"
           },
           {
-            title: '姓名',
-            dataIndex: 'name',
-          },
-          {
-            title: '身份证',
-            dataIndex: 'idCard',
-          },
-          {
-            title: '性别',
-            dataIndex: 'gender',
-            valueType: 'select',
-            valueEnum: {
-              0: '男',
-              1: '女',
-            },
-          },
-          {
-            title: '角色',
-            dataIndex: 'careerRole',
-            valueType: 'select',
-            valueEnum: {
-              safetyOfficer: '安全员',
-              monitoringOfficer: '监控员',
-              vehicleAdministrator: '车辆管理人员',
-              driver: '驾驶员',
-              principalInCharge: '主要负责人',
-              vehicleStaffAdministrator: '车辆人员管理员',
-              generalStaff: '普通员工',
-            },
-          },
-          {
-            title: '岗位',
-            dataIndex: 'departmentPosition',
+            title: "所属部门",
+            dataIndex: "departmentPosition",
             valueType: 'department',
             fieldProps: {
-              allowTypes: ['position'],
+              allowTypes: ['position']
             },
           },
           {
-            title: '在职',
-            dataIndex: 'isEmployed',
+            title: "车牌号码",
+            dataIndex: "licensePlate"
+          },
+          {
+            title: "车主姓名",
+            dataIndex: "ownerName"
+          },
+          {
+            title: "驾驶员",
+            dataIndex: "driverName"
+          },
+          {
+            title: "驾驶员电话",
+            dataIndex: "driverPhone"
+          },
+          {
+            title: "车辆类型",
+            dataIndex: "vehicleType",
             valueType: 'select',
             valueEnum: {
-              false: '否',
-              true: '是',
+              "smallCar": "小型汽车",
+              "trailer": "挂车",
+              "heavyDumpTruck": "重型自卸货车",
+              "flatbedTruck": "栏板车",
+              "tractorTruck": "牵引车",
+              "tankTruck": "罐式车",
+              "passengerBus": "客运班车",
+              "largeOrdinaryBus": "大型普通客车",
+              "mediumOrdinaryBus": "中型普通客车",
+              "smallOrdinaryBus": "小型普通客车",
+              "transitBus": "公交车",
+              "other": "其他类别",
             },
           },
           {
-            title: '账号关联',
-            dataIndex: 'isRegistered',
+            title: "车辆技术等级",
+            dataIndex: "technicalLevel",
             valueType: 'select',
             valueEnum: {
-              false: '否',
-              true: '是',
-            },
-            render: (dom, record) => (
-              <>
-                {dom}
-
-                <Button
-                  type="link"
-                  size="small"
-                  onClick={async () => {
-                    const resp =
-                      await Api.dashboard.core.employee.document.refreshBinding(
-                        record.id,
-                      );
-                    if (resp.code === 200) {
-                      message.success(`刷新成功`);
-                      actionRef.current?.reload();
-                    } else {
-                      message.error(`刷新成功: ${resp.msg}`);
-                      console.error(resp);
-                    }
-                  }}
-                >
-                  刷新绑定
-                </Button>
-              </>
-            ),
+              L1: "一级",
+              L2: "二级",
+              L3: "三级",
+              NONE: "未评定"
+            }
+          },
+          {
+            title: "状态",
+            dataIndex: "status",
+            valueType: 'select',
+            valueEnum: {
+              "inUse": "使用中",
+              "transferred": "已过户",
+              "scrapped": "已报废",
+              "suspended": "已停运"
+            }
           },
           {
             title: '操作',

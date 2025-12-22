@@ -1,3 +1,4 @@
+import { scan } from "react-scan";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { initIcons } from '@/lib/icons.ts';
@@ -7,6 +8,9 @@ import App from './App';
 import '@/assets/fonts/MiSansVF.ttf';
 
 initIcons();
+scan({
+  enabled: true,
+});
 
 const rootEl = document.getElementById('root');
 if (rootEl) {
