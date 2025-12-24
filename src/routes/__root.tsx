@@ -5,7 +5,7 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { App, ConfigProvider, theme } from 'antd';
-import {useEffect, useMemo} from 'react';
+import { useEffect, useMemo } from 'react';
 import AiFormItem from '@/components/formItem/AiFormItem.tsx';
 import AssetsPicker, {
   AssetsPickerView,
@@ -13,12 +13,14 @@ import AssetsPicker, {
 import DepartmentPicker, {
   DepartmentPickerView,
 } from '@/components/formItem/DepartmentPicker.tsx';
+import EmployeePicker, {
+  EmployeePickerView,
+} from '@/components/formItem/EmployeePicker.tsx';
 import ValidDateRange, {
   ValidDateRangeView,
 } from '@/components/formItem/ValidDateRange.tsx';
 import NotFound from '@/components/NotFound.tsx';
 import { ThemeProvider, useTheme } from '@/components/theme-provider.tsx';
-import EmployeePicker, {EmployeePickerView} from "@/components/formItem/EmployeePicker.tsx";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -38,8 +40,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     useEffect(() => {
       document.documentElement.setAttribute(
         'data-prefers-color-scheme',
-        currentTheme ? 'dark' : 'light'
-      )
+        currentTheme ? 'dark' : 'light',
+      );
     }, [currentTheme]);
 
     return (

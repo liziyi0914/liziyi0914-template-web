@@ -2,7 +2,7 @@ import { Icon } from '@iconify/react';
 import type { TreeDataNode } from 'antd';
 import axios from 'axios';
 import { instance } from '@/lib/api.ts';
-import type {CompanyStructureDepartmentVO} from '@/lib/types.ts';
+import type { CompanyStructureDepartmentVO } from '@/lib/types.ts';
 
 /**
  * 将 CompanyStructureDepartmentVO 数组转换为 TreeDataNode 树结构
@@ -249,10 +249,17 @@ export async function runTemplate(
   }
 }
 
-export function columnIdBase(name: Array<string>, version: string, path: Array<string>): string {
+export function columnIdBase(
+  name: Array<string>,
+  version: string,
+  path: Array<string>,
+): string {
   return `${path.join('_')}__${version}__${name.join('_')}`;
 }
 
-export function columnIdFn(path: Array<string>): (version: string, ...name: Array<string>) => string {
-  return (version: string, ...name: Array<string>) => columnIdBase(name, version, path);
+export function columnIdFn(
+  path: Array<string>,
+): (version: string, ...name: Array<string>) => string {
+  return (version: string, ...name: Array<string>) =>
+    columnIdBase(name, version, path);
 }

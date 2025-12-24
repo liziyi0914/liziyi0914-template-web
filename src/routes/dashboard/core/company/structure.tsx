@@ -19,6 +19,7 @@ import {
   type TreeDataNode,
 } from 'antd';
 import html2canvas from 'html2canvas-pro';
+import { useAtomValue } from 'jotai';
 import React, {
   type PropsWithChildren,
   useEffect,
@@ -28,8 +29,7 @@ import React, {
 } from 'react';
 import { Api } from '@/lib/api.ts';
 import { convertDepartmentsToTreeData } from '@/lib/functions.tsx';
-import {useAtomValue} from "jotai";
-import {LoginState} from "@/routes/dashboard.tsx";
+import { LoginState } from '@/routes/dashboard.tsx';
 
 export const Route = createFileRoute('/dashboard/core/company/structure')({
   component: RouteComponent,
@@ -224,15 +224,16 @@ const StructureGraph: React.FC<{
   const divRef = useRef<HTMLDivElement>(null);
 
   const mapTree = async (tree: TreeDataNode[]) => {
-    let list: GraphNodeType[] = [];
+    const list: GraphNodeType[] = [];
 
-    for (let item of tree) {
-      let children = item.children
-        ? await mapTree(item.children)
-        : [];
+    for (const item of tree) {
+      let children = item.children ? await mapTree(item.children) : [];
 
       if (`${item.key}`.startsWith('position.')) {
-        let resp = await Api.dashboard.core.company.structure.listPositionEmployees(`${item.key}`.substring('position.'.length));
+        const resp =
+          await Api.dashboard.core.company.structure.listPositionEmployees(
+            `${item.key}`.substring('position.'.length),
+          );
         if (resp.code === 200 && resp.data) {
           children = [
             ...children,
@@ -407,7 +408,10 @@ function RouteComponent() {
               setOpenStructureModal(false);
             }}
           >
-            <StructureGraph companyName={loginState?.companyName ?? ''} tree={tree} />
+            <StructureGraph
+              companyName={loginState?.companyName ?? ''}
+              tree={tree}
+            />
           </Modal>
 
           <div className="flex">

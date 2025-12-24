@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import {Select} from 'antd';
+import { Select } from 'antd';
 import type React from 'react';
 import { useMemo } from 'react';
 import { Api } from '@/lib/api.ts';
@@ -27,10 +27,12 @@ const Component: React.FC<{
       onChange={props.onChange}
       placeholder={props.placeholder}
       allowClear
-      options={data.data?.map((item) => ({
-        value: item.id,
-        label: item.name ? `${item.name} (${item.phone})` : item.phone,
-      })) ?? []}
+      options={
+        data.data?.map((item) => ({
+          value: item.id,
+          label: item.name ? `${item.name} (${item.phone})` : item.phone,
+        })) ?? []
+      }
     />
   );
 };

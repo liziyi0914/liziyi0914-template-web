@@ -37,7 +37,7 @@ const Component: React.FC<{
         maskClosable: false,
       });
 
-      let extra = await props.extraData();
+      const extra = await props.extraData();
 
       try {
         const rows = [];

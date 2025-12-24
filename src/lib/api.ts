@@ -1,6 +1,7 @@
 import type { ProFormColumnsType } from '@ant-design/pro-components';
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { BACKEND_URL } from '@/lib/constants';
+import { columnIdBase } from '@/lib/functions.tsx';
 import type {
   AssetsInfoVO,
   CompanyListVO,
@@ -8,14 +9,16 @@ import type {
   CompanyStructurePositionUpdateVO,
   CompanyStructureVO,
   DepartmentInfoVO,
-  EmployeeDataVO, EmployeeInfoVO,
+  EmployeeDataVO,
+  EmployeeInfoVO,
   EmployeeSearchResultItem,
   OSSUploadPresignArgs,
   TemplateInfoVO,
   TemplateUpdateRequest,
-  UserInfoVO, VehicleDataVO, VehicleSearchResultItem,
+  UserInfoVO,
+  VehicleDataVO,
+  VehicleSearchResultItem,
 } from '@/lib/types.ts';
-import {columnIdBase} from "@/lib/functions.tsx";
 
 export interface ApiResult<T = any> {
   code: number;
@@ -174,7 +177,7 @@ export const uploadOss: <T = any>(
     };
   } else {
     try {
-      let text = await uploadResp.text();
+      const text = await uploadResp.text();
 
       const json = JSON.parse(text);
 
@@ -619,17 +622,17 @@ export const Api = {
             });
           },
           listPositionEmployees: (id: string) => {
-            return request<Array<{
-              id: string;
-              name?: string;
-              phone: string;
-              careerRole?: string;
-            }>>(
-              {
-                url: `/dashboard/core/company/structure/position/${id}/employee`,
-                method: 'GET',
-              },
-            );
+            return request<
+              Array<{
+                id: string;
+                name?: string;
+                phone: string;
+                careerRole?: string;
+              }>
+            >({
+              url: `/dashboard/core/company/structure/position/${id}/employee`,
+              method: 'GET',
+            });
           },
         },
       },
@@ -722,7 +725,11 @@ export const Api = {
             method: 'GET',
           });
         },
-        update: (id: string, plateNumber: string, data: Record<string, any>) => {
+        update: (
+          id: string,
+          plateNumber: string,
+          data: Record<string, any>,
+        ) => {
           return request({
             url: `/dashboard/core/vehicle/${id}`,
             method: 'POST',
@@ -743,7 +750,6 @@ export const Api = {
   },
 };
 
-
 export const DataApi = {
   dashboard: {
     core: {
@@ -753,7 +759,11 @@ export const DataApi = {
           if (resp.code === 200 && resp.data) {
             return {
               ...resp.data.data,
-              [columnIdBase(['companyName'], 'v1', ['core', 'company', 'info'])]: resp.data.companyName,
+              [columnIdBase(['companyName'], 'v1', [
+                'core',
+                'company',
+                'info',
+              ])]: resp.data.companyName,
             };
           }
           return {};
@@ -766,7 +776,11 @@ export const DataApi = {
           if (resp.code === 200 && resp.data) {
             return {
               ...resp.data.data,
-              [columnIdBase(['basic', 'basic', 'phone'], 'v1', ['core', 'employee', 'document'])]: resp.data.phone,
+              [columnIdBase(['basic', 'basic', 'phone'], 'v1', [
+                'core',
+                'employee',
+                'document',
+              ])]: resp.data.phone,
             };
           }
 

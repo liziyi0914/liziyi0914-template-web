@@ -1,6 +1,10 @@
 import * as _ from 'lodash';
 import { Api } from '@/lib/api.ts';
-import type {ColumnsType, DepartmentInfoVO, EmployeeInfoVO} from '@/lib/types.ts';
+import type {
+  ColumnsType,
+  DepartmentInfoVO,
+  EmployeeInfoVO,
+} from '@/lib/types.ts';
 import { day } from '@/lib/utils.ts';
 
 function flattenColumns(
@@ -338,7 +342,7 @@ export async function json2column(
         }
         case 'employee': {
           let v;
-          for (let employee of employees) {
+          for (const employee of employees) {
             if (employee.name === value || employee.phone === value) {
               v = `${employee.id}`;
             }

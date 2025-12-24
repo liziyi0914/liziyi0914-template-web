@@ -11,10 +11,10 @@ import { useRef, useState } from 'react';
 import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
 import ProExport from '@/components/ProExport.tsx';
 import ProImport from '@/components/ProImport.tsx';
-import {Api, type ApiResult, DataApi} from '@/lib/api.ts';
+import { Api, type ApiResult, DataApi } from '@/lib/api.ts';
+import { columnIdFn } from '@/lib/functions.tsx';
 import type { ColumnsType, EmployeeDataVO } from '@/lib/types.ts';
-import {columnIdFn} from "@/lib/functions.tsx";
-import {companyInfoColumns} from "@/routes/dashboard/core/company/info.tsx";
+import { companyInfoColumns } from '@/routes/dashboard/core/company/info.tsx';
 
 export const Route = createFileRoute('/dashboard/core/employee/document')({
   component: RouteComponent,
@@ -131,7 +131,12 @@ const columns: ColumnsType[] = [
           },
           {
             title: '紧急联系人电话',
-            dataIndex: columnId('v1', 'basic', 'basic', 'emergencyContactPhone'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'basic',
+              'emergencyContactPhone',
+            ),
             colProps: {
               span: 12,
             },
@@ -317,7 +322,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'basic', 'safetyCommitmentLetter', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'safetyCommitmentLetter',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -334,7 +344,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'basic', 'responsibilityStatement', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'responsibilityStatement',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -351,7 +366,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'basic', 'physicalExaminationCertificate', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'physicalExaminationCertificate',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -411,7 +431,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'safety', 'safetyManagementQualificationCertificate', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'safety',
+              'safetyManagementQualificationCertificate',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -428,7 +453,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'safety', 'registeredSafetyEngineerCertificate', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'safety',
+              'registeredSafetyEngineerCertificate',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -471,7 +501,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'driver', 'professionalQualificationCertificate', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'driver',
+              'professionalQualificationCertificate',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -488,7 +523,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'driver', 'occupationalHazardsNotificationLetter', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'driver',
+              'occupationalHazardsNotificationLetter',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -514,7 +554,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'monitoring', 'trainingCertificate', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'monitoring',
+              'trainingCertificate',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -557,7 +602,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'chief', 'safetyManagementQualificationCertificate', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'chief',
+              'safetyManagementQualificationCertificate',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -708,10 +758,7 @@ function RouteComponent() {
           />,
           <ProExport
             key="export"
-            columns={[
-              ...companyInfoColumns,
-              ...columns,
-            ]}
+            columns={[...companyInfoColumns, ...columns]}
             identifier="core.employee.document"
             keys={(selectedRows?.length ?? 0) === 0 ? [] : selectedRows}
             fetchAllIds={async () => {
@@ -735,7 +782,7 @@ function RouteComponent() {
               return data;
             }}
             extraData={async () => {
-              let companyInfo = await DataApi.dashboard.core.company.info();
+              const companyInfo = await DataApi.dashboard.core.company.info();
 
               return {
                 ...companyInfo,
@@ -859,7 +906,8 @@ function RouteComponent() {
                         id: record.id,
                         data: {
                           ...resp.data.data,
-                          [columnId('v1', 'basic', 'basic', 'phone')]: resp.data.phone,
+                          [columnId('v1', 'basic', 'basic', 'phone')]:
+                            resp.data.phone,
                         },
                       });
                     } else {

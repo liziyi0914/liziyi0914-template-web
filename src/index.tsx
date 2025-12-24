@@ -1,6 +1,6 @@
-import { scan } from "react-scan";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { scan } from 'react-scan';
 import { initIcons } from '@/lib/icons.ts';
 import reportWebVitals from '@/reportWebVitals.ts';
 import App from './App';

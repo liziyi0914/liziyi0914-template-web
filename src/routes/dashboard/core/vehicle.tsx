@@ -1,20 +1,21 @@
 import {
   type ActionType,
   type Key,
-  ProForm, ProFormGroup,
+  ProForm,
+  ProFormGroup,
   ProTable,
 } from '@ant-design/pro-components';
-import {Icon} from '@iconify/react';
-import {createFileRoute} from '@tanstack/react-router';
-import {App, Button, Modal, Popconfirm} from 'antd';
-import {useRef, useState} from 'react';
+import { Icon } from '@iconify/react';
+import { createFileRoute } from '@tanstack/react-router';
+import { App, Button, Modal, Popconfirm } from 'antd';
+import { useRef, useState } from 'react';
 import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
 import ProExport from '@/components/ProExport.tsx';
 import ProImport from '@/components/ProImport.tsx';
-import {Api, type ApiResult, DataApi} from '@/lib/api.ts';
-import type {ColumnsType, VehicleDataVO} from '@/lib/types.ts';
-import {columnIdFn} from "@/lib/functions.tsx";
-import {companyInfoColumns} from "@/routes/dashboard/core/company/info.tsx";
+import { Api, type ApiResult, DataApi } from '@/lib/api.ts';
+import { columnIdFn } from '@/lib/functions.tsx';
+import type { ColumnsType, VehicleDataVO } from '@/lib/types.ts';
+import { companyInfoColumns } from '@/routes/dashboard/core/company/info.tsx';
 
 export const Route = createFileRoute('/dashboard/core/vehicle')({
   component: RouteComponent,
@@ -42,9 +43,7 @@ const columns: ColumnsType[] = [
             dataIndex: columnId('v1', 'basic', 'basic', 'plateNumber'),
             valueType: 'text',
             formItemProps: {
-              rules: [
-                { required: true, message: '请输入车牌号' },
-              ],
+              rules: [{ required: true, message: '请输入车牌号' }],
             },
             colProps: {
               span: 12,
@@ -59,14 +58,14 @@ const columns: ColumnsType[] = [
             },
           },
           {
-            title: "状态",
-            dataIndex: columnId('v1', 'basic', 'basic', "status"),
+            title: '状态',
+            dataIndex: columnId('v1', 'basic', 'basic', 'status'),
             valueType: 'select',
             valueEnum: {
-              "inUse": "使用中",
-              "transferred": "已过户",
-              "scrapped": "已报废",
-              "suspended": "已停运"
+              inUse: '使用中',
+              transferred: '已过户',
+              scrapped: '已报废',
+              suspended: '已停运',
             },
             colProps: {
               span: 12,
@@ -91,7 +90,12 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'file'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'vehicleRegistrationCertificate',
+              'file',
+            ),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -104,15 +108,25 @@ const columns: ColumnsType[] = [
           },
           {
             title: '机动车所有人',
-            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'owner'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'vehicleRegistrationCertificate',
+              'owner',
+            ),
             valueType: 'text',
             colProps: {
               span: 12,
             },
           },
           {
-            title: "车辆类型",
-            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', "vehicleType"),
+            title: '车辆类型',
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'vehicleRegistrationCertificate',
+              'vehicleType',
+            ),
             valueType: 'text',
             colProps: {
               span: 12,
@@ -120,7 +134,12 @@ const columns: ColumnsType[] = [
           },
           {
             title: '车辆识别代号',
-            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'vehicleCode'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'vehicleRegistrationCertificate',
+              'vehicleCode',
+            ),
             valueType: 'text',
             colProps: {
               span: 12,
@@ -128,7 +147,12 @@ const columns: ColumnsType[] = [
           },
           {
             title: '发动机号',
-            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'engineNumber'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'vehicleRegistrationCertificate',
+              'engineNumber',
+            ),
             valueType: 'text',
             colProps: {
               span: 12,
@@ -136,7 +160,12 @@ const columns: ColumnsType[] = [
           },
           {
             title: '机动车登记编号',
-            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'certificateNumber'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'vehicleRegistrationCertificate',
+              'certificateNumber',
+            ),
             valueType: 'text',
             colProps: {
               span: 12,
@@ -166,13 +195,18 @@ const columns: ColumnsType[] = [
           },
           {
             title: '行驶证号',
-            dataIndex: columnId('v1', 'basic', 'vehicleLicense', 'licenseNumber'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'vehicleLicense',
+              'licenseNumber',
+            ),
             valueType: 'text',
             colProps: {
               span: 12,
             },
           },
-        ]
+        ],
       },
       {
         valueType: '$tabGroup',
@@ -196,13 +230,18 @@ const columns: ColumnsType[] = [
           },
           {
             title: '道路运输证号',
-            dataIndex: columnId('v1', 'basic', 'roadTransportPermit', 'roadTransportPermitNumber'),
+            dataIndex: columnId(
+              'v1',
+              'basic',
+              'roadTransportPermit',
+              'roadTransportPermitNumber',
+            ),
             valueType: 'text',
             colProps: {
               span: 12,
             },
           },
-        ]
+        ],
       },
       {
         valueType: '$tabGroup',
@@ -278,7 +317,7 @@ const columns: ColumnsType[] = [
               span: 24,
             },
           },
-        ]
+        ],
       },
       {
         valueType: '$tabGroup',
@@ -299,14 +338,14 @@ const columns: ColumnsType[] = [
               allowFileTypes: ['image/*'],
             },
           },
-        ]
-      }
+        ],
+      },
     ],
   },
 ];
 
 function RouteComponent() {
-  const {message} = App.useApp();
+  const { message } = App.useApp();
   const actionRef = useRef<ActionType>(undefined);
   const [vehicle, setVehicle] = useState<
     { id?: string; data?: Record<string, any> } | undefined
@@ -329,8 +368,8 @@ function RouteComponent() {
           grid
           initialValues={vehicle?.data ?? {}}
           onFinish={async (values) => {
-            console.log(values)
-            const plateNumber = values[columnId('v1', 'basic', 'basic', 'plateNumber')];
+            const plateNumber =
+              values[columnId('v1', 'basic', 'basic', 'plateNumber')];
             if (!plateNumber) {
               return false;
             }
@@ -366,7 +405,7 @@ function RouteComponent() {
           }}
         >
           <div className="pb-6 grow">
-            <GroupedEmbedSchemaForm columns={columns}/>
+            <GroupedEmbedSchemaForm columns={columns} />
           </div>
         </ProForm>
       </Modal>
@@ -402,16 +441,16 @@ function RouteComponent() {
               for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 if (row?.[columnId('v1', 'basic', 'basic', 'plateNumber')]) {
-                  const plateNumber = row[columnId('v1', 'basic', 'basic', 'plateNumber')];
+                  const plateNumber =
+                    row[columnId('v1', 'basic', 'basic', 'plateNumber')];
 
                   const data = row;
                   delete data[columnId('v1', 'basic', 'basic', 'plateNumber')];
 
-                  const resp =
-                    await Api.dashboard.core.vehicle.create(
-                      plateNumber,
-                      data,
-                    );
+                  const resp = await Api.dashboard.core.vehicle.create(
+                    plateNumber,
+                    data,
+                  );
 
                   if (resp.code === 200) {
                     counts.success++;
@@ -428,10 +467,7 @@ function RouteComponent() {
           />,
           <ProExport
             key="export"
-            columns={[
-              ...companyInfoColumns,
-              ...columns,
-            ]}
+            columns={[...companyInfoColumns, ...columns]}
             identifier="core.vehicle"
             keys={(selectedRows?.length ?? 0) === 0 ? [] : selectedRows}
             fetchAllIds={async () => {
@@ -439,9 +475,7 @@ function RouteComponent() {
               return resp.data ?? [];
             }}
             fetchData={async (key) => {
-              const resp = await Api.dashboard.core.vehicle.get(
-                `${key}`,
-              );
+              const resp = await Api.dashboard.core.vehicle.get(`${key}`);
               let data: VehicleDataVO | any | undefined = resp.data;
 
               if (data) {
@@ -455,7 +489,7 @@ function RouteComponent() {
               return data;
             }}
             extraData={async () => {
-              let companyInfo = await DataApi.dashboard.core.company.info();
+              const companyInfo = await DataApi.dashboard.core.company.info();
 
               return {
                 ...companyInfo,
@@ -476,9 +510,7 @@ function RouteComponent() {
             dataIndex: 'plateNumber',
             valueType: 'text',
             formItemProps: {
-              rules: [
-                { required: true, message: '请输入车牌号' },
-              ],
+              rules: [{ required: true, message: '请输入车牌号' }],
             },
           },
           {
@@ -492,19 +524,19 @@ function RouteComponent() {
             valueType: 'text',
           },
           {
-            title: "车辆类型",
-            dataIndex: "vehicleType",
+            title: '车辆类型',
+            dataIndex: 'vehicleType',
             valueType: 'text',
           },
           {
-            title: "状态",
-            dataIndex: "status",
+            title: '状态',
+            dataIndex: 'status',
             valueType: 'select',
             valueEnum: {
-              "inUse": "使用中",
-              "transferred": "已过户",
-              "scrapped": "已报废",
-              "suspended": "已停运"
+              inUse: '使用中',
+              transferred: '已过户',
+              scrapped: '已报废',
+              suspended: '已停运',
             },
           },
           {
@@ -529,7 +561,8 @@ function RouteComponent() {
                         id: record.id,
                         data: {
                           ...resp.data.data,
-                          [columnId('v1', 'basic', 'basic', 'plateNumber')]: resp.data.plateNumber,
+                          [columnId('v1', 'basic', 'basic', 'plateNumber')]:
+                            resp.data.plateNumber,
                         },
                       });
                     } else {
@@ -543,10 +576,9 @@ function RouteComponent() {
                 <Popconfirm
                   title={`确定删除${record.plateNumber}？`}
                   onConfirm={async () => {
-                    const resp =
-                      await Api.dashboard.core.vehicle.delete(
-                        record.id,
-                      );
+                    const resp = await Api.dashboard.core.vehicle.delete(
+                      record.id,
+                    );
                     if (resp.code === 200) {
                       message.success('删除成功');
                       actionRef.current?.reload();

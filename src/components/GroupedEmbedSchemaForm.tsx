@@ -1,5 +1,5 @@
 import { BetaSchemaForm } from '@ant-design/pro-components';
-import {Form, Tabs} from 'antd';
+import { Form, Tabs } from 'antd';
 import type { TabPlacement } from 'antd/lib/tabs';
 import * as _ from 'lodash';
 import type React from 'react';
@@ -10,7 +10,14 @@ const flattenColumns = (columns: ColumnsType[], data: any): ColumnsType[] => {
   return _.uniqBy(
     columns.flatMap((column) => {
       if (column.valueType === '$tabGroup') {
-        return [...flattenColumns((typeof column.columns === 'function' ? column.columns(data) : column.columns) ?? [], data)];
+        return [
+          ...flattenColumns(
+            (typeof column.columns === 'function'
+              ? column.columns(data)
+              : column.columns) ?? [],
+            data,
+          ),
+        ];
       }
       return column;
     }),
@@ -41,17 +48,20 @@ const TabsSchemaForm: React.FC<{
                 <BetaSchemaForm
                   layoutType="Embed"
                   columns={
-                    (typeof column.columns === 'function' ? column.columns(data) : column.columns)?.filter(
-                      (column) => column.valueType !== '$tabGroup',
-                    ) ?? []
+                    (typeof column.columns === 'function'
+                      ? column.columns(data)
+                      : column.columns
+                    )?.filter((column) => column.valueType !== '$tabGroup') ??
+                    []
                   }
                 />
               </div>
               <TabsSchemaForm
                 columns={
-                  (typeof column.columns === 'function' ? column.columns(data) : column.columns)?.filter(
-                    (column) => column.valueType === '$tabGroup',
-                  ) ?? []
+                  (typeof column.columns === 'function'
+                    ? column.columns(data)
+                    : column.columns
+                  )?.filter((column) => column.valueType === '$tabGroup') ?? []
                 }
                 tabPlacement={props.tabPlacement === 'top' ? 'start' : 'top'}
               />

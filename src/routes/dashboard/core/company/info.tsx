@@ -2,8 +2,8 @@ import { BetaSchemaForm, ProForm } from '@ant-design/pro-components';
 import { createFileRoute } from '@tanstack/react-router';
 import { App } from 'antd';
 import { Api } from '@/lib/api.ts';
-import type {ColumnsType} from "@/lib/types.ts";
-import {columnIdFn} from "@/lib/functions.tsx";
+import { columnIdFn } from '@/lib/functions.tsx';
+import type { ColumnsType } from '@/lib/types.ts';
 
 export const Route = createFileRoute('/dashboard/core/company/info')({
   component: RouteComponent,
