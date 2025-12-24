@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Api } from '@/lib/api.ts';
-import type { ColumnsType, DepartmentInfoVO } from '@/lib/types.ts';
+import type {ColumnsType, DepartmentInfoVO, EmployeeInfoVO} from '@/lib/types.ts';
 import { day } from '@/lib/utils.ts';
 
 function flattenColumns(
@@ -65,6 +65,14 @@ export async function column2json(
     const resp = await Api.common.getDepartments();
     if (resp.code === 200 && resp.data) {
       departments = resp.data;
+    }
+  }
+
+  let employees: EmployeeInfoVO[] = [];
+  if (columns.filter((i) => i.valueType === 'employee').length > 0) {
+    const resp = await Api.common.getEmployees();
+    if (resp.code === 200 && resp.data) {
+      employees = resp.data;
     }
   }
 
@@ -169,6 +177,20 @@ export async function column2json(
 
           break;
         }
+        case 'employee': {
+          let v;
+
+          for (const employee of employees) {
+            if (employee.id === `${value}`) {
+              v = employee.name ? employee.name : employee.phone;
+              break;
+            }
+          }
+
+          value = v;
+
+          break;
+        }
         default: {
           value = `${value}`;
         }
@@ -193,6 +215,14 @@ export async function json2column(
     const resp = await Api.common.getDepartments();
     if (resp.code === 200 && resp.data) {
       departments = resp.data;
+    }
+  }
+
+  let employees: EmployeeInfoVO[] = [];
+  if (columns.filter((i) => i.valueType === 'employee').length > 0) {
+    const resp = await Api.common.getEmployees();
+    if (resp.code === 200 && resp.data) {
+      employees = resp.data;
     }
   }
 
@@ -293,8 +323,6 @@ export async function json2column(
 
           if (parts.length >= 1) {
             department = departments.filter((i) => i.name === parts[0])?.[0];
-          } else {
-            return result;
           }
 
           if (parts.length >= 2 && department) {
@@ -305,6 +333,18 @@ export async function json2column(
           } else {
             value = `${department?.id}`;
           }
+
+          break;
+        }
+        case 'employee': {
+          let v;
+          for (let employee of employees) {
+            if (employee.name === value || employee.phone === value) {
+              v = `${employee.id}`;
+            }
+          }
+
+          value = v;
 
           break;
         }

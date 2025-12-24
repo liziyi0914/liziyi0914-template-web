@@ -8,12 +8,12 @@ import type {
   CompanyStructurePositionUpdateVO,
   CompanyStructureVO,
   DepartmentInfoVO,
-  EmployeeDataVO,
+  EmployeeDataVO, EmployeeInfoVO,
   EmployeeSearchResultItem,
   OSSUploadPresignArgs,
   TemplateInfoVO,
   TemplateUpdateRequest,
-  UserInfoVO,
+  UserInfoVO, VehicleDataVO, VehicleSearchResultItem,
 } from '@/lib/types.ts';
 import {columnIdBase} from "@/lib/functions.tsx";
 
@@ -245,6 +245,12 @@ export const Api = {
     getDepartments: () => {
       return request<DepartmentInfoVO[]>({
         url: '/common/departments',
+        method: 'GET',
+      });
+    },
+    getEmployees: () => {
+      return request<EmployeeInfoVO[]>({
+        url: '/common/employees',
         method: 'GET',
       });
     },
@@ -682,6 +688,55 @@ export const Api = {
               method: 'POST',
             });
           },
+        },
+      },
+      vehicle: {
+        getIds: () => {
+          return request<Array<string>>({
+            url: '/dashboard/core/vehicle/ids',
+            method: 'GET',
+          });
+        },
+        list: (page: PageQuery) => {
+          return requestPage<VehicleSearchResultItem>(
+            {
+              url: '/dashboard/core/vehicle/',
+              method: 'POST',
+            },
+            page,
+          );
+        },
+        create: (plateNumber: string, data: Record<string, any>) => {
+          return request({
+            url: `/dashboard/core/vehicle/`,
+            method: 'PUT',
+            data: {
+              plateNumber,
+              data,
+            },
+          });
+        },
+        get: (id: string) => {
+          return request<VehicleDataVO>({
+            url: `/dashboard/core/vehicle/${id}`,
+            method: 'GET',
+          });
+        },
+        update: (id: string, plateNumber: string, data: Record<string, any>) => {
+          return request({
+            url: `/dashboard/core/vehicle/${id}`,
+            method: 'POST',
+            data: {
+              plateNumber,
+              data,
+            },
+          });
+        },
+        delete: (id: string) => {
+          return request({
+            url: `/dashboard/core/vehicle/${id}`,
+            method: 'DELETE',
+          });
         },
       },
     },

@@ -73,8 +73,8 @@ const columns: ColumnsType[] = [
             dataIndex: columnId('v1', 'basic', 'basic', 'gender'),
             valueType: 'select',
             valueEnum: {
-              0: '男',
-              1: '女',
+              '0': '男',
+              '1': '女',
             },
             colProps: {
               span: 12,
@@ -681,11 +681,11 @@ function RouteComponent() {
               };
               for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                if (row?.['phone']) {
-                  const phone = row.phone;
+                if (row?.[columnId('v1', 'basic', 'basic', 'phone')]) {
+                  const phone = row[columnId('v1', 'basic', 'basic', 'phone')];
 
                   const data = row;
-                  delete data.phone;
+                  delete data[columnId('v1', 'basic', 'basic', 'phone')];
 
                   const resp =
                     await Api.dashboard.core.employee.document.create(
@@ -768,8 +768,8 @@ function RouteComponent() {
             dataIndex: 'gender',
             valueType: 'select',
             valueEnum: {
-              0: '男',
-              1: '女',
+              '0': '男',
+              '1': '女',
             },
           },
           {

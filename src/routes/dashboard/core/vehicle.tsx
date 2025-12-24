@@ -1,7 +1,7 @@
 import {
   type ActionType,
   type Key,
-  ProForm,
+  ProForm, ProFormGroup,
   ProTable,
 } from '@ant-design/pro-components';
 import {Icon} from '@iconify/react';
@@ -11,12 +11,16 @@ import {useRef, useState} from 'react';
 import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
 import ProExport from '@/components/ProExport.tsx';
 import ProImport from '@/components/ProImport.tsx';
-import {Api, type ApiResult} from '@/lib/api.ts';
-import type {ColumnsType, EmployeeDataVO} from '@/lib/types.ts';
+import {Api, type ApiResult, DataApi} from '@/lib/api.ts';
+import type {ColumnsType, VehicleDataVO} from '@/lib/types.ts';
+import {columnIdFn} from "@/lib/functions.tsx";
+import {companyInfoColumns} from "@/routes/dashboard/core/company/info.tsx";
 
 export const Route = createFileRoute('/dashboard/core/vehicle')({
   component: RouteComponent,
 });
+
+const columnId = columnIdFn(['core', 'vehicle']);
 
 const columns: ColumnsType[] = [
   {
@@ -34,23 +38,12 @@ const columns: ColumnsType[] = [
         },
         columns: [
           {
-            title: '证件照（大头照/小一寸/大一寸）',
-            dataIndex: 'photoFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '手机号',
-            dataIndex: 'phone',
+            title: '车牌号',
+            dataIndex: columnId('v1', 'basic', 'basic', 'plateNumber'),
+            valueType: 'text',
             formItemProps: {
-              required: true,
               rules: [
-                {
-                  required: true,
-                  message: '手机号不能为空',
-                },
+                { required: true, message: '请输入车牌号' },
               ],
             },
             colProps: {
@@ -58,144 +51,30 @@ const columns: ColumnsType[] = [
             },
           },
           {
-            title: '姓名',
-            dataIndex: 'name',
+            title: '驾驶员',
+            dataIndex: columnId('v1', 'basic', 'basic', 'driver'),
+            valueType: 'employee',
             colProps: {
               span: 12,
             },
           },
           {
-            title: '角色',
-            dataIndex: 'careerRole',
+            title: "状态",
+            dataIndex: columnId('v1', 'basic', 'basic', "status"),
             valueType: 'select',
             valueEnum: {
-              safetyOfficer: '安全员',
-              monitoringOfficer: '监控员',
-              vehicleAdministrator: '车辆管理人员',
-              driver: '驾驶员',
-              principalInCharge: '主要负责人',
-              vehicleStaffAdministrator: '车辆人员管理员',
-              generalStaff: '普通员工',
+              "inUse": "使用中",
+              "transferred": "已过户",
+              "scrapped": "已报废",
+              "suspended": "已停运"
             },
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '岗位',
-            dataIndex: 'departmentPosition',
-            valueType: 'department',
-            fieldProps: {
-              allowTypes: ['position'],
-            },
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '家庭地址',
-            dataIndex: 'homeAddress',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '邮箱',
-            dataIndex: 'email',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '紧急联系人',
-            dataIndex: 'emergencyContact',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '紧急联系人电话',
-            dataIndex: 'emergencyContactPhone',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '政治面貌',
-            dataIndex: 'politicalStatus',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '婚否',
-            dataIndex: 'maritalStatus',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '学历',
-            dataIndex: 'educationLevel',
-            valueType: 'select',
-            valueEnum: {
-              primarySchool: '小学',
-              juniorHighSchool: '初中',
-              seniorHighSchool: '高中',
-              juniorCollege: '专科',
-              undergraduate: '本科',
-              graduate: '研究生',
-              secondaryVocationalSchool: '中专',
-            },
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '毕业学校',
-            dataIndex: 'graduationSchool',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '专业',
-            dataIndex: 'major',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '入职日期',
-            dataIndex: 'joinDate',
-            valueType: 'date',
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '在职',
-            dataIndex: 'isEmployed',
-            valueType: 'select',
-            valueEnum: {
-              true: '是',
-              false: '否',
-            },
-            colProps: {
-              span: 12,
-            },
-          },
-          {
-            title: '家庭成员',
-            dataIndex: 'familyMembers',
-            valueType: 'textarea',
             colProps: {
               span: 12,
             },
           },
           {
             title: '备注',
-            dataIndex: 'remark',
+            dataIndex: columnId('v1', 'basic', 'basic', 'remark'),
             valueType: 'textarea',
             colProps: {
               span: 12,
@@ -206,378 +85,222 @@ const columns: ColumnsType[] = [
       {
         valueType: '$tabGroup',
         group: {
-          id: 'idCard',
-          title: '身份证',
+          id: 'vehicleRegistrationCertificate',
+          title: '车辆登记证书',
         },
         columns: [
           {
-            title: '身份证',
-            dataIndex: 'idCardFile',
+            title: '文件',
+            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'file'),
             valueType: '#assets',
-            fieldProps: {
-              multiple: true,
-              maxCount: 2,
-              allowFileTypes: ['image/*'],
-            },
             colProps: {
               span: 12,
             },
+            fieldProps: {
+              multiple: true,
+              maxCount: 3,
+              allowFileTypes: ['image/*'],
+            },
           },
           {
-            title: '身份证号',
-            dataIndex: 'idCard',
+            title: '机动车所有人',
+            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'owner'),
             valueType: 'text',
             colProps: {
               span: 12,
             },
           },
           {
-            title: '性别',
-            dataIndex: 'gender',
-            valueType: 'select',
-            valueEnum: {
-              0: '男',
-              1: '女',
-            },
+            title: "车辆类型",
+            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', "vehicleType"),
+            valueType: 'text',
             colProps: {
               span: 12,
             },
           },
           {
-            title: '有效期限',
-            dataIndex: 'idCardValidDate',
-            valueType: 'validDateRange',
+            title: '车辆识别代号',
+            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'vehicleCode'),
+            valueType: 'text',
             colProps: {
               span: 12,
             },
           },
           {
-            valueType: '#ai',
+            title: '发动机号',
+            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'engineNumber'),
+            valueType: 'text',
+            colProps: {
+              span: 12,
+            },
+          },
+          {
+            title: '机动车登记编号',
+            dataIndex: columnId('v1', 'basic', 'vehicleRegistrationCertificate', 'certificateNumber'),
+            valueType: 'text',
+            colProps: {
+              span: 12,
+            },
+          },
+        ],
+      },
+      {
+        valueType: '$tabGroup',
+        group: {
+          id: 'vehicleLicense',
+          title: '车辆行驶证',
+        },
+        columns: [
+          {
+            title: '文件',
+            dataIndex: columnId('v1', 'basic', 'vehicleLicense', 'file'),
+            valueType: '#assets',
+            colProps: {
+              span: 12,
+            },
             fieldProps: {
-              assets: 'idCardFile',
-              columns: [
-                {
-                  title: '姓名',
-                  dataIndex: 'name',
-                  colProps: {
-                    span: 12,
-                  },
+              multiple: true,
+              maxCount: 3,
+              allowFileTypes: ['image/*'],
+            },
+          },
+          {
+            title: '行驶证号',
+            dataIndex: columnId('v1', 'basic', 'vehicleLicense', 'licenseNumber'),
+            valueType: 'text',
+            colProps: {
+              span: 12,
+            },
+          },
+        ]
+      },
+      {
+        valueType: '$tabGroup',
+        group: {
+          id: 'roadTransportPermit',
+          title: '道路运输证',
+        },
+        columns: [
+          {
+            title: '文件',
+            dataIndex: columnId('v1', 'basic', 'roadTransportPermit', 'file'),
+            valueType: '#assets',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              multiple: true,
+              maxCount: 3,
+              allowFileTypes: ['image/*'],
+            },
+          },
+          {
+            title: '道路运输证号',
+            dataIndex: columnId('v1', 'basic', 'roadTransportPermit', 'roadTransportPermitNumber'),
+            valueType: 'text',
+            colProps: {
+              span: 12,
+            },
+          },
+        ]
+      },
+      {
+        valueType: '$tabGroup',
+        group: {
+          id: 'insurance',
+          title: '保险信息',
+        },
+        columns: [
+          {
+            title: '文件',
+            dataIndex: columnId('v1', 'basic', 'insurance', 'file'),
+            valueType: '#assets',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              multiple: true,
+              allowFileTypes: ['image/*'],
+            },
+          },
+          {
+            title: '保险信息',
+            dataIndex: columnId('v1', 'basic', 'insurance', 'list'),
+            valueType: 'formList',
+            fieldProps: {
+              itemContainerRender: (dom: any) => (
+                <ProFormGroup>{dom}</ProFormGroup>
+              ),
+              alwaysShowItemLabel: true,
+            },
+            columns: [
+              {
+                title: '类型',
+                dataIndex: 'type',
+                valueType: 'text',
+                colProps: {
+                  span: 'auto',
                 },
-                {
-                  title: '身份证号',
-                  dataIndex: 'idCard',
-                  valueType: 'text',
+              },
+              {
+                title: '保险公司',
+                dataIndex: 'company',
+                valueType: 'text',
+                colProps: {
+                  span: 'auto',
                 },
-                {
-                  title: '性别',
-                  dataIndex: 'gender',
-                  valueType: 'select',
-                  valueEnum: {
-                    '0': '男',
-                    '1': '女',
-                  },
+              },
+              {
+                title: '有效期',
+                dataIndex: 'validDate',
+                valueType: 'validDateRange',
+                fieldProps: {
+                  noLong: true,
                 },
-                {
-                  title: '有效期限',
-                  dataIndex: 'idCardValidDate',
-                  valueType: 'validDateRange',
+                colProps: {
+                  span: 'auto',
                 },
-              ],
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'laborContract',
-          title: '劳动合同',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'laborContractFile',
-            valueType: '#assets',
+              },
+              {
+                title: '保额',
+                dataIndex: 'amount',
+                valueType: 'digit',
+                fieldProps: {
+                  prefix: '¥',
+                  decimalSeparator: ',',
+                },
+                colProps: {
+                  span: 'auto',
+                },
+              },
+            ],
             colProps: {
-              span: 12,
+              span: 24,
             },
           },
-        ],
+        ]
       },
       {
         valueType: '$tabGroup',
         group: {
-          id: 'safetyCommitmentLetter',
-          title: '安全承诺书',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'safetyCommitmentLetterFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'responsibilityStatement',
-          title: '责任书',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'responsibilityStatementFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'physicalExaminationCertificate',
-          title: '体检证明',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'physicalExaminationCertificateFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'trainingRecord',
-          title: '培训教育记录',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'trainingRecordFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'otherDocuments',
+          id: 'other',
           title: '其它文件',
         },
         columns: [
           {
             title: '文件',
-            dataIndex: 'otherDocumentsFile',
+            dataIndex: columnId('v1', 'basic', 'other', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
             },
-          },
-        ],
-      },
-    ],
-  },
-  {
-    valueType: '$tabGroup',
-    group: {
-      id: 'safety',
-      title: '安全管理人员档案',
-    },
-    columns: [
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'safetyManagementQualificationCertificate',
-          title: '安全管理资格证',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'safetyManagementQualificationCertificateFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
+            fieldProps: {
+              multiple: true,
+              allowFileTypes: ['image/*'],
             },
           },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'registeredSafetyEngineerCertificate',
-          title: '注册安全工程师证',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'registeredSafetyEngineerCertificateFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-    ],
-  },
-  {
-    valueType: '$tabGroup',
-    group: {
-      id: 'driver',
-      title: '驾驶人员档案',
-    },
-    columns: [
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'drivingLicense',
-          title: '驾驶证',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'drivingLicenseFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'professionalQualificationCertificate',
-          title: '从业资格证',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'professionalQualificationCertificateFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'occupationalHazardsNotificationLetter',
-          title: '职业危害告知书',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'occupationalHazardsNotificationLetterFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-    ],
-  },
-  {
-    valueType: '$tabGroup',
-    group: {
-      id: 'monitoring',
-      title: '监控人员档案',
-    },
-    columns: [
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'trainingCertificate',
-          title: '培训证明',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'trainingCertificateFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'assessmentRecord',
-          title: '考核记录',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'assessmentRecordFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-    ],
-  },
-  {
-    valueType: '$tabGroup',
-    group: {
-      id: 'chief',
-      title: '主要负责人员档案',
-    },
-    columns: [
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'safetyManagementQualificationCertificate',
-          title: '安全管理资格证',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'safetyManagementQualificationCertificateFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
-      {
-        valueType: '$tabGroup',
-        group: {
-          id: 'authorizationLetter',
-          title: '委托书',
-        },
-        columns: [
-          {
-            title: '文件',
-            dataIndex: 'authorizationLetterFile',
-            valueType: '#assets',
-            colProps: {
-              span: 12,
-            },
-          },
-        ],
-      },
+        ]
+      }
     ],
   },
 ];
@@ -585,7 +308,7 @@ const columns: ColumnsType[] = [
 function RouteComponent() {
   const {message} = App.useApp();
   const actionRef = useRef<ActionType>(undefined);
-  const [employee, setEmployee] = useState<
+  const [vehicle, setVehicle] = useState<
     { id?: string; data?: Record<string, any> } | undefined
   >(undefined);
   const [selectedRows, setSelectedRows] = useState<Key[]>([]);
@@ -593,37 +316,38 @@ function RouteComponent() {
   return (
     <div>
       <Modal
-        open={!!employee}
+        open={!!vehicle}
         title="编辑"
         destroyOnHidden
         footer={null}
         width="80vw"
         onCancel={() => {
-          setEmployee(undefined);
+          setVehicle(undefined);
         }}
       >
         <ProForm
           grid
-          initialValues={employee?.data ?? {}}
+          initialValues={vehicle?.data ?? {}}
           onFinish={async (values) => {
-            const phone = values.phone;
-            if (!phone) {
+            console.log(values)
+            const plateNumber = values[columnId('v1', 'basic', 'basic', 'plateNumber')];
+            if (!plateNumber) {
               return false;
             }
 
-            delete values.phone;
+            delete values[columnId('v1', 'basic', 'basic', 'plateNumber')];
 
             let resp: ApiResult;
 
-            if (employee?.id) {
-              resp = await Api.dashboard.core.employee.document.update(
-                employee.id,
-                phone,
+            if (vehicle?.id) {
+              resp = await Api.dashboard.core.vehicle.update(
+                vehicle.id,
+                plateNumber,
                 values,
               );
             } else {
-              resp = await Api.dashboard.core.employee.document.create(
-                phone,
+              resp = await Api.dashboard.core.vehicle.create(
+                plateNumber,
                 values,
               );
             }
@@ -632,7 +356,7 @@ function RouteComponent() {
               message.success('保存成功');
               actionRef.current?.reload();
               // form.setFieldsValue({});
-              setEmployee(undefined);
+              setVehicle(undefined);
               return true;
             } else {
               message.error(`保存失败: ${resp.msg}`);
@@ -648,7 +372,7 @@ function RouteComponent() {
       </Modal>
       <ProTable
         actionRef={actionRef}
-        request={Api.dashboard.core.employee.document.list}
+        request={Api.dashboard.core.vehicle.list}
         rowSelection={{
           type: 'checkbox',
           onChange: (selectedRowKeys) => {
@@ -660,15 +384,15 @@ function RouteComponent() {
         toolBarRender={() => [
           <Button
             key="add"
-            icon={<Icon icon="lucide:plus"/>}
+            icon={<Icon icon="lucide:plus" />}
             onClick={() => {
-              setEmployee({});
+              setVehicle({});
             }}
           >
             添加
           </Button>,
           <ProImport
-            title="人员档案"
+            title="车辆档案"
             columns={columns}
             onImport={async (rows) => {
               const counts = {
@@ -677,15 +401,15 @@ function RouteComponent() {
               };
               for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                if (row?.['phone']) {
-                  const phone = row.phone;
+                if (row?.[columnId('v1', 'basic', 'basic', 'plateNumber')]) {
+                  const plateNumber = row[columnId('v1', 'basic', 'basic', 'plateNumber')];
 
                   const data = row;
-                  delete data.phone;
+                  delete data[columnId('v1', 'basic', 'basic', 'plateNumber')];
 
                   const resp =
-                    await Api.dashboard.core.employee.document.create(
-                      phone,
+                    await Api.dashboard.core.vehicle.create(
+                      plateNumber,
                       data,
                     );
 
@@ -704,18 +428,21 @@ function RouteComponent() {
           />,
           <ProExport
             key="export"
-            columns={columns}
-            identifier="core.employee.document"
+            columns={[
+              ...companyInfoColumns,
+              ...columns,
+            ]}
+            identifier="core.vehicle"
             keys={(selectedRows?.length ?? 0) === 0 ? [] : selectedRows}
             fetchAllIds={async () => {
-              const resp = await Api.dashboard.core.employee.document.getIds();
+              const resp = await Api.dashboard.core.vehicle.getIds();
               return resp.data ?? [];
             }}
             fetchData={async (key) => {
-              const resp = await Api.dashboard.core.employee.document.get(
+              const resp = await Api.dashboard.core.vehicle.get(
                 `${key}`,
               );
-              let data: EmployeeDataVO | any | undefined = resp.data;
+              let data: VehicleDataVO | any | undefined = resp.data;
 
               if (data) {
                 data = {
@@ -726,6 +453,13 @@ function RouteComponent() {
               }
 
               return data;
+            }}
+            extraData={async () => {
+              let companyInfo = await DataApi.dashboard.core.company.info();
+
+              return {
+                ...companyInfo,
+              };
             }}
           />,
         ]}
@@ -738,62 +472,29 @@ function RouteComponent() {
             search: false,
           },
           {
-            title: "档案编号",
-            dataIndex: "archiveId"
-          },
-          {
-            title: "所属部门",
-            dataIndex: "departmentPosition",
-            valueType: 'department',
-            fieldProps: {
-              allowTypes: ['position']
+            title: '车牌号',
+            dataIndex: 'plateNumber',
+            valueType: 'text',
+            formItemProps: {
+              rules: [
+                { required: true, message: '请输入车牌号' },
+              ],
             },
           },
           {
-            title: "车牌号码",
-            dataIndex: "licensePlate"
+            title: '驾驶员',
+            dataIndex: 'driver',
+            valueType: 'employee',
           },
           {
-            title: "车主姓名",
-            dataIndex: "ownerName"
-          },
-          {
-            title: "驾驶员",
-            dataIndex: "driverName"
-          },
-          {
-            title: "驾驶员电话",
-            dataIndex: "driverPhone"
+            title: '机动车所有人',
+            dataIndex: 'owner',
+            valueType: 'text',
           },
           {
             title: "车辆类型",
             dataIndex: "vehicleType",
-            valueType: 'select',
-            valueEnum: {
-              "smallCar": "小型汽车",
-              "trailer": "挂车",
-              "heavyDumpTruck": "重型自卸货车",
-              "flatbedTruck": "栏板车",
-              "tractorTruck": "牵引车",
-              "tankTruck": "罐式车",
-              "passengerBus": "客运班车",
-              "largeOrdinaryBus": "大型普通客车",
-              "mediumOrdinaryBus": "中型普通客车",
-              "smallOrdinaryBus": "小型普通客车",
-              "transitBus": "公交车",
-              "other": "其他类别",
-            },
-          },
-          {
-            title: "车辆技术等级",
-            dataIndex: "technicalLevel",
-            valueType: 'select',
-            valueEnum: {
-              L1: "一级",
-              L2: "二级",
-              L3: "三级",
-              NONE: "未评定"
-            }
+            valueType: 'text',
           },
           {
             title: "状态",
@@ -804,7 +505,7 @@ function RouteComponent() {
               "transferred": "已过户",
               "scrapped": "已报废",
               "suspended": "已停运"
-            }
+            },
           },
           {
             title: '操作',
@@ -817,18 +518,18 @@ function RouteComponent() {
                   onClick={async () => {
                     const loading = message.loading(`加载中...`, 0);
 
-                    const resp = await Api.dashboard.core.employee.document.get(
+                    const resp = await Api.dashboard.core.vehicle.get(
                       record.id,
                     );
 
                     loading();
 
                     if (resp.code === 200 && resp.data) {
-                      setEmployee({
+                      setVehicle({
                         id: record.id,
                         data: {
                           ...resp.data.data,
-                          phone: resp.data.phone,
+                          [columnId('v1', 'basic', 'basic', 'plateNumber')]: resp.data.plateNumber,
                         },
                       });
                     } else {
@@ -840,10 +541,10 @@ function RouteComponent() {
                   编辑
                 </Button>
                 <Popconfirm
-                  title={`确定删除${record.phone}？`}
+                  title={`确定删除${record.plateNumber}？`}
                   onConfirm={async () => {
                     const resp =
-                      await Api.dashboard.core.employee.document.delete(
+                      await Api.dashboard.core.vehicle.delete(
                         record.id,
                       );
                     if (resp.code === 200) {

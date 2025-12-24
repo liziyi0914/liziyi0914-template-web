@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { day } from '@/lib/utils.ts';
 
 const Component: React.FC<{
+  noLong?: boolean;
   value?: (string | undefined | null)[];
   onChange?: (value: (string | undefined | null)[]) => void;
 }> = (props) => {
@@ -31,18 +32,20 @@ const Component: React.FC<{
           disabled={[false, isLong]}
         />
       </div>
-      <div className="flex gap-x-1 items-center select-none">
-        <div>长期</div>
-        <Switch
-          value={isLong}
-          onChange={() => {
-            props.onChange?.([
-              props?.value?.[0],
-              props.value?.[1] === '#LONG' ? '2099-01-01' : '#LONG',
-            ]);
-          }}
-        />
-      </div>
+      {props.noLong ? null : (
+        <div className="flex gap-x-1 items-center select-none">
+          <div>长期</div>
+          <Switch
+            value={isLong}
+            onChange={() => {
+              props.onChange?.([
+                props?.value?.[0],
+                props.value?.[1] === '#LONG' ? '2099-01-01' : '#LONG',
+              ]);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

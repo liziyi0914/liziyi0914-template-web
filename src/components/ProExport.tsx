@@ -12,6 +12,7 @@ import { day } from '@/lib/utils.ts';
 
 export const templateIdentifierMap = {
   'core.employee.document': '人员档案',
+  'core.vehicle': '车辆档案',
 };
 export type TemplateIdentifier = keyof typeof templateIdentifierMap;
 

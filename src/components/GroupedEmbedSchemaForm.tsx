@@ -31,7 +31,7 @@ const TabsSchemaForm: React.FC<{
       destroyOnHidden
       tabPlacement={props.tabPlacement}
       items={props.columns.map((column) => {
-        console.log((typeof column.columns === 'function' ? column.columns(data) : column.columns))
+        // console.log((typeof column.columns === 'function' ? column.columns(data) : column.columns))
         return {
           label: column.group?.title ?? '-',
           key: column.group?.id ?? `${column.dataIndex}`,

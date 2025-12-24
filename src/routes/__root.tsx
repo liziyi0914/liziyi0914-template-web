@@ -18,6 +18,7 @@ import ValidDateRange, {
 } from '@/components/formItem/ValidDateRange.tsx';
 import NotFound from '@/components/NotFound.tsx';
 import { ThemeProvider, useTheme } from '@/components/theme-provider.tsx';
+import EmployeePicker, {EmployeePickerView} from "@/components/formItem/EmployeePicker.tsx";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -68,6 +69,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
                   },
                   renderFormItem: (_, props) => {
                     return <DepartmentPicker {...props.fieldProps} />;
+                  },
+                },
+                employee: {
+                  render: (text) => {
+                    return <EmployeePickerView value={text} />;
+                  },
+                  renderFormItem: (_, props) => {
+                    return <EmployeePicker {...props.fieldProps} />;
                   },
                 },
                 validDateRange: {

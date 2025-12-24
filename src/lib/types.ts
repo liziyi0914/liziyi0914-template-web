@@ -11,6 +11,7 @@ export type FormFieldType =
   | '#ai'
   | '#assets'
   | 'department'
+  | 'employee'
   | 'validDateRange';
 export type ColumnsType<T = any, ValueType = FormFieldType> = Omit<
   ProFormColumnsType<T, ValueType>,
@@ -118,6 +119,21 @@ export type EmployeeDataVO = {
   data: Record<string, any>;
 };
 
+export type VehicleSearchResultItem = {
+  id: string;
+  plateNumber: string;
+  driver?: string | null;
+  owner?: string | null;
+  vehicleType?: string | null;
+  status?: string | null;
+};
+
+export type VehicleDataVO = {
+  id: string;
+  plateNumber: string;
+  data: Record<string, any>;
+};
+
 export type DepartmentInfoVO = {
   id: string;
   name: string;
@@ -126,6 +142,12 @@ export type DepartmentInfoVO = {
     id: string;
     name: string;
   }>;
+};
+
+export type EmployeeInfoVO = {
+  id: string;
+  name?: string;
+  phone: string;
 };
 
 export type TemplateInfoVO = {
