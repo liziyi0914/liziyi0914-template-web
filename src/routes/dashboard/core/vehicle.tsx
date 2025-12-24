@@ -16,6 +16,7 @@ import { Api, type ApiResult, DataApi } from '@/lib/api.ts';
 import { columnIdFn } from '@/lib/functions.tsx';
 import type { ColumnsType, VehicleDataVO } from '@/lib/types.ts';
 import { companyInfoColumns } from '@/routes/dashboard/core/company/info.tsx';
+import { employeeInfoColumns } from '@/routes/dashboard/core/employee/document.tsx';
 
 export const Route = createFileRoute('/dashboard/core/vehicle')({
   component: RouteComponent,
@@ -467,7 +468,11 @@ function RouteComponent() {
           />,
           <ProExport
             key="export"
-            columns={[...companyInfoColumns, ...columns]}
+            columns={[
+              ...companyInfoColumns,
+              ...employeeInfoColumns,
+              ...columns,
+            ]}
             identifier="core.vehicle"
             keys={(selectedRows?.length ?? 0) === 0 ? [] : selectedRows}
             fetchAllIds={async () => {
@@ -484,6 +489,17 @@ function RouteComponent() {
                   ...data.data,
                 };
                 delete data.data;
+
+                if (data?.[columnId('v1', 'basic', 'basic', 'driver')]) {
+                  const employee =
+                    await DataApi.dashboard.core.employee.document(
+                      data[columnId('v1', 'basic', 'basic', 'driver')],
+                    );
+                  data = {
+                    ...data,
+                    ...employee,
+                  };
+                }
               }
 
               return data;

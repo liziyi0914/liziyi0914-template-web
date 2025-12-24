@@ -15,14 +15,26 @@ function flattenColumns(
 
   columns.forEach((column) => {
     if (column.columns) {
-      result.push(
-        ...flattenColumns(
-          typeof column.columns === 'function'
-            ? column.columns(data)
-            : column.columns,
-          data,
-        ),
-      );
+      if (column.valueType === 'formList') {
+        result.push({
+          ...column,
+          columns: flattenColumns(
+            typeof column.columns === 'function'
+              ? column.columns(data)
+              : column.columns,
+            data,
+          ),
+        });
+      } else {
+        result.push(
+          ...flattenColumns(
+            typeof column.columns === 'function'
+              ? column.columns(data)
+              : column.columns,
+            data,
+          ),
+        );
+      }
     } else {
       result.push(column);
     }
@@ -33,6 +45,8 @@ function flattenColumns(
 
 export function genColumnsKVMap(columns: Array<ColumnsType>) {
   const flattedColumns = flattenColumns(columns, {});
+
+  // console.log(flattedColumns);
 
   return flattedColumns
     .filter(
@@ -49,9 +63,21 @@ export function genColumnsKVMap(columns: Array<ColumnsType>) {
         id = dataIndex as string;
       }
 
+      let title = `${column.title}`;
+
+      if (column.valueType === 'formList') {
+        const subColumns: Array<ColumnsType> = column.columns
+          ? typeof column.columns === 'function'
+            ? column.columns({})
+            : column.columns
+          : [];
+        id = `${id}{${subColumns.map((i) => i.dataIndex).join(', ')}}`;
+        title = `${title}{${subColumns.map((i) => i.title).join(', ')}}`;
+      }
+
       return {
         id: id,
-        name: column.title,
+        name: title,
       };
     });
 }
@@ -60,7 +86,7 @@ export async function column2json(
   columns: Array<ColumnsType>,
   data: Record<string, any>,
 ) {
-  const flattedColumns = flattenColumns(columns, data);
+  let flattedColumns = flattenColumns(columns, data);
 
   const result: Record<string, any> = {};
 
@@ -80,128 +106,149 @@ export async function column2json(
     }
   }
 
-  flattedColumns
-    .filter((column) => !!column.dataIndex)
-    .forEach((column) => {
-      const dataIndex = column.dataIndex as _.PropertyPath;
+  flattedColumns = flattedColumns.filter((column) => !!column.dataIndex);
 
-      let value = _.get(data, dataIndex, undefined);
+  for (const column of flattedColumns) {
+    const dataIndex = column.dataIndex as _.PropertyPath;
 
-      if (value === null || value === undefined) {
-        return;
-      }
+    let value = _.get(data, dataIndex, undefined);
 
-      switch (column.valueType) {
-        case 'validDateRange': {
-          const parts = Array.isArray(value) ? value : [];
+    if (value === null || value === undefined) {
+      continue;
+    }
 
-          if (parts.length === 0) {
-            value = '';
-          } else if (parts.length === 1) {
-            const d1s = `${parts[0]}`.trim();
-            const d1 = day(d1s);
+    switch (column.valueType) {
+      case 'validDateRange': {
+        const parts = Array.isArray(value) ? value : [];
 
-            value = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
-          } else if (parts.length === 2) {
-            let d1s = `${parts[0]}`.trim();
-            const d1 = day(d1s);
-            d1s = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
+        if (parts.length === 0) {
+          value = '';
+        } else if (parts.length === 1) {
+          const d1s = `${parts[0]}`.trim();
+          const d1 = day(d1s);
 
-            let d2s = `${parts[1]}`.trim();
-            if (d2s === '#LONG' || d2s === '长期') {
-              value = `${d1s} ~ 长期`;
+          value = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
+        } else if (parts.length === 2) {
+          let d1s = `${parts[0]}`.trim();
+          const d1 = day(d1s);
+          d1s = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
+
+          let d2s = `${parts[1]}`.trim();
+          if (d2s === '#LONG' || d2s === '长期') {
+            value = `${d1s} ~ 长期`;
+          } else {
+            const d2 = day(d2s);
+            if (d2.isValid()) {
+              d2s = d2.format('YYYY-MM-DD');
+              value = `${d1s} ~ ${d2s}`;
             } else {
-              const d2 = day(d2s);
-              if (d2.isValid()) {
-                d2s = d2.format('YYYY-MM-DD');
-                value = `${d1s} ~ ${d2s}`;
-              } else {
-                value = d1s;
-              }
-            }
-          } else {
-            value = '';
-          }
-
-          break;
-        }
-        case 'date': {
-          const t = day(`${value}`);
-          if (t.isValid()) {
-            value = t.format('YYYY-MM-DD');
-          } else {
-            value = undefined;
-          }
-          break;
-        }
-        case 'dateTime': {
-          const t = day(`${value}`);
-          if (t.isValid()) {
-            value = t.format('YYYY-MM-DD HH:mm:ss');
-          } else {
-            value = undefined;
-          }
-          break;
-        }
-        case 'select': {
-          const valueEnum =
-            typeof column.valueEnum === 'function'
-              ? column.valueEnum(data)
-              : column.valueEnum;
-
-          if (valueEnum) {
-            // @ts-expect-error
-            const enumV = valueEnum?.[`${value}`];
-            value = enumV?.['text'] ?? enumV;
-          } else {
-            value = undefined;
-          }
-          break;
-        }
-        case 'department': {
-          let v;
-          for (const department of departments) {
-            if (department.id === `${value}`) {
-              v = department.name;
-              break;
-            }
-
-            for (const position of department.positions ?? []) {
-              if (position.id === `${value}`) {
-                v = `${department.name} - ${position.name}`;
-                break;
-              }
-            }
-            if (v) {
-              break;
+              value = d1s;
             }
           }
-
-          value = v;
-
-          break;
+        } else {
+          value = '';
         }
-        case 'employee': {
-          let v;
 
-          for (const employee of employees) {
-            if (employee.id === `${value}`) {
-              v = employee.name ? employee.name : employee.phone;
-              break;
-            }
-          }
-
-          value = v;
-
-          break;
-        }
-        default: {
-          value = `${value}`;
-        }
+        break;
       }
+      case 'date': {
+        const t = day(`${value}`);
+        if (t.isValid()) {
+          value = t.format('YYYY-MM-DD');
+        } else {
+          value = undefined;
+        }
+        break;
+      }
+      case 'dateTime': {
+        const t = day(`${value}`);
+        if (t.isValid()) {
+          value = t.format('YYYY-MM-DD HH:mm:ss');
+        } else {
+          value = undefined;
+        }
+        break;
+      }
+      case 'select': {
+        const valueEnum =
+          typeof column.valueEnum === 'function'
+            ? column.valueEnum(data)
+            : column.valueEnum;
 
-      _.set(result, dataIndex, value);
-    });
+        if (valueEnum) {
+          // @ts-expect-error
+          const enumV = valueEnum?.[`${value}`];
+          value = enumV?.['text'] ?? enumV;
+        } else {
+          value = undefined;
+        }
+        break;
+      }
+      case 'department': {
+        let v;
+        for (const department of departments) {
+          if (department.id === `${value}`) {
+            v = department.name;
+            break;
+          }
+
+          for (const position of department.positions ?? []) {
+            if (position.id === `${value}`) {
+              v = `${department.name} - ${position.name}`;
+              break;
+            }
+          }
+          if (v) {
+            break;
+          }
+        }
+
+        value = v;
+
+        break;
+      }
+      case 'employee': {
+        let v;
+
+        for (const employee of employees) {
+          if (employee.id === `${value}`) {
+            v = employee.name ? employee.name : employee.phone;
+            break;
+          }
+        }
+
+        value = v;
+
+        break;
+      }
+      case 'formList': {
+        const v = [];
+
+        for (const element of value) {
+          const subColumns: Array<ColumnsType> = column.columns
+            ? typeof column.columns === 'function'
+              ? column.columns({})
+              : column.columns
+            : [];
+          const e = await column2json(subColumns, element);
+          if (e) {
+            v.push(e);
+          }
+        }
+
+        value = v;
+
+        break;
+      }
+      default: {
+        value = `${value}`;
+      }
+    }
+
+    _.set(result, dataIndex, value);
+  }
+
+  console.log(result);
 
   return result;
 }

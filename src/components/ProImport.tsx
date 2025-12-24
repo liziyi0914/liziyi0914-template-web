@@ -59,6 +59,9 @@ const columns2headInfo = (columns: ColumnsType[]) => {
       case '#assets': {
         break;
       }
+      case 'formList': {
+        break;
+      }
       default: {
         mappings.push(column);
         headers[0].push(`${column.title}`);

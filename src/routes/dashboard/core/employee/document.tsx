@@ -22,7 +22,7 @@ export const Route = createFileRoute('/dashboard/core/employee/document')({
 
 const columnId = columnIdFn(['core', 'employee', 'document']);
 
-const columns: ColumnsType[] = [
+export const employeeInfoColumns: ColumnsType[] = [
   {
     valueType: '$tabGroup',
     group: {
@@ -696,7 +696,7 @@ function RouteComponent() {
           }}
         >
           <div className="pb-6 grow">
-            <GroupedEmbedSchemaForm columns={columns} />
+            <GroupedEmbedSchemaForm columns={employeeInfoColumns} />
           </div>
         </ProForm>
       </Modal>
@@ -723,7 +723,7 @@ function RouteComponent() {
           </Button>,
           <ProImport
             title="人员档案"
-            columns={columns}
+            columns={employeeInfoColumns}
             onImport={async (rows) => {
               const counts = {
                 success: 0,
@@ -758,7 +758,7 @@ function RouteComponent() {
           />,
           <ProExport
             key="export"
-            columns={[...companyInfoColumns, ...columns]}
+            columns={[...companyInfoColumns, ...employeeInfoColumns]}
             identifier="core.employee.document"
             keys={(selectedRows?.length ?? 0) === 0 ? [] : selectedRows}
             fetchAllIds={async () => {
