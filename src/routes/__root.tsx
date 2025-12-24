@@ -5,7 +5,7 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { App, ConfigProvider, theme } from 'antd';
-import { useMemo } from 'react';
+import {useEffect, useMemo} from 'react';
 import AiFormItem from '@/components/formItem/AiFormItem.tsx';
 import AssetsPicker, {
   AssetsPickerView,
@@ -34,7 +34,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         : themeCfg.theme;
     }, [themeCfg.theme]);
 
-    console.log(currentTheme);
+    useEffect(() => {
+      document.documentElement.setAttribute(
+        'data-prefers-color-scheme',
+        currentTheme ? 'dark' : 'light'
+      )
+    }, [currentTheme]);
 
     return (
       <>

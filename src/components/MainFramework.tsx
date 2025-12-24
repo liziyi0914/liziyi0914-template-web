@@ -31,9 +31,9 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
 
   return (
     <div className="flex justify-center bg-blue-100 dark:bg-blue-950">
-      <div className="max-w-xl w-screen h-screen flex flex-col shadow-lg bg-white">
+      <div className="max-w-xl w-screen h-screen flex flex-col shadow-lg bg-card">
         {frameworkState.navbarVisible && (
-          <div className="border-0 border-b border-gray-200 dark:border-gray-700">
+          <div className="border-0 border-b border-gray-200 dark:border-gray-800">
             <NavBar
               back={frameworkState.navbarBackVisible ? '' : null}
               onBack={() => {

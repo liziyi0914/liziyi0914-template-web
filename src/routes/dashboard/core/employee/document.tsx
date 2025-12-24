@@ -11,13 +11,16 @@ import { useRef, useState } from 'react';
 import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
 import ProExport from '@/components/ProExport.tsx';
 import ProImport from '@/components/ProImport.tsx';
-import { Api, type ApiResult } from '@/lib/api.ts';
+import {Api, type ApiResult, DataApi} from '@/lib/api.ts';
 import type { ColumnsType, EmployeeDataVO } from '@/lib/types.ts';
-import {companyInfoExportColumns} from "@/routes/dashboard/core/company/info.tsx";
+import {columnIdFn} from "@/lib/functions.tsx";
+import {companyInfoColumns} from "@/routes/dashboard/core/company/info.tsx";
 
 export const Route = createFileRoute('/dashboard/core/employee/document')({
   component: RouteComponent,
 });
+
+const columnId = columnIdFn(['core', 'employee', 'document']);
 
 const columns: ColumnsType[] = [
   {
@@ -36,7 +39,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '证件照（大头照/小一寸/大一寸）',
-            dataIndex: 'photoFile',
+            dataIndex: columnId('v1', 'basic', 'basic', 'photoFile'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -44,7 +47,7 @@ const columns: ColumnsType[] = [
           },
           {
             title: '手机号',
-            dataIndex: 'phone',
+            dataIndex: columnId('v1', 'basic', 'basic', 'phone'),
             formItemProps: {
               required: true,
               rules: [
@@ -60,14 +63,26 @@ const columns: ColumnsType[] = [
           },
           {
             title: '姓名',
-            dataIndex: 'name',
+            dataIndex: columnId('v1', 'basic', 'basic', 'name'),
+            colProps: {
+              span: 12,
+            },
+          },
+          {
+            title: '性别',
+            dataIndex: columnId('v1', 'basic', 'basic', 'gender'),
+            valueType: 'select',
+            valueEnum: {
+              0: '男',
+              1: '女',
+            },
             colProps: {
               span: 12,
             },
           },
           {
             title: '角色',
-            dataIndex: 'careerRole',
+            dataIndex: columnId('v1', 'basic', 'basic', 'careerRole'),
             valueType: 'select',
             valueEnum: {
               safetyOfficer: '安全员',
@@ -84,7 +99,7 @@ const columns: ColumnsType[] = [
           },
           {
             title: '岗位',
-            dataIndex: 'departmentPosition',
+            dataIndex: columnId('v1', 'basic', 'basic', 'departmentPosition'),
             valueType: 'department',
             fieldProps: {
               allowTypes: ['position'],
@@ -95,49 +110,49 @@ const columns: ColumnsType[] = [
           },
           {
             title: '家庭地址',
-            dataIndex: 'homeAddress',
+            dataIndex: columnId('v1', 'basic', 'basic', 'homeAddress'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '邮箱',
-            dataIndex: 'email',
+            dataIndex: columnId('v1', 'basic', 'basic', 'email'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '紧急联系人',
-            dataIndex: 'emergencyContact',
+            dataIndex: columnId('v1', 'basic', 'basic', 'emergencyContact'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '紧急联系人电话',
-            dataIndex: 'emergencyContactPhone',
+            dataIndex: columnId('v1', 'basic', 'basic', 'emergencyContactPhone'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '政治面貌',
-            dataIndex: 'politicalStatus',
+            dataIndex: columnId('v1', 'basic', 'basic', 'politicalStatus'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '婚否',
-            dataIndex: 'maritalStatus',
+            dataIndex: columnId('v1', 'basic', 'basic', 'maritalStatus'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '学历',
-            dataIndex: 'educationLevel',
+            dataIndex: columnId('v1', 'basic', 'basic', 'educationLevel'),
             valueType: 'select',
             valueEnum: {
               primarySchool: '小学',
@@ -154,21 +169,21 @@ const columns: ColumnsType[] = [
           },
           {
             title: '毕业学校',
-            dataIndex: 'graduationSchool',
+            dataIndex: columnId('v1', 'basic', 'basic', 'graduationSchool'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '专业',
-            dataIndex: 'major',
+            dataIndex: columnId('v1', 'basic', 'basic', 'major'),
             colProps: {
               span: 12,
             },
           },
           {
             title: '入职日期',
-            dataIndex: 'joinDate',
+            dataIndex: columnId('v1', 'basic', 'basic', 'joinDate'),
             valueType: 'date',
             colProps: {
               span: 12,
@@ -176,7 +191,7 @@ const columns: ColumnsType[] = [
           },
           {
             title: '在职',
-            dataIndex: 'isEmployed',
+            dataIndex: columnId('v1', 'basic', 'basic', 'isEmployed'),
             valueType: 'select',
             valueEnum: {
               true: '是',
@@ -188,7 +203,7 @@ const columns: ColumnsType[] = [
           },
           {
             title: '家庭成员',
-            dataIndex: 'familyMembers',
+            dataIndex: columnId('v1', 'basic', 'basic', 'familyMembers'),
             valueType: 'textarea',
             colProps: {
               span: 12,
@@ -196,7 +211,7 @@ const columns: ColumnsType[] = [
           },
           {
             title: '备注',
-            dataIndex: 'remark',
+            dataIndex: columnId('v1', 'basic', 'basic', 'remark'),
             valueType: 'textarea',
             colProps: {
               span: 12,
@@ -213,7 +228,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '身份证',
-            dataIndex: 'idCardFile',
+            dataIndex: columnId('v1', 'basic', 'idCard', 'file'),
             valueType: '#assets',
             fieldProps: {
               multiple: true,
@@ -226,27 +241,15 @@ const columns: ColumnsType[] = [
           },
           {
             title: '身份证号',
-            dataIndex: 'idCard',
+            dataIndex: columnId('v1', 'basic', 'idCard', 'idCard'),
             valueType: 'text',
             colProps: {
               span: 12,
             },
           },
           {
-            title: '性别',
-            dataIndex: 'gender',
-            valueType: 'select',
-            valueEnum: {
-              0: '男',
-              1: '女',
-            },
-            colProps: {
-              span: 12,
-            },
-          },
-          {
             title: '有效期限',
-            dataIndex: 'idCardValidDate',
+            dataIndex: columnId('v1', 'basic', 'idCard', 'validDate'),
             valueType: 'validDateRange',
             colProps: {
               span: 12,
@@ -255,23 +258,23 @@ const columns: ColumnsType[] = [
           {
             valueType: '#ai',
             fieldProps: {
-              assets: 'idCardFile',
+              assets: columnId('v1', 'basic', 'idCard', 'file'),
               columns: [
                 {
                   title: '姓名',
-                  dataIndex: 'name',
+                  dataIndex: columnId('v1', 'basic', 'basic', 'name'),
                   colProps: {
                     span: 12,
                   },
                 },
                 {
                   title: '身份证号',
-                  dataIndex: 'idCard',
+                  dataIndex: columnId('v1', 'basic', 'idCard', 'idCard'),
                   valueType: 'text',
                 },
                 {
                   title: '性别',
-                  dataIndex: 'gender',
+                  dataIndex: columnId('v1', 'basic', 'basic', 'gender'),
                   valueType: 'select',
                   valueEnum: {
                     '0': '男',
@@ -280,7 +283,7 @@ const columns: ColumnsType[] = [
                 },
                 {
                   title: '有效期限',
-                  dataIndex: 'idCardValidDate',
+                  dataIndex: columnId('v1', 'basic', 'idCard', 'validDate'),
                   valueType: 'validDateRange',
                 },
               ],
@@ -297,7 +300,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'laborContractFile',
+            dataIndex: columnId('v1', 'basic', 'laborContract', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -314,7 +317,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'safetyCommitmentLetterFile',
+            dataIndex: columnId('v1', 'basic', 'safetyCommitmentLetter', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -331,7 +334,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'responsibilityStatementFile',
+            dataIndex: columnId('v1', 'basic', 'responsibilityStatement', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -348,7 +351,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'physicalExaminationCertificateFile',
+            dataIndex: columnId('v1', 'basic', 'physicalExaminationCertificate', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -365,7 +368,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'trainingRecordFile',
+            dataIndex: columnId('v1', 'basic', 'trainingRecord', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -382,7 +385,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'otherDocumentsFile',
+            dataIndex: columnId('v1', 'basic', 'otherDocuments', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -408,7 +411,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'safetyManagementQualificationCertificateFile',
+            dataIndex: columnId('v1', 'safety', 'safetyManagementQualificationCertificate', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -425,7 +428,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'registeredSafetyEngineerCertificateFile',
+            dataIndex: columnId('v1', 'safety', 'registeredSafetyEngineerCertificate', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -451,7 +454,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'drivingLicenseFile',
+            dataIndex: columnId('v1', 'driver', 'drivingLicense', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -468,7 +471,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'professionalQualificationCertificateFile',
+            dataIndex: columnId('v1', 'driver', 'professionalQualificationCertificate', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -485,7 +488,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'occupationalHazardsNotificationLetterFile',
+            dataIndex: columnId('v1', 'driver', 'occupationalHazardsNotificationLetter', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -511,7 +514,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'trainingCertificateFile',
+            dataIndex: columnId('v1', 'monitoring', 'trainingCertificate', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -528,7 +531,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'assessmentRecordFile',
+            dataIndex: columnId('v1', 'monitoring', 'assessmentRecord', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -554,7 +557,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'safetyManagementQualificationCertificateFile',
+            dataIndex: columnId('v1', 'chief', 'safetyManagementQualificationCertificate', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -571,7 +574,7 @@ const columns: ColumnsType[] = [
         columns: [
           {
             title: '文件',
-            dataIndex: 'authorizationLetterFile',
+            dataIndex: columnId('v1', 'chief', 'authorizationLetter', 'file'),
             valueType: '#assets',
             colProps: {
               span: 12,
@@ -607,12 +610,12 @@ function RouteComponent() {
           grid
           initialValues={employee?.data ?? {}}
           onFinish={async (values) => {
-            const phone = values.phone;
+            const phone = values[columnId('v1', 'basic', 'basic', 'phone')];
             if (!phone) {
               return false;
             }
 
-            delete values.phone;
+            delete values[columnId('v1', 'basic', 'basic', 'phone')];
 
             let resp: ApiResult;
 
@@ -706,7 +709,7 @@ function RouteComponent() {
           <ProExport
             key="export"
             columns={[
-              ...companyInfoExportColumns,
+              ...companyInfoColumns,
               ...columns,
             ]}
             identifier="core.employee.document"
@@ -732,12 +735,11 @@ function RouteComponent() {
               return data;
             }}
             extraData={async () => {
-              let resp = await Api.dashboard.core.company.info.get();
+              let companyInfo = await DataApi.dashboard.core.company.info();
 
-              return resp?.data ? {
-                ...resp.data.data,
-                companyName: resp.data.companyName,
-              } : {};
+              return {
+                ...companyInfo,
+              };
             }}
           />,
         ]}
@@ -857,7 +859,7 @@ function RouteComponent() {
                         id: record.id,
                         data: {
                           ...resp.data.data,
-                          phone: resp.data.phone,
+                          [columnId('v1', 'basic', 'basic', 'phone')]: resp.data.phone,
                         },
                       });
                     } else {

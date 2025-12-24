@@ -15,6 +15,7 @@ import type {
   TemplateUpdateRequest,
   UserInfoVO,
 } from '@/lib/types.ts';
+import {columnIdBase} from "@/lib/functions.tsx";
 
 export interface ApiResult<T = any> {
   code: number;
@@ -173,7 +174,9 @@ export const uploadOss: <T = any>(
     };
   } else {
     try {
-      const json = await uploadResp.json();
+      let text = await uploadResp.text();
+
+      const json = JSON.parse(text);
 
       if (json?.code && typeof json?.code === 'number' && json.code !== 200) {
         return {
@@ -679,6 +682,40 @@ export const Api = {
               method: 'POST',
             });
           },
+        },
+      },
+    },
+  },
+};
+
+
+export const DataApi = {
+  dashboard: {
+    core: {
+      company: {
+        info: async (): Promise<Record<string, any>> => {
+          const resp = await Api.dashboard.core.company.info.get();
+          if (resp.code === 200 && resp.data) {
+            return {
+              ...resp.data.data,
+              [columnIdBase(['companyName'], 'v1', ['core', 'company', 'info'])]: resp.data.companyName,
+            };
+          }
+          return {};
+        },
+      },
+      employee: {
+        document: async (id: string): Promise<Record<string, any>> => {
+          const resp = await Api.dashboard.core.employee.document.get(id);
+
+          if (resp.code === 200 && resp.data) {
+            return {
+              ...resp.data.data,
+              [columnIdBase(['basic', 'basic', 'phone'], 'v1', ['core', 'employee', 'document'])]: resp.data.phone,
+            };
+          }
+
+          return {};
         },
       },
     },

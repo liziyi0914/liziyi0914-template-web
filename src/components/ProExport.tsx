@@ -69,6 +69,8 @@ const Component: React.FC<{
           content: <div>正在处理数据中……</div>,
         });
 
+        // console.log(rows)
+
         await runTemplate(templateId, rows);
 
         m.destroy();

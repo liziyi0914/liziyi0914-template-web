@@ -3,15 +3,18 @@ import { createFileRoute } from '@tanstack/react-router';
 import { App } from 'antd';
 import { Api } from '@/lib/api.ts';
 import type {ColumnsType} from "@/lib/types.ts";
+import {columnIdFn} from "@/lib/functions.tsx";
 
 export const Route = createFileRoute('/dashboard/core/company/info')({
   component: RouteComponent,
 });
 
-const companyInfoColumns: Array<ColumnsType> = [
+const columnId = columnIdFn(['core', 'company', 'info']);
+
+export const companyInfoColumns: Array<ColumnsType> = [
   {
     title: '企业名称',
-    dataIndex: 'companyName',
+    dataIndex: columnId('v1', 'companyName'),
     fieldProps: {
       disabled: true,
     },
@@ -30,49 +33,49 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '企业类型',
-    dataIndex: 'companyType',
+    dataIndex: columnId('v1', 'companyType'),
     colProps: {
       span: 12,
     },
   },
   {
     title: '法人姓名',
-    dataIndex: 'legalRepresentativeName',
+    dataIndex: columnId('v1', 'legalRepresentativeName'),
     colProps: {
       span: 12,
     },
   },
   {
     title: '法人联系电话',
-    dataIndex: 'legalRepresentativePhone',
+    dataIndex: columnId('v1', 'legalRepresentativePhone'),
     colProps: {
       span: 12,
     },
   },
   {
     title: '社会信用代码',
-    dataIndex: 'socialCreditCode',
+    dataIndex: columnId('v1', 'socialCreditCode'),
     colProps: {
       span: 12,
     },
   },
   {
     title: '经营许可证号',
-    dataIndex: 'businessPermitNumber',
+    dataIndex: columnId('v1', 'businessPermitNumber'),
     colProps: {
       span: 12,
     },
   },
   {
     title: '经营许可范围',
-    dataIndex: 'businessScope',
+    dataIndex: columnId('v1', 'businessScope'),
     colProps: {
       span: 12,
     },
   },
   {
     title: '经营许可证有效期',
-    dataIndex: 'businessPermitExpiry',
+    dataIndex: columnId('v1', 'businessPermitExpiry'),
     valueType: 'validDateRange',
     colProps: {
       span: 12,
@@ -80,14 +83,14 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '企业地址',
-    dataIndex: 'companyAddress',
+    dataIndex: columnId('v1', 'companyAddress'),
     colProps: {
       span: 24,
     },
   },
   {
     title: '公司简介',
-    dataIndex: 'companyIntroduction',
+    dataIndex: columnId('v1', 'companyIntroduction'),
     valueType: 'textarea',
     colProps: {
       span: 24,
@@ -98,7 +101,7 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '专职安全管理人员人数',
-    dataIndex: 'fullTimeSafetyStaffCount',
+    dataIndex: columnId('v1', 'fullTimeSafetyStaffCount'),
     valueType: 'digit',
     colProps: {
       span: 12,
@@ -106,7 +109,7 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '特种设备管理人员人数',
-    dataIndex: 'specialEquipmentStaffCount',
+    dataIndex: columnId('v1', 'specialEquipmentStaffCount'),
     valueType: 'digit',
     colProps: {
       span: 12,
@@ -114,7 +117,7 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '驾驶员人数',
-    dataIndex: 'driverCount',
+    dataIndex: columnId('v1', 'driverCount'),
     valueType: 'digit',
     colProps: {
       span: 12,
@@ -122,7 +125,7 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '押运员人数',
-    dataIndex: 'escortCount',
+    dataIndex: columnId('v1', 'escortCount'),
     valueType: 'digit',
     colProps: {
       span: 12,
@@ -130,7 +133,7 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '装卸管理员人数',
-    dataIndex: 'loadingUnloadingManagerCount',
+    dataIndex: columnId('v1', 'loadingUnloadingManagerCount'),
     valueType: 'digit',
     colProps: {
       span: 12,
@@ -138,7 +141,7 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '是否标准化达标',
-    dataIndex: 'isStandardized',
+    dataIndex: columnId('v1', 'isStandardized'),
     valueType: 'select',
     valueEnum: {
       true: '是',
@@ -150,7 +153,7 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '营业执照',
-    dataIndex: 'businessLicenseFile',
+    dataIndex: columnId('v1', 'businessLicenseFile'),
     valueType: '#assets',
     colProps: {
       span: 12,
@@ -158,18 +161,13 @@ const companyInfoColumns: Array<ColumnsType> = [
   },
   {
     title: '经营许可证',
-    dataIndex: 'businessPermitFile',
+    dataIndex: columnId('v1', 'businessPermitFile'),
     valueType: '#assets',
     colProps: {
       span: 12,
     },
   },
 ];
-
-export const companyInfoExportColumns: Array<ColumnsType> = companyInfoColumns.map((column) => ({
-  ...column,
-  dataIndex: `_company__${column.dataIndex}`,
-}));
 
 function RouteComponent() {
   const { message } = App.useApp();
@@ -184,14 +182,14 @@ function RouteComponent() {
         if (resp.code === 200 && resp.data) {
           return {
             ...resp.data.data,
-            companyName: resp.data.companyName,
+            [columnId('v1', 'companyName')]: resp.data.companyName,
           };
         }
         return {};
       }}
       onFinish={async (values) => {
         const v = values;
-        delete v.companyName;
+        delete v[columnId('v1', 'companyName')];
         const resp = await Api.dashboard.core.company.info.update({
           data: v,
         });
@@ -220,32 +218,32 @@ function RouteComponent() {
             },
             fieldProps: {
               label: '营业执照',
-              assets: 'businessLicenseFile',
+              assets: columnId('v1', 'businessLicenseFile'),
               columns: [
                 {
                   title: '企业类型',
-                  dataIndex: 'companyType',
+                  dataIndex: columnId('v1', 'companyType'),
                   colProps: {
                     span: 12,
                   },
                 },
                 {
                   title: '法人姓名',
-                  dataIndex: 'legalRepresentativeName',
+                  dataIndex: columnId('v1', 'legalRepresentativeName'),
                   colProps: {
                     span: 12,
                   },
                 },
                 {
                   title: '社会信用代码',
-                  dataIndex: 'socialCreditCode',
+                  dataIndex: columnId('v1', 'socialCreditCode'),
                   colProps: {
                     span: 12,
                   },
                 },
                 {
                   title: '企业地址',
-                  dataIndex: 'companyAddress',
+                  dataIndex: columnId('v1', 'companyAddress'),
                   colProps: {
                     span: 24,
                   },
@@ -260,25 +258,25 @@ function RouteComponent() {
             },
             fieldProps: {
               label: '经营许可证',
-              assets: 'businessPermitFile',
+              assets: columnId('v1', 'businessPermitFile'),
               columns: [
                 {
                   title: '经营许可证号',
-                  dataIndex: 'businessPermitNumber',
+                  dataIndex: columnId('v1', 'businessPermitNumber'),
                   colProps: {
                     span: 12,
                   },
                 },
                 {
                   title: '经营许可范围',
-                  dataIndex: 'businessScope',
+                  dataIndex: columnId('v1', 'businessScope'),
                   colProps: {
                     span: 12,
                   },
                 },
                 {
                   title: '经营许可证有效期',
-                  dataIndex: 'businessPermitExpiry',
+                  dataIndex: columnId('v1', 'businessPermitExpiry'),
                   valueType: 'validDateRange',
                   colProps: {
                     span: 12,

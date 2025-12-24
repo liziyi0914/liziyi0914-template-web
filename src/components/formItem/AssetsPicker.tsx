@@ -110,11 +110,13 @@ export const UploadAssetsForm: React.FC<{
         });
 
         if (uploadResp.code !== 200) {
-          message.error(uploadResp.msg || '上传失败，请稍后重试');
+          console.error(uploadResp);
+          message.error(uploadResp.msg ? `上传失败: ${uploadResp.msg}` : '上传失败，请稍后重试');
           return;
         }
         if (!uploadResp.data) {
-          message.error(uploadResp.msg || '上传失败，请稍后重试');
+          console.error(uploadResp);
+          message.error(uploadResp.msg ? `上传失败: ${uploadResp.msg}` : '上传失败，请稍后重试');
           return;
         }
 
