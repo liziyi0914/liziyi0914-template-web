@@ -28,6 +28,9 @@ export default defineConfig({
       strategy: 'split-by-experience',
     },
   },
+  server: {
+    port: 4000,
+  },
   html: {
     tags: [
       {

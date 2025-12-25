@@ -169,6 +169,64 @@ export async function column2json(
         }
         break;
       }
+      case 'dateRange': {
+        const parts = Array.isArray(value) ? value : [];
+
+        if (parts.length === 0) {
+          value = '';
+        } else if (parts.length === 1) {
+          const d1s = `${parts[0]}`.trim();
+          const d1 = day(d1s);
+
+          value = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
+        } else if (parts.length === 2) {
+          let d1s = `${parts[0]}`.trim();
+          const d1 = day(d1s);
+          d1s = d1.isValid() ? d1.format('YYYY-MM-DD') : '';
+
+          let d2s = `${parts[1]}`.trim();
+          const d2 = day(d2s);
+          if (d2.isValid()) {
+            d2s = d2.format('YYYY-MM-DD');
+            value = `${d1s} ~ ${d2s}`;
+          } else {
+            value = d1s;
+          }
+        } else {
+          value = '';
+        }
+
+        break;
+      }
+      case 'dateTimeRange': {
+        const parts = Array.isArray(value) ? value : [];
+
+        if (parts.length === 0) {
+          value = '';
+        } else if (parts.length === 1) {
+          const d1s = `${parts[0]}`.trim();
+          const d1 = day(d1s);
+
+          value = d1.isValid() ? d1.format('YYYY-MM-DD HH:mm:ss') : '';
+        } else if (parts.length === 2) {
+          let d1s = `${parts[0]}`.trim();
+          const d1 = day(d1s);
+          d1s = d1.isValid() ? d1.format('YYYY-MM-DD HH:mm:ss') : '';
+
+          let d2s = `${parts[1]}`.trim();
+          const d2 = day(d2s);
+          if (d2.isValid()) {
+            d2s = d2.format('YYYY-MM-DD');
+            value = `${d1s} ~ ${d2s}`;
+          } else {
+            value = d1s;
+          }
+        } else {
+          value = '';
+        }
+
+        break;
+      }
       case 'select': {
         const valueEnum =
           typeof column.valueEnum === 'function'
@@ -336,6 +394,58 @@ export async function json2column(
               value = t.format('YYYY-MM-DD HH:mm:ss');
             }
           } catch (e) {}
+
+          break;
+        }
+        case 'dateRange': {
+          const parts = `${value}`.split('~').map((i) => i.trim());
+          const d: string[] = [];
+
+          if (parts.length >= 1) {
+            try {
+              const t = day(parts[0]);
+              if (t.isValid()) {
+                d.push(t.format('YYYY-MM-DD'));
+              }
+            } catch (e) {}
+          }
+
+          if (parts.length >= 2) {
+            try {
+              const t = day(parts[1]);
+              if (t.isValid()) {
+                d.push(t.format('YYYY-MM-DD'));
+              }
+            } catch (e) {}
+          }
+
+          value = d;
+
+          break;
+        }
+        case 'dateTimeRange': {
+          const parts = `${value}`.split('~').map((i) => i.trim());
+          const d: string[] = [];
+
+          if (parts.length >= 1) {
+            try {
+              const t = day(parts[0]);
+              if (t.isValid()) {
+                d.push(t.format('YYYY-MM-DD HH:mm:ss'));
+              }
+            } catch (e) {}
+          }
+
+          if (parts.length >= 2) {
+            try {
+              const t = day(parts[1]);
+              if (t.isValid()) {
+                d.push(t.format('YYYY-MM-DD HH:mm:ss'));
+              }
+            } catch (e) {}
+          }
+
+          value = d;
 
           break;
         }

@@ -1,13 +1,14 @@
 import {
+  BetaSchemaForm,
   ModalForm,
-  ProDescriptions,
   ProForm,
   type ProFormColumnsType,
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { Icon } from '@iconify/react';
-import { App, Button } from 'antd';
+import { App, Button, Modal } from 'antd';
 import { useCallback, useState } from 'react';
+import { AssetsPickerView } from '@/components/formItem/AssetsPicker.tsx';
 import { Api } from '@/lib/api.ts';
 
 const Component: React.FC<{
@@ -15,10 +16,11 @@ const Component: React.FC<{
   assets?: string;
   columns?: ProFormColumnsType[];
 }> = (props) => {
-  const { message, modal } = App.useApp();
+  const { message } = App.useApp();
   const form = ProForm.useFormInstance();
 
   const [lockModal, setLockModal] = useState(false);
+  const [confirm, setConfirm] = useState<Record<string, any>>();
 
   const fetchAi = useCallback(
     async (prompts: string) => {
@@ -71,19 +73,7 @@ const Component: React.FC<{
           result[k] = data[k];
         }
 
-        modal.confirm({
-          title: '确定填入以下内容：',
-          content: (
-            <ProDescriptions
-              dataSource={result}
-              column={1}
-              columns={(props.columns as any) ?? []}
-            ></ProDescriptions>
-          ),
-          onOk: async () => {
-            form.setFieldsValue(result);
-          },
-        });
+        setConfirm(result);
 
         return true;
       } else {
@@ -95,54 +85,89 @@ const Component: React.FC<{
     [form],
   );
 
+  console.log(form);
+
   return (
-    <ModalForm
-      title={props.label ?? 'AI填写'}
-      onFinish={async (values) => {
-        setLockModal(true);
-        const resp = await fetchAi(values?.prompts ?? '');
-        setLockModal(false);
-        return resp;
-      }}
-      trigger={
-        <Button icon={<Icon icon="octicon:sparkles-fill-24" />}>
-          {props.label ?? 'AI填写'}
-        </Button>
-      }
-      submitter={{
-        searchConfig: {},
-        resetButtonProps: {
-          className: 'hidden',
-        },
-        render: (props) => {
-          return [
-            <Button
-              key="submit"
-              type="primary"
-              htmlType="submit"
-              loading={lockModal}
-              onClick={() => {
-                props.submit();
-              }}
-            >
-              提交
-            </Button>,
-          ];
-        },
-      }}
-      modalProps={{
-        destroyOnHidden: true,
-        closable: !lockModal,
-        maskClosable: !lockModal,
-      }}
-    >
-      <ProFormTextArea
-        disabled={lockModal}
-        name="prompts"
-        label="提示词"
-        placeholder="请输入"
-      />
-    </ModalForm>
+    <>
+      <Modal
+        open={!!confirm}
+        title="确定填入以下内容："
+        footer={null}
+        destroyOnHidden
+        onCancel={() => {
+          setConfirm(undefined);
+        }}
+      >
+        <div className="pb-3">
+          <AssetsPickerView
+            value={form.getFieldValue(props.assets)}
+            canPreview={true}
+          />
+        </div>
+        <BetaSchemaForm
+          initialValues={confirm}
+          columns={props.columns ?? []}
+          onFinish={async (values) => {
+            form.setFieldsValue(values);
+            setConfirm(undefined);
+            return true;
+          }}
+        />
+      </Modal>
+      <ModalForm
+        title={props.label ?? 'AI填写'}
+        onFinish={async (values) => {
+          setLockModal(true);
+          const resp = await fetchAi(values?.prompts ?? '');
+          setLockModal(false);
+          return resp;
+        }}
+        trigger={
+          <Button icon={<Icon icon="octicon:sparkles-fill-24" />}>
+            {props.label ?? 'AI填写'}
+          </Button>
+        }
+        submitter={{
+          searchConfig: {},
+          resetButtonProps: {
+            className: 'hidden',
+          },
+          render: (props) => {
+            return [
+              <Button
+                key="submit"
+                type="primary"
+                htmlType="submit"
+                loading={lockModal}
+                onClick={() => {
+                  props.submit();
+                }}
+              >
+                提交
+              </Button>,
+            ];
+          },
+        }}
+        modalProps={{
+          destroyOnHidden: true,
+          closable: !lockModal,
+          maskClosable: !lockModal,
+        }}
+      >
+        <div className="pb-3">
+          <AssetsPickerView
+            value={form.getFieldValue(props.assets)}
+            canPreview={true}
+          />
+        </div>
+        <ProFormTextArea
+          disabled={lockModal}
+          name="prompts"
+          label="提示词"
+          placeholder="请输入"
+        />
+      </ModalForm>
+    </>
   );
 };
 

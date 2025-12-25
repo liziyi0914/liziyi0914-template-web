@@ -428,7 +428,10 @@ const Component: React.FC<{
 
 export const AssetsPickerView: React.FC<{
   value?: string;
+  canPreview?: boolean;
 }> = (props) => {
+  const { message } = App.useApp();
+
   const assetsInfoList = useQuery({
     queryKey: ['assetsInfo', props.value],
     queryFn: async () => {
@@ -450,6 +453,48 @@ export const AssetsPickerView: React.FC<{
     refetchOnWindowFocus: false,
   });
 
+  const cacheFileList = useMemo(() => {
+    return assetsInfoList.data?.map((info) => {
+      if (!info) {
+        return <div>资源获取失败</div>;
+      }
+      return (
+        <div>
+          {info.fileType === 'image/*' && (
+            <div>
+              <OssImage src={info.id} width={200} />
+            </div>
+          )}
+          <div className="flex gap-x-1 items-center">
+            <div>{info.name}</div>
+            <div>
+              <Button
+                type="link"
+                onClick={async () => {
+                  const resp = await Api.common.getAssetsLink(info.id);
+                  if (resp.code === 200 && resp.data) {
+                    const url = resp.data;
+                    const a = document.createElement('a');
+                    a.target = '_blank';
+                    a.href = url;
+                    a.download = info.name;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    message.success('下载成功');
+                  } else {
+                    message.error('下载失败');
+                  }
+                }}
+              >
+                下载
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }, [assetsInfoList.data]);
+
   const name = useMemo(() => {
     if (!assetsInfoList.data) {
       return '-';
@@ -460,7 +505,17 @@ export const AssetsPickerView: React.FC<{
       .join('、');
   }, [assetsInfoList.data]);
 
-  return <>{name}</>;
+  return (
+    <>
+      {!!props.canPreview && props.value && (
+        <div>
+          <div className="flex flex-col gap-y-3">{cacheFileList}</div>
+          <div className="flex gap-x-3"></div>
+        </div>
+      )}
+      {!props.canPreview && name}
+    </>
+  );
 };
 
 export default Component;
