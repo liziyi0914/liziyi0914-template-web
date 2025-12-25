@@ -1,5 +1,6 @@
 import './App.css';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { ThemeProvider } from 'next-themes';
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
 import { routeTree } from './routeTree.gen.ts';
 
@@ -24,9 +25,11 @@ declare module '@tanstack/react-router' {
 
 const App = () => {
   return (
-    <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-      <RouterProvider router={router} />
-    </TanStackQueryProvider.Provider>
+    <ThemeProvider>
+      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+        <RouterProvider router={router} />
+      </TanStackQueryProvider.Provider>
+    </ThemeProvider>
   );
 };
 

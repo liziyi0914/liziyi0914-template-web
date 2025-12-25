@@ -6,7 +6,7 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { Icon } from '@iconify/react';
-import { App, Button, Modal } from 'antd';
+import { Alert, App, Button, Modal } from 'antd';
 import { useCallback, useState } from 'react';
 import { AssetsPickerView } from '@/components/formItem/AssetsPicker.tsx';
 import { Api } from '@/lib/api.ts';
@@ -154,7 +154,8 @@ const Component: React.FC<{
           maskClosable: !lockModal,
         }}
       >
-        <div className="pb-3">
+        <Alert title="PDF文件截取前三页进行识别" type="info" showIcon />
+        <div className="py-3">
           <AssetsPickerView
             value={form.getFieldValue(props.assets)}
             canPreview={true}

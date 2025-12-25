@@ -1436,6 +1436,65 @@ const columns: ColumnsType[] = [
             },
           },
           {
+            valueType: '#ai',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              assets: columnId('v1', 'basic', 'insurance', 'file'),
+              columns: [
+                {
+                  title: '保险信息',
+                  dataIndex: columnId('v1', 'basic', 'insurance', 'list'),
+                  valueType: 'formList',
+                  fieldProps: {
+                    itemContainerRender: (dom: any) => (
+                      <ProFormGroup>{dom}</ProFormGroup>
+                    ),
+                    alwaysShowItemLabel: true,
+                  },
+                  columns: [
+                    {
+                      title: '保险公司',
+                      dataIndex: 'insuranceCompany',
+                      valueType: 'text',
+                      colProps: {
+                        span: 'auto',
+                      },
+                    },
+                    {
+                      title: '承保险种',
+                      dataIndex: 'insuranceType',
+                      valueType: 'text',
+                      colProps: {
+                        span: 'auto',
+                      },
+                    },
+                    {
+                      title: '金额',
+                      dataIndex: 'amount',
+                      valueType: 'money',
+                      colProps: {
+                        span: 'auto',
+                      },
+                    },
+                    {
+                      title: '保险期间',
+                      dataIndex: 'insurancePeriod',
+                      valueType: 'dateTimeRange',
+                      colProps: {
+                        span: 'auto',
+                      },
+                    },
+                  ],
+                  colProps: {
+                    span: 24,
+                  },
+                },
+              ],
+            },
+          },
+          {
             title: '保险信息',
             dataIndex: columnId('v1', 'basic', 'insurance', 'list'),
             valueType: 'formList',

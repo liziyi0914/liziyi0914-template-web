@@ -5,8 +5,8 @@ import { Button, Card, Dropdown, Modal } from 'antd';
 import { Toast } from 'antd-mobile';
 import * as jose from 'jose';
 import { useAtomValue } from 'jotai';
+import { useTheme } from 'next-themes';
 import React, { type PropsWithChildren, useState } from 'react';
-import { useTheme } from '@/components/theme-provider.tsx';
 import { Api } from '@/lib/api.ts';
 import { LoginState } from '@/routes/dashboard.tsx';
 
@@ -53,7 +53,7 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const loginState = useAtomValue(LoginState);
-  const themeCfg = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const [companies, setCompanies] = useState<string[]>();
 
@@ -209,7 +209,7 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
                     icon: <Icon icon="icon-park-outline:dark-mode" />,
                     label: '跟随系统',
                     onClick: () => {
-                      themeCfg.setTheme('system');
+                      setTheme('system');
                     },
                   },
                   {
@@ -219,7 +219,7 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
                     ),
                     label: '白天模式',
                     onClick: () => {
-                      themeCfg.setTheme('light');
+                      setTheme('light');
                     },
                   },
                   {
@@ -229,7 +229,7 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
                     ),
                     label: '黑夜模式',
                     onClick: () => {
-                      themeCfg.setTheme('dark');
+                      setTheme('dark');
                     },
                   },
                 ],
@@ -240,9 +240,9 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
                 icon={
                   <Icon
                     icon={
-                      themeCfg.theme === 'system'
+                      theme === 'system'
                         ? 'icon-park-outline:dark-mode'
-                        : themeCfg.theme === 'light'
+                        : theme === 'light'
                           ? 'material-symbols:light-mode-outline-rounded'
                           : 'material-symbols:dark-mode-outline-rounded'
                     }
