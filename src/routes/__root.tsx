@@ -35,6 +35,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         'data-prefers-color-scheme',
         t ?? 'light',
       );
+      document.documentElement.classList.toggle('dark', t === 'dark');
     }, [t]);
 
     return (

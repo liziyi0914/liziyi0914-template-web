@@ -85,7 +85,7 @@ const Component: React.FC<{
     [form],
   );
 
-  console.log(form);
+  console.log(props.columns);
 
   return (
     <>

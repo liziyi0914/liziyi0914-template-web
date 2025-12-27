@@ -13,7 +13,7 @@ import GroupedEmbedSchemaForm from '@/components/GroupedEmbedSchemaForm.tsx';
 import ProExport from '@/components/ProExport.tsx';
 import ProImport from '@/components/ProImport.tsx';
 import { Api, type ApiResult, DataApi } from '@/lib/api.ts';
-import { columnIdFn } from '@/lib/functions.tsx';
+import { columnIdFn, fillAiRefs } from '@/lib/functions.tsx';
 import type { ColumnsType, VehicleDataVO } from '@/lib/types.ts';
 import { companyInfoColumns } from '@/routes/dashboard/core/company/info.tsx';
 import { employeeInfoColumns } from '@/routes/dashboard/core/employee/document.tsx';
@@ -23,8 +23,13 @@ export const Route = createFileRoute('/dashboard/core/vehicle')({
 });
 
 const columnId = columnIdFn(['core', 'vehicle']);
+// let columnId = (...a: string[]) => {
+//   console.log(`columnId(${a.map(i => `'${i}'`).join(', ')}),`)
+//
+//   return '';
+// };
 
-const columns: ColumnsType[] = [
+const columns: ColumnsType[] = fillAiRefs([
   {
     valueType: '$tabGroup',
     group: {
@@ -99,12 +104,336 @@ const columns: ColumnsType[] = [
             ),
             valueType: '#assets',
             colProps: {
-              span: 24,
+              span: 12,
             },
             fieldProps: {
               multiple: true,
               maxCount: 3,
               allowFileTypes: ['image/*'],
+            },
+          },
+          {
+            valueType: '#ai',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              assets: columnId(
+                'v1',
+                'basic',
+                'vehicleRegistrationCertificate',
+                'file',
+              ),
+              columnRefs: [
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'ownerIdInfo',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'registrationAuthority',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'registrationDate',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'registrationNumber',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'registrationVehicleInfo',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'vehicleType',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'vehicleBrand',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'vehicleModel',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'bodyColor',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'vin',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'madeIn',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'engineNumber',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'engineModel',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'fuelType',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'displacement',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'power',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'manufacturer',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'steeringType',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'frontWheelTrack',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'rearWheelTrack',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'tireCount',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'tireSpecification',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'leafSpringCount',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'wheelbase',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'axleCount',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'overallLength',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'overallWidth',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'overallHeight',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'cargoBoxLength',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'cargoBoxWidth',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'cargoBoxHeight',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'totalMass',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'ratedLoadCapacity',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'ratedPassengerCapacity',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'authorizedTowingMass',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'cabPassengerCapacity',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'usageNature',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'vehicleAcquisitionMethod',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'manufactureDate',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'basic',
+                  'issueDate',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'relocationSummary',
+                  'list',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'mortgage',
+                  'list',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'relocation',
+                  'list',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleRegistrationCertificate',
+                  'transfer',
+                  'list',
+                ),
+              ],
             },
           },
           {
@@ -958,12 +1287,61 @@ const columns: ColumnsType[] = [
             dataIndex: columnId('v1', 'basic', 'vehicleLicense', 'file'),
             valueType: '#assets',
             colProps: {
-              span: 24,
+              span: 12,
             },
             fieldProps: {
               multiple: true,
               maxCount: 3,
               allowFileTypes: ['image/*'],
+            },
+          },
+          {
+            valueType: '#ai',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              assets: columnId('v1', 'basic', 'vehicleLicense', 'file'),
+              columnRefs: [
+                columnId('v1', 'basic', 'vehicleLicense', 'licensePlateNumber'),
+                columnId('v1', 'basic', 'vehicleLicense', 'vehicleType'),
+                columnId('v1', 'basic', 'vehicleLicense', 'owner'),
+                columnId('v1', 'basic', 'vehicleLicense', 'address'),
+                columnId('v1', 'basic', 'vehicleLicense', 'usageNature'),
+                columnId('v1', 'basic', 'vehicleLicense', 'brandModel'),
+                columnId('v1', 'basic', 'vehicleLicense', 'vin'),
+                columnId('v1', 'basic', 'vehicleLicense', 'engineNumber'),
+                columnId('v1', 'basic', 'vehicleLicense', 'registrationDate'),
+                columnId('v1', 'basic', 'vehicleLicense', 'issueDate'),
+                columnId('v1', 'basic', 'vehicleLicense', 'fileNumber'),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleLicense',
+                  'ratedPassengerCapacity',
+                ),
+                columnId('v1', 'basic', 'vehicleLicense', 'totalMass'),
+                columnId('v1', 'basic', 'vehicleLicense', 'curbWeight'),
+                columnId('v1', 'basic', 'vehicleLicense', 'ratedLoadCapacity'),
+                columnId('v1', 'basic', 'vehicleLicense', 'overallLength'),
+                columnId('v1', 'basic', 'vehicleLicense', 'overallWidth'),
+                columnId('v1', 'basic', 'vehicleLicense', 'overallHeight'),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleLicense',
+                  'authorizedTowingMass',
+                ),
+                columnId('v1', 'basic', 'vehicleLicense', 'remarks'),
+                columnId('v1', 'basic', 'vehicleLicense', 'mandatoryScrapDate'),
+                columnId(
+                  'v1',
+                  'basic',
+                  'vehicleLicense',
+                  'inspectionExpiryDate',
+                ),
+                columnId('v1', 'basic', 'vehicleLicense', 'inspectionRecords'),
+              ],
             },
           },
           {
@@ -1224,12 +1602,62 @@ const columns: ColumnsType[] = [
             dataIndex: columnId('v1', 'basic', 'roadTransportPermit', 'file'),
             valueType: '#assets',
             colProps: {
-              span: 24,
+              span: 12,
             },
             fieldProps: {
               multiple: true,
               maxCount: 3,
               allowFileTypes: ['image/*'],
+            },
+          },
+          {
+            valueType: '#ai',
+            colProps: {
+              span: 12,
+            },
+            fieldProps: {
+              assets: columnId('v1', 'basic', 'roadTransportPermit', 'file'),
+              columnRefs: [
+                columnId('v1', 'basic', 'roadTransportPermit', 'businessName'),
+                columnId('v1', 'basic', 'roadTransportPermit', 'address'),
+                columnId(
+                  'v1',
+                  'basic',
+                  'roadTransportPermit',
+                  'licensePlateNumber',
+                ),
+                columnId('v1', 'basic', 'roadTransportPermit', 'licenseNumber'),
+                columnId('v1', 'basic', 'roadTransportPermit', 'vehicleType'),
+                columnId('v1', 'basic', 'roadTransportPermit', 'tonnageSeats'),
+                columnId('v1', 'basic', 'roadTransportPermit', 'businessScope'),
+                columnId(
+                  'v1',
+                  'basic',
+                  'roadTransportPermit',
+                  'vehicleDimensions',
+                ),
+                columnId('v1', 'basic', 'roadTransportPermit', 'issueDate'),
+                columnId('v1', 'basic', 'roadTransportPermit', 'validUntil'),
+                columnId(
+                  'v1',
+                  'basic',
+                  'roadTransportPermit',
+                  'issuingAuthority',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'roadTransportPermit',
+                  'inspectionValidUntil',
+                ),
+                columnId(
+                  'v1',
+                  'basic',
+                  'roadTransportPermit',
+                  'technicalGrade',
+                ),
+                columnId('v1', 'basic', 'roadTransportPermit', 'remarks'),
+              ],
             },
           },
           {
@@ -1442,56 +1870,7 @@ const columns: ColumnsType[] = [
             },
             fieldProps: {
               assets: columnId('v1', 'basic', 'insurance', 'file'),
-              columns: [
-                {
-                  title: '保险信息',
-                  dataIndex: columnId('v1', 'basic', 'insurance', 'list'),
-                  valueType: 'formList',
-                  fieldProps: {
-                    itemContainerRender: (dom: any) => (
-                      <ProFormGroup>{dom}</ProFormGroup>
-                    ),
-                    alwaysShowItemLabel: true,
-                  },
-                  columns: [
-                    {
-                      title: '保险公司',
-                      dataIndex: 'insuranceCompany',
-                      valueType: 'text',
-                      colProps: {
-                        span: 'auto',
-                      },
-                    },
-                    {
-                      title: '承保险种',
-                      dataIndex: 'insuranceType',
-                      valueType: 'text',
-                      colProps: {
-                        span: 'auto',
-                      },
-                    },
-                    {
-                      title: '金额',
-                      dataIndex: 'amount',
-                      valueType: 'money',
-                      colProps: {
-                        span: 'auto',
-                      },
-                    },
-                    {
-                      title: '保险期间',
-                      dataIndex: 'insurancePeriod',
-                      valueType: 'dateTimeRange',
-                      colProps: {
-                        span: 'auto',
-                      },
-                    },
-                  ],
-                  colProps: {
-                    span: 24,
-                  },
-                },
-              ],
+              columnRefs: [columnId('v1', 'basic', 'insurance', 'list')],
             },
           },
           {
@@ -1973,7 +2352,7 @@ const columns: ColumnsType[] = [
       },
     ],
   },
-];
+]);
 
 function RouteComponent() {
   const { message } = App.useApp();
@@ -1982,6 +2361,8 @@ function RouteComponent() {
     { id?: string; data?: Record<string, any> } | undefined
   >(undefined);
   const [selectedRows, setSelectedRows] = useState<Key[]>([]);
+
+  console.log(columns);
 
   return (
     <div>

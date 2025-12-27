@@ -2,7 +2,7 @@ import { Icon } from '@iconify/react';
 import type { TreeDataNode } from 'antd';
 import axios from 'axios';
 import { instance } from '@/lib/api.ts';
-import type { CompanyStructureDepartmentVO } from '@/lib/types.ts';
+import type { ColumnsType, CompanyStructureDepartmentVO } from '@/lib/types.ts';
 
 /**
  * 将 CompanyStructureDepartmentVO 数组转换为 TreeDataNode 树结构
@@ -262,4 +262,62 @@ export function columnIdFn(
 ): (version: string, ...name: Array<string>) => string {
   return (version: string, ...name: Array<string>) =>
     columnIdBase(name, version, path);
+}
+
+export function columns2map(
+  columns: Array<ColumnsType>,
+): Record<any, ColumnsType> {
+  let map: Record<any, ColumnsType> = {};
+
+  columns.forEach((column) => {
+    const subColumns =
+      typeof column.columns === 'function'
+        ? column.columns({})
+        : (column.columns ?? []);
+
+    if (!column.dataIndex) {
+      if (subColumns.length > 0) {
+        map = {
+          ...map,
+          ...columns2map(subColumns),
+        };
+      }
+      return;
+    } else {
+      map[column.dataIndex as any] = column;
+    }
+  });
+
+  return map;
+}
+
+export function fillAiRefs(columns: Array<ColumnsType>): Array<ColumnsType> {
+  const map = columns2map(columns);
+
+  return columns.map((column) => {
+    const fieldProps = column.fieldProps as Record<string, any>;
+
+    if (column.valueType === '#ai' && !!fieldProps?.['columnRefs']) {
+      fieldProps['columns'] = fieldProps['columnRefs'].map((ref: string) => {
+        const column = map[ref];
+        return {
+          title: column.title || undefined,
+          dataIndex: column.dataIndex || undefined,
+          valueType: column.valueType || undefined,
+          columns: column.columns || undefined,
+        };
+      });
+      delete fieldProps['columnRefs'];
+    }
+
+    return {
+      ...column,
+      columns: column.columns
+        ? typeof column.columns === 'function'
+          ? fillAiRefs(column.columns({}))
+          : fillAiRefs(column.columns)
+        : undefined,
+      fieldProps: fieldProps,
+    };
+  });
 }

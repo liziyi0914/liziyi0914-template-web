@@ -193,12 +193,13 @@ export const uploadOss: <T = any>(
         code: 200,
         msg: 'Success',
       };
-    } catch (e) {}
-
-    return {
-      code: 200,
-      msg: 'Success',
-    };
+    } catch (e) {
+      console.error(e);
+      return {
+        code: 400,
+        msg: `${e}`,
+      };
+    }
   }
 };
 
