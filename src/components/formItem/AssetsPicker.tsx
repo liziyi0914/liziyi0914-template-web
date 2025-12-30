@@ -1,7 +1,7 @@
 import {
   ProForm,
   ProFormDependency,
-  ProFormSelect,
+  ProFormRadio,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
@@ -143,7 +143,7 @@ export const UploadAssetsForm: React.FC<{
           },
         ]}
       />
-      <ProFormSelect
+      <ProFormRadio.Group
         name="fileType"
         label="文件类型"
         initialValue={fileType?.[0]?.value}

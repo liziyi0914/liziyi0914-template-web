@@ -6,48 +6,9 @@ import { Toast } from 'antd-mobile';
 import * as jose from 'jose';
 import { useAtomValue } from 'jotai';
 import { useTheme } from 'next-themes';
-import React, { type PropsWithChildren, useState } from 'react';
+import React, { type PropsWithChildren, useMemo, useState } from 'react';
 import { Api } from '@/lib/api.ts';
 import { LoginState } from '@/routes/dashboard.tsx';
-
-// const Component: React.FC<PropsWithChildren<{
-// }>> = (props) => {
-//   return (
-//     <div className="h-screen overflow-hidden">
-//       <div className="h-16 bg-[#005398] flex items-center px-3">
-//         <div className="grow text-white text-xl select-none">
-//           交通运输企业安全生产管理系统
-//         </div>
-//         <div>
-//         </div>
-//       </div>
-//       <div className="h-full flex">
-//         <div className="w-[256px] bg-[#001529] overflow-y-auto">
-//           <Menu
-//             theme='dark'
-//             // onClick={onClick}
-//             style={{ width: 256 }}
-//             defaultOpenKeys={['sub1']}
-//             // selectedKeys={[current]}
-//             mode="inline"
-//             items={items}
-//           />
-//         </div>
-//         <div className="grow w-0 overflow-auto">
-//           {props.children}
-//           <div>
-//             <div>123</div>
-//             {'a'.repeat(100).split('').map((item, index) => {
-//               return (
-//                 <div key={index}>{item}</div>
-//               );
-//             })}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 
 const Component: React.FC<PropsWithChildren<{}>> = (props) => {
   const location = useLocation();
@@ -56,6 +17,86 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
   const { theme, setTheme } = useTheme();
 
   const [companies, setCompanies] = useState<string[]>();
+
+  const menu = useMemo(() => {
+    return [
+      {
+        path: '/dashboard/home',
+        name: '首页',
+        icon: <Icon icon="icon-park-outline:home" />,
+      },
+      ...(loginState?.companyName === '系统管理员'
+        ? [
+            {
+              path: '/dashboard/system',
+              name: '系统管理',
+              icon: <Icon icon="icon-park-outline:setting-two" />,
+              routes: [
+                {
+                  path: 'company',
+                  name: '企业',
+                },
+                {
+                  path: 'user',
+                  name: '用户',
+                },
+                {
+                  path: 'template',
+                  name: '模板',
+                },
+              ],
+            },
+          ]
+        : []),
+      {
+        path: '/dashboard/core',
+        name: '企业信息',
+        icon: <Icon icon="icon-park-outline:building-one" />,
+        routes: [
+          {
+            path: 'company',
+            name: '企业管理',
+            routes: [
+              {
+                path: 'info',
+                name: '基本信息',
+              },
+              {
+                path: 'structure',
+                name: '组织架构',
+              },
+              {
+                path: 'assets',
+                name: '资源库',
+              },
+            ],
+          },
+          {
+            path: 'vehicle',
+            name: '车辆管理',
+          },
+          {
+            path: 'employee',
+            name: '人员管理',
+            routes: [
+              {
+                path: 'document',
+                name: '人员档案',
+              },
+              {
+                path: 'mind',
+                name: '心理测评',
+              },
+            ],
+          },
+          {
+            path: 'finance',
+            name: '安全生产费用',
+          },
+        ],
+      },
+    ];
+  }, [loginState]);
 
   return (
     <div className="h-screen">
@@ -118,79 +159,7 @@ const Component: React.FC<PropsWithChildren<{}>> = (props) => {
         }}
         route={{
           path: '/dashboard',
-          routes: [
-            {
-              path: '/dashboard/home',
-              name: '首页',
-              icon: <Icon icon="icon-park-outline:home" />,
-            },
-            {
-              path: '/dashboard/system',
-              name: '系统管理',
-              icon: <Icon icon="icon-park-outline:setting-two" />,
-              routes: [
-                {
-                  path: 'company',
-                  name: '企业',
-                },
-                {
-                  path: 'user',
-                  name: '用户',
-                },
-                {
-                  path: 'template',
-                  name: '模板',
-                },
-              ],
-            },
-            {
-              path: '/dashboard/core',
-              name: '企业信息',
-              icon: <Icon icon="icon-park-outline:building-one" />,
-              routes: [
-                {
-                  path: 'company',
-                  name: '企业管理',
-                  routes: [
-                    {
-                      path: 'info',
-                      name: '基本信息',
-                    },
-                    {
-                      path: 'structure',
-                      name: '组织架构',
-                    },
-                    {
-                      path: 'assets',
-                      name: '资源库',
-                    },
-                  ],
-                },
-                {
-                  path: 'vehicle',
-                  name: '车辆管理',
-                },
-                {
-                  path: 'employee',
-                  name: '人员管理',
-                  routes: [
-                    {
-                      path: 'document',
-                      name: '人员档案',
-                    },
-                    {
-                      path: 'mind',
-                      name: '心理测评',
-                    },
-                  ],
-                },
-                {
-                  path: 'finance',
-                  name: '安全生产费用',
-                },
-              ],
-            },
-          ],
+          routes: menu,
         }}
         menu={
           {

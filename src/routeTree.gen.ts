@@ -16,9 +16,7 @@ import { Route as HomeRouteImport } from './routes/_home'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as HomeIndexRouteImport } from './routes/_home/index'
 import { Route as DashboardHomeRouteImport } from './routes/dashboard/home'
-import { Route as HomeUserRouteImport } from './routes/_home/user'
-import { Route as HomeTodoRouteImport } from './routes/_home/todo'
-import { Route as HomeTrainingIndexRouteImport } from './routes/_home/training/index'
+import { Route as Home404RouteImport } from './routes/_home/404'
 import { Route as DashboardSystemUserRouteImport } from './routes/dashboard/system/user'
 import { Route as DashboardSystemTemplateRouteImport } from './routes/dashboard/system/template'
 import { Route as DashboardSystemCompanyRouteImport } from './routes/dashboard/system/company'
@@ -62,19 +60,9 @@ const DashboardHomeRoute = DashboardHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => DashboardRoute,
 } as any)
-const HomeUserRoute = HomeUserRouteImport.update({
-  id: '/user',
-  path: '/user',
-  getParentRoute: () => HomeRoute,
-} as any)
-const HomeTodoRoute = HomeTodoRouteImport.update({
-  id: '/todo',
-  path: '/todo',
-  getParentRoute: () => HomeRoute,
-} as any)
-const HomeTrainingIndexRoute = HomeTrainingIndexRouteImport.update({
-  id: '/training/',
-  path: '/training/',
+const Home404Route = Home404RouteImport.update({
+  id: '/404',
+  path: '/404',
   getParentRoute: () => HomeRoute,
 } as any)
 const DashboardSystemUserRoute = DashboardSystemUserRouteImport.update({
@@ -126,8 +114,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/todo': typeof HomeTodoRoute
-  '/user': typeof HomeUserRoute
+  '/404': typeof Home404Route
   '/dashboard/home': typeof DashboardHomeRoute
   '/': typeof HomeIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -135,7 +122,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
   '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
-  '/training': typeof HomeTrainingIndexRoute
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
   '/dashboard/core/company/info': typeof DashboardCoreCompanyInfoRoute
   '/dashboard/core/company/structure': typeof DashboardCoreCompanyStructureRoute
@@ -144,8 +130,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/todo': typeof HomeTodoRoute
-  '/user': typeof HomeUserRoute
+  '/404': typeof Home404Route
   '/dashboard/home': typeof DashboardHomeRoute
   '/': typeof HomeIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -153,7 +138,6 @@ export interface FileRoutesByTo {
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
   '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
-  '/training': typeof HomeTrainingIndexRoute
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
   '/dashboard/core/company/info': typeof DashboardCoreCompanyInfoRoute
   '/dashboard/core/company/structure': typeof DashboardCoreCompanyStructureRoute
@@ -165,8 +149,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/_home/todo': typeof HomeTodoRoute
-  '/_home/user': typeof HomeUserRoute
+  '/_home/404': typeof Home404Route
   '/dashboard/home': typeof DashboardHomeRoute
   '/_home/': typeof HomeIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -174,7 +157,6 @@ export interface FileRoutesById {
   '/dashboard/system/company': typeof DashboardSystemCompanyRoute
   '/dashboard/system/template': typeof DashboardSystemTemplateRoute
   '/dashboard/system/user': typeof DashboardSystemUserRoute
-  '/_home/training/': typeof HomeTrainingIndexRoute
   '/dashboard/core/company/assets': typeof DashboardCoreCompanyAssetsRoute
   '/dashboard/core/company/info': typeof DashboardCoreCompanyInfoRoute
   '/dashboard/core/company/structure': typeof DashboardCoreCompanyStructureRoute
@@ -186,8 +168,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/register'
-    | '/todo'
-    | '/user'
+    | '/404'
     | '/dashboard/home'
     | '/'
     | '/dashboard/'
@@ -195,7 +176,6 @@ export interface FileRouteTypes {
     | '/dashboard/system/company'
     | '/dashboard/system/template'
     | '/dashboard/system/user'
-    | '/training'
     | '/dashboard/core/company/assets'
     | '/dashboard/core/company/info'
     | '/dashboard/core/company/structure'
@@ -204,8 +184,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/register'
-    | '/todo'
-    | '/user'
+    | '/404'
     | '/dashboard/home'
     | '/'
     | '/dashboard'
@@ -213,7 +192,6 @@ export interface FileRouteTypes {
     | '/dashboard/system/company'
     | '/dashboard/system/template'
     | '/dashboard/system/user'
-    | '/training'
     | '/dashboard/core/company/assets'
     | '/dashboard/core/company/info'
     | '/dashboard/core/company/structure'
@@ -224,8 +202,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/register'
-    | '/_home/todo'
-    | '/_home/user'
+    | '/_home/404'
     | '/dashboard/home'
     | '/_home/'
     | '/dashboard/'
@@ -233,7 +210,6 @@ export interface FileRouteTypes {
     | '/dashboard/system/company'
     | '/dashboard/system/template'
     | '/dashboard/system/user'
-    | '/_home/training/'
     | '/dashboard/core/company/assets'
     | '/dashboard/core/company/info'
     | '/dashboard/core/company/structure'
@@ -298,25 +274,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHomeRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_home/user': {
-      id: '/_home/user'
-      path: '/user'
-      fullPath: '/user'
-      preLoaderRoute: typeof HomeUserRouteImport
-      parentRoute: typeof HomeRoute
-    }
-    '/_home/todo': {
-      id: '/_home/todo'
-      path: '/todo'
-      fullPath: '/todo'
-      preLoaderRoute: typeof HomeTodoRouteImport
-      parentRoute: typeof HomeRoute
-    }
-    '/_home/training/': {
-      id: '/_home/training/'
-      path: '/training'
-      fullPath: '/training'
-      preLoaderRoute: typeof HomeTrainingIndexRouteImport
+    '/_home/404': {
+      id: '/_home/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof Home404RouteImport
       parentRoute: typeof HomeRoute
     }
     '/dashboard/system/user': {
@@ -379,17 +341,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface HomeRouteChildren {
-  HomeTodoRoute: typeof HomeTodoRoute
-  HomeUserRoute: typeof HomeUserRoute
+  Home404Route: typeof Home404Route
   HomeIndexRoute: typeof HomeIndexRoute
-  HomeTrainingIndexRoute: typeof HomeTrainingIndexRoute
 }
 
 const HomeRouteChildren: HomeRouteChildren = {
-  HomeTodoRoute: HomeTodoRoute,
-  HomeUserRoute: HomeUserRoute,
+  Home404Route: Home404Route,
   HomeIndexRoute: HomeIndexRoute,
-  HomeTrainingIndexRoute: HomeTrainingIndexRoute,
 }
 
 const HomeRouteWithChildren = HomeRoute._addFileChildren(HomeRouteChildren)

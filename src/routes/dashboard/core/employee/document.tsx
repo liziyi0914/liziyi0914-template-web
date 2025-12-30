@@ -271,33 +271,11 @@ export const employeeInfoColumns: ColumnsType[] = [
             valueType: '#ai',
             fieldProps: {
               assets: columnId('v1', 'basic', 'idCard', 'file'),
-              columns: [
-                {
-                  title: '姓名',
-                  dataIndex: columnId('v1', 'basic', 'basic', 'name'),
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '身份证号',
-                  dataIndex: columnId('v1', 'basic', 'idCard', 'idCard'),
-                  valueType: 'text',
-                },
-                {
-                  title: '性别',
-                  dataIndex: columnId('v1', 'basic', 'basic', 'gender'),
-                  valueType: 'select',
-                  valueEnum: {
-                    '0': '男',
-                    '1': '女',
-                  },
-                },
-                {
-                  title: '有效期限',
-                  dataIndex: columnId('v1', 'basic', 'idCard', 'validDate'),
-                  valueType: 'validDateRange',
-                },
+              columnRefs: [
+                columnId('v1', 'basic', 'basic', 'name'),
+                columnId('v1', 'basic', 'idCard', 'idCard'),
+                columnId('v1', 'basic', 'basic', 'gender'),
+                columnId('v1', 'basic', 'idCard', 'validDate'),
               ],
             },
           },
@@ -504,85 +482,18 @@ export const employeeInfoColumns: ColumnsType[] = [
             },
             fieldProps: {
               assets: columnId('v1', 'driver', 'drivingLicense', 'file'),
-              columns: [
-                {
-                  title: '初次领证日期',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'drivingLicense',
-                    'firstIssueDate',
-                  ),
-                  valueType: 'date',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '准驾车型',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'drivingLicense',
-                    'permittedVehicleTypes',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '有效期限',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'drivingLicense',
-                    'validPeriod',
-                  ),
-                  valueType: 'validDateRange',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '证号',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'drivingLicense',
-                    'licenseNumber',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '档案编号',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'drivingLicense',
-                    'fileNumber',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '记录',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'drivingLicense',
-                    'records',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
+              columnRefs: [
+                columnId('v1', 'driver', 'drivingLicense', 'firstIssueDate'),
+                columnId(
+                  'v1',
+                  'driver',
+                  'drivingLicense',
+                  'permittedVehicleTypes',
+                ),
+                columnId('v1', 'driver', 'drivingLicense', 'validPeriod'),
+                columnId('v1', 'driver', 'drivingLicense', 'licenseNumber'),
+                columnId('v1', 'driver', 'drivingLicense', 'fileNumber'),
+                columnId('v1', 'driver', 'drivingLicense', 'records'),
               ],
             },
           },
@@ -688,98 +599,49 @@ export const employeeInfoColumns: ColumnsType[] = [
                 'professionalQualificationCertificate',
                 'file',
               ),
-              columns: [
-                {
-                  title: '证号',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'professionalQualificationCertificate',
-                    'certificateNumber',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '准驾车型',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'professionalQualificationCertificate',
-                    'permittedVehicleType',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '从业资格类别',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'professionalQualificationCertificate',
-                    'qualificationCategory',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '有效期',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'professionalQualificationCertificate',
-                    'validPeriod',
-                  ),
-                  valueType: 'validDateRange',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '核发机关',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'professionalQualificationCertificate',
-                    'issuingAuthority',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '继续教育信息',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'professionalQualificationCertificate',
-                    'continuingEducation',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
-                {
-                  title: '诚信考核信息',
-                  dataIndex: columnId(
-                    'v1',
-                    'driver',
-                    'professionalQualificationCertificate',
-                    'integrityAssessment',
-                  ),
-                  valueType: 'text',
-                  colProps: {
-                    span: 12,
-                  },
-                },
+              columnRefs: [
+                columnId(
+                  'v1',
+                  'driver',
+                  'professionalQualificationCertificate',
+                  'certificateNumber',
+                ),
+                columnId(
+                  'v1',
+                  'driver',
+                  'professionalQualificationCertificate',
+                  'permittedVehicleType',
+                ),
+                columnId(
+                  'v1',
+                  'driver',
+                  'professionalQualificationCertificate',
+                  'qualificationCategory',
+                ),
+                columnId(
+                  'v1',
+                  'driver',
+                  'professionalQualificationCertificate',
+                  'validPeriod',
+                ),
+                columnId(
+                  'v1',
+                  'driver',
+                  'professionalQualificationCertificate',
+                  'issuingAuthority',
+                ),
+                columnId(
+                  'v1',
+                  'driver',
+                  'professionalQualificationCertificate',
+                  'continuingEducation',
+                ),
+                columnId(
+                  'v1',
+                  'driver',
+                  'professionalQualificationCertificate',
+                  'integrityAssessment',
+                ),
               ],
             },
           },

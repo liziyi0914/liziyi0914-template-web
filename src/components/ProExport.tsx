@@ -80,7 +80,7 @@ const Component: React.FC<{
       } catch (e) {
         m.destroy();
         console.error(e);
-        message.error('导出失败');
+        message.error(`导出失败: ${e}`);
       }
     },
     [

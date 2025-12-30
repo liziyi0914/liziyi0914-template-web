@@ -1,5 +1,6 @@
 import { Icon } from '@iconify/react';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { Toast } from 'antd-mobile';
 import { useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import { mainAtom } from '@/components/MainFramework.tsx';
@@ -47,7 +48,16 @@ function RouteComponent() {
       <div className="p-6">
         <div className="pb-3">应用与功能</div>
         <div className="grid grid-cols-4">
-          <AppCard icon="ph:signature" title="文件签署" />
+          <AppCard
+            icon="ph:signature"
+            title="文件签署"
+            onClick={() => {
+              Toast.show({
+                content: '功能开发中...',
+                icon: 'fail',
+              });
+            }}
+          />
           <AppCard
             icon="lucide:settings"
             title="管理后台"

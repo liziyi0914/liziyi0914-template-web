@@ -209,8 +209,16 @@ export async function runTemplate(
     );
 
     if (response.headers['content-type'] === 'application/json') {
-      console.error('模板执行失败', response);
-      throw new Error('模板执行失败');
+      let json;
+      try {
+        const text = response.data?.text?.();
+        json = JSON.parse(text);
+      } catch (e) {
+        console.error('模板执行失败', e);
+        throw new Error(`模板执行失败`);
+      }
+      console.error('模板执行失败', json);
+      throw new Error(`模板执行失败: ${json}`);
     }
 
     // 处理文件名（兼容多种格式）

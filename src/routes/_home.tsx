@@ -3,12 +3,10 @@ import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router';
 import { Spin, Watermark } from 'antd';
 import { useEffect } from 'react';
 import MainFramework from '@/components/MainFramework.tsx';
-import NotFound from '@/components/NotFound.tsx';
 import { Api } from '@/lib/api.ts';
 
 export const Route = createFileRoute('/_home')({
   component: RouteComponent,
-  notFoundComponent: () => <NotFound />,
 });
 
 function RouteComponent() {

@@ -46,6 +46,7 @@ function RouteComponent() {
                 type: values.type,
                 identifier: values.identifier,
                 assets: values.assets,
+                print: values.print,
               });
             } else {
               resp = await Api.dashboard.system.template.create([
@@ -54,6 +55,7 @@ function RouteComponent() {
                   type: values.type,
                   identifier: values.identifier,
                   assets: values.assets,
+                  print: values.print,
                 },
               ]);
             }
@@ -123,6 +125,11 @@ function RouteComponent() {
                     },
                   ],
                 },
+              },
+              {
+                title: '输出PDF',
+                dataIndex: 'print',
+                valueType: 'switch',
               },
               {
                 valueType: 'dependency',

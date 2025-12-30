@@ -2,7 +2,11 @@ import { ProConfigProvider } from '@ant-design/pro-components';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useNavigate,
+} from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { App, ConfigProvider, theme } from 'antd';
 import { useTheme } from 'next-themes';
@@ -20,7 +24,6 @@ import EmployeePicker, {
 import ValidDateRange, {
   ValidDateRangeView,
 } from '@/components/formItem/ValidDateRange.tsx';
-import NotFound from '@/components/NotFound.tsx';
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -112,5 +115,15 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       </>
     );
   },
-  notFoundComponent: () => <NotFound />,
+  notFoundComponent: () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      navigate({
+        to: '/404',
+      });
+    }, []);
+
+    return <></>;
+  },
 });

@@ -156,6 +156,7 @@ export type TemplateInfoVO = {
   type: string;
   identifier: string;
   assets: string;
+  print: boolean;
 };
 
 export type TemplateUpdateRequest = {
@@ -163,4 +164,5 @@ export type TemplateUpdateRequest = {
   type: string;
   identifier: string;
   assets: string;
+  print: boolean;
 };
