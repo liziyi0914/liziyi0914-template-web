@@ -1,7 +1,5 @@
-onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
-  - cn-font-split
-  - core-js
-  - esbuild
-  - koffi
-  - protobufjs
+allowBuilds:
+  cn-font-split: true
+  core-js: true
+  koffi: true
+  protobufjs: true
