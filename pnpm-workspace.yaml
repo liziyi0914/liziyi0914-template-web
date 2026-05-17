@@ -1,5 +1,5 @@
 allowBuilds:
   cn-font-split: true
-  core-js: true
   koffi: true
+  msw: true
   protobufjs: true

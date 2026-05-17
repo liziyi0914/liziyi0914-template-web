@@ -14,7 +14,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["src/**", "!**/routeTree.gen.ts"]
+    "includes": ["*", "src/**", "!**/routeTree.gen.ts"]
   },
   "formatter": {
     "indentStyle": "space"
@@ -26,7 +26,8 @@
   },
   "css": {
     "parser": {
-      "cssModules": true
+      "cssModules": true,
+      "tailwindDirectives": true
     }
   },
   "linter": {

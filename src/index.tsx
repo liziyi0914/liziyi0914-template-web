@@ -1,13 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { initIcons } from '@/lib/icons.ts';
-import reportWebVitals from '@/reportWebVitals.ts';
-
-// @ts-ignore
-import '@/assets/fonts/MiSansVF.ttf?subsets';
-
-initIcons();
+import reportWebVitals from '@/lib/reportWebVitals.ts';
+import '@/assets/fonts/MiSansVF.ttf';
 
 const rootEl = document.getElementById('root');
 if (rootEl) {

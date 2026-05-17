@@ -3,6 +3,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
+import { PacerDevtoolsPanel } from '@tanstack/react-pacer-devtools';
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -25,6 +26,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
             {
               name: 'Tanstack Query',
               render: <ReactQueryDevtoolsPanel />,
+            },
+            {
+              name: 'Tanstack Pacer',
+              render: <PacerDevtoolsPanel />,
             },
           ]}
         />
