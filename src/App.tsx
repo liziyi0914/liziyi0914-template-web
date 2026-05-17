@@ -2,7 +2,7 @@ import './App.css';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { routeTree } from './routeTree.gen.ts';
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
-import { ThemeProvider } from '@/components/theme-provider.tsx';
+import { ThemeProvider } from 'next-themes';
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({
@@ -25,7 +25,7 @@ declare module '@tanstack/react-router' {
 
 const App = () => {
   return (
-    <ThemeProvider>
+    <ThemeProvider attribute="class">
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
         <RouterProvider router={router} />
       </TanStackQueryProvider.Provider>
