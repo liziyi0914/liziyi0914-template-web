@@ -3,7 +3,7 @@ mod tray;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
+  let builder = tauri::Builder::default()
     .plugin(tauri_plugin_store::Builder::default().build())
     .setup(|app| {
       if cfg!(debug_assertions) {
@@ -20,17 +20,20 @@ pub fn run() {
       }
 
       Ok(())
-    })
-    .on_window_event(|window, event| {
-      // 关闭按钮只隐藏窗口，退出由托盘菜单负责
-      #[cfg(desktop)]
-      if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-        if window.label() == "main" {
-          api.prevent_close();
-          let _ = window.hide();
-        }
+    });
+
+  // 关闭按钮只隐藏窗口，退出由托盘菜单负责；仅桌面端有此语义
+  #[cfg(desktop)]
+  let builder = builder.on_window_event(|window, event| {
+    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+      if window.label() == "main" {
+        api.prevent_close();
+        let _ = window.hide();
       }
-    })
+    }
+  });
+
+  builder
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
