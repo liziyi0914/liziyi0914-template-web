@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import reportWebVitals from '@/lib/reportWebVitals.ts';
+import App from './App';
 import '@/assets/fonts/MiSansVF.ttf';
 
 const rootEl = document.getElementById('root');
@@ -14,9 +14,9 @@ if (rootEl) {
   );
 }
 
-// @ts-ignore
+// @ts-expect-error
 function sendToAnalytics({ id, name, value }) {
-  // @ts-ignore
+  // @ts-expect-error
   ga('send', 'event', {
     eventCategory: 'Web Vitals',
     eventAction: name,

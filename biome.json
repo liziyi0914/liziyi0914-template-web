@@ -35,5 +35,11 @@
     "rules": {
       "recommended": true
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/components/ui/**"],
+      "linter": { "enabled": false }
+    }
+  ]
 }

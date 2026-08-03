@@ -1,8 +1,8 @@
 import { defineConfig } from '@rsbuild/core';
 import { pluginBabel } from '@rsbuild/plugin-babel';
 import { pluginReact } from '@rsbuild/plugin-react';
-import { tanstackRouter } from '@tanstack/router-plugin/rspack';
 import type { RspackPluginInstance } from '@rspack/core';
+import { tanstackRouter } from '@tanstack/router-plugin/rspack';
 import Font from 'vite-plugin-font';
 
 /** vite-plugin-font 在 Windows 会生成 /D:/... 路径，Rspack 无法解析 */

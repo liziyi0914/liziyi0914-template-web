@@ -1,8 +1,8 @@
 import './App.css';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import { routeTree } from './routeTree.gen.ts';
-import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
 import { ThemeProvider } from 'next-themes';
+import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx';
+import { routeTree } from './routeTree.gen.ts';
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({
