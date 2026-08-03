@@ -45,6 +45,14 @@ export default defineConfig({
       chain.module.rule(CHAIN_ID.RULE.FONT).exclude.add(/\.(ttf|otf)$/); // 要求 RsBuild 不处理 .ttf 文件
     },
     rspack: {
+      watchOptions: {
+        ignored: [
+          '**/src-tauri/target/**',
+          '**/src-tauri/gen/**',
+          '**/node_modules/**',
+          '**/.git/**',
+        ],
+      },
       plugins: [
         tanstackRouter({
           target: 'react',
