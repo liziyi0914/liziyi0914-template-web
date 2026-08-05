@@ -1,8 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { IS_MOBILE_UI } from '@/lib/platform';
 import reportWebVitals from '@/lib/reportWebVitals.ts';
 import App from './App';
 import '@/assets/fonts/MiSansVF.ttf';
+
+// 挂在 <html> 而非移动端外壳上，Portal 出去的 toast、弹层才能一起放大命中区域
+document.documentElement.classList.toggle('touch-ui', IS_MOBILE_UI);
 
 const rootEl = document.getElementById('root');
 if (rootEl) {

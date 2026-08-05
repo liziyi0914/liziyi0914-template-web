@@ -53,6 +53,10 @@ open class BuildTask : DefaultTask() {
         project.exec {
             workingDir(File(project.projectDir, rootDirRel))
             executable(executable)
+//            // Android Studio 以 GUI 方式启动时 PATH 不含 nvm 目录,需显式注入;
+//            // pnpm 是 corepack 脚本,node 也必须在 PATH 中。nvm 切换 node 版本后需同步更新此路径
+//            val nvmBin = "${System.getProperty("user.home")}/.nvm/versions/node/v22.18.0/bin"
+//            environment("PATH", "$nvmBin:${System.getenv("PATH")}")
             args(args)
             if (project.logger.isEnabled(LogLevel.DEBUG)) {
                 args("-vv")

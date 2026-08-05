@@ -28,8 +28,32 @@ function fixWindowsFontAbsolutePaths(): RspackPluginInstance {
   };
 }
 
+/**
+ * 移动端 dev 时 WebView 走 tauri.localhost 自定义协议代理，
+ * 懒编译触发用的 POST /_rspack/lazy/trigger 到不了 dev server，
+ * 异步 chunk 的 import() 会永远挂起，页面渲染不出任何内容
+ */
+const tauriPlatform = process.env.TAURI_ENV_PLATFORM ?? '';
+const isTauriMobile = ['android', 'ios'].includes(tauriPlatform);
+
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
+  dev: {
+    lazyCompilation: !isTauriMobile,
+  },
+  html: {
+    title: 'GDUFE Classroom',
+    meta: {
+      // viewport-fit=cover 才能拿到非零的 safe-area-inset-*，禁用缩放避免误触双指放大
+      viewport:
+        'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
+    },
+  },
+  source: {
+    define: {
+      __TAURI_PLATFORM__: JSON.stringify(tauriPlatform),
+    },
+  },
   plugins: [
     pluginReact(),
     pluginBabel({

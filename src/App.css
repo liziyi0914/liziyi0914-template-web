@@ -4,6 +4,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* 手机横屏（以及分屏）纵向空间极窄，需要比 landscape: 更精确的判定 */
+@custom-variant short (@media (max-height: 520px));
+
+/* 移动端外壳铺满全屏，用系统安全区把内容让开刘海、圆角与手势条 */
+@utility p-safe {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+
 body {
   font-family:
     "MiSans VF", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
@@ -131,4 +140,47 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/*
+ * radix-nova 的控件按鼠标指针设计（输入框与按钮均为 32px），手指点不准。
+ * 移动端在 <html> 上挂 .touch-ui，统一放大命中区域；这里刻意不写进 @layer，
+ * 好让规则优先于 Tailwind utilities 层里的 h-8 等原始尺寸。
+ */
+.touch-ui {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.touch-ui [data-slot="input"],
+.touch-ui [data-slot="input-group"] {
+  height: 2.75rem;
+  padding-inline: 0.75rem;
+  /* 小于 16px 时 iOS 聚焦输入框会自动放大页面 */
+  font-size: 1rem;
+}
+
+.touch-ui [data-slot="input-group"] {
+  padding-inline: 0;
+}
+
+.touch-ui [data-slot="input-group-control"] {
+  height: 100%;
+  font-size: 1rem;
+}
+
+.touch-ui [data-slot="button"][data-size="sm"],
+.touch-ui [data-slot="button"][data-size="default"] {
+  height: 2.5rem;
+  padding-inline: 0.875rem;
+}
+
+.touch-ui [data-slot="button"][data-size="icon"],
+.touch-ui [data-slot="button"][data-size="icon-sm"] {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.touch-ui [data-slot="input-group-addon"] [data-slot="button"] {
+  width: 2rem;
+  height: 2rem;
 }

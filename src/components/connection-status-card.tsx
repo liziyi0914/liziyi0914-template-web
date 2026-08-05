@@ -15,9 +15,13 @@ import { formatText } from '@/lib/format';
 
 const BUSY_STATES = new Set(['connecting', 'reconnecting']);
 
+const DESKTOP_UNCONFIGURED_HINT = '尚未配置服务器，请先在右侧填写连接参数';
+
 interface ConnectionStatusCardProps {
   info: ConnectionInfo;
   serverUrl: string | null;
+  /** 未配置时的引导文案，移动端的设置入口不在右侧而在应用栏 */
+  unconfiguredHint?: string;
   onReconnect: () => void;
   onSimulateFailure: () => void;
 }
@@ -25,6 +29,7 @@ interface ConnectionStatusCardProps {
 export function ConnectionStatusCard({
   info,
   serverUrl,
+  unconfiguredHint = DESKTOP_UNCONFIGURED_HINT,
   onReconnect,
   onSimulateFailure,
 }: ConnectionStatusCardProps) {
@@ -37,9 +42,9 @@ export function ConnectionStatusCard({
       <CardHeader>
         <CardTitle>连接状态</CardTitle>
         <CardDescription>
-          {serverUrl ? serverUrl : '尚未配置服务器，请先在右侧填写连接参数'}
+          {serverUrl ? serverUrl : unconfiguredHint}
         </CardDescription>
-        <CardAction className="flex items-center gap-2">
+        <CardAction className="flex flex-wrap items-center justify-end gap-2">
           {import.meta.env.DEV && (
             <Button
               variant="ghost"

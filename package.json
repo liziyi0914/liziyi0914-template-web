@@ -9,8 +9,10 @@
     "dev": "rsbuild",
     "format": "biome format --write",
     "preview": "rsbuild preview",
+    "pc:dev": "tauri dev",
+    "pc:build": "tauri build",
     "android:init": "source ./scripts/android-env.sh && tauri android init",
-    "android:dev": "source ./scripts/android-env.sh && tauri android dev --host",
+    "android:dev": "source ./scripts/android-env.sh && tauri android dev --open",
     "android:build": "source ./scripts/android-env.sh && tauri android build --apk"
   },
   "dependencies": {
