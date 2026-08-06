@@ -1,3 +1,5 @@
+pub mod config;
+pub mod error;
 pub mod tls;
 
 /// 冒烟验证：确认在目标平台上能完成一次 HTTPS 握手。
@@ -12,3 +14,4 @@ pub async fn tls_smoke_test() -> Result<u16, String> {
         .map_err(|e| e.to_string())?;
     Ok(response.status().as_u16())
 }
+pub mod wake;
