@@ -1,10 +1,12 @@
 #[cfg(desktop)]
 mod tray;
+mod voice;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   let builder = tauri::Builder::default()
     .plugin(tauri_plugin_store::Builder::default().build())
+    .invoke_handler(tauri::generate_handler![voice::tls_smoke_test])
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
