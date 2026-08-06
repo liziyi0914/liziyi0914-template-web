@@ -22,8 +22,9 @@ pub async fn start_asr<R: Runtime>(
     on_event: Channel<VoiceEvent>,
 ) -> Result<(), String> {
     let mut slot = state.0.lock().await;
-    // 重复启动直接报错而不是静默重启：静默重启会让前端以为还是原来那个会话
-    if slot.is_some() {
+    // 重复启动直接报错而不是静默重启：静默重启会让前端以为还是原来那个会话。
+    // 已经自行结束的会话不算占位，否则一次识别服务掉线就再也起不来了。
+    if slot.as_ref().is_some_and(|session| !session.is_finished()) {
         return Err("语音会话已在运行".to_string());
     }
 

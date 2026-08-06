@@ -48,3 +48,11 @@ function detect(): UiPlatform {
 export const UI_PLATFORM: UiPlatform = detect();
 
 export const IS_MOBILE_UI = UI_PLATFORM === 'mobile';
+
+/**
+ * 是否跑在真正的安卓构建上。
+ *
+ * 与 `IS_MOBILE_UI` 不同：后者可以被 `?ui=mobile` 覆盖用于浏览器调试，
+ * 而麦克风、原生插件这类能力只看真实构建目标。
+ */
+export const IS_ANDROID = __TAURI_PLATFORM__ === 'android';

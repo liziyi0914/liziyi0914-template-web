@@ -27,6 +27,11 @@ pub struct SessionHandle {
 }
 
 impl SessionHandle {
+    /// 会话可能因识别服务断开等原因自行结束，此时留在状态里的句柄已经没用了。
+    pub fn is_finished(&self) -> bool {
+        self.task.is_finished()
+    }
+
     /// 通知会话停止并等它收尾。
     pub async fn shutdown(mut self) {
         if let Some(stop) = self.stop.take() {

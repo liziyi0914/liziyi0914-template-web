@@ -2,9 +2,10 @@ import { Link } from '@tanstack/react-router';
 import { Settings } from 'lucide-react';
 import { MobilePage } from '@/components/mobile/page';
 import { Button } from '@/components/ui/button';
+import { VoiceDemo } from '@/components/voice-demo';
 
 /**
- * 移动端首页。连接状态与配置都在设置页里，这里留空等课室交互界面接入。
+ * 移动端首页。连接状态与配置都在设置页里，这里目前只放语音命令 demo。
  * 连接的建立由根路由的 useConnectionBootstrap 负责，不依赖本页挂载。
  */
 export function MobileHome() {
@@ -17,6 +18,8 @@ export function MobileHome() {
           </Link>
         </Button>
       }
-    />
+    >
+      <VoiceDemo />
+    </MobilePage>
   );
 }
