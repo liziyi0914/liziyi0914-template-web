@@ -7,7 +7,12 @@ pub fn run() {
   let builder = tauri::Builder::default()
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_mic::init())
-    .invoke_handler(tauri::generate_handler![voice::tls_smoke_test])
+    .manage(voice::VoiceState::default())
+    .invoke_handler(tauri::generate_handler![
+      voice::commands::start_asr,
+      voice::commands::stop_asr,
+      voice::tls_smoke_test
+    ])
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(

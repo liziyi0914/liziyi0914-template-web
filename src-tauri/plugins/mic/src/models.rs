@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// PCM 走 base64 而不是裸字节：Kotlin 只能通过 `Channel.send(JSObject)` 主动
 ///推数据，而它只接受 JSON；Tauri 文档亦说明安卓上不支持 `InvokeBody::Raw`。
+// 只由 serde 在 derive 出来的代码里构造，dead_code 追不到那里
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub(crate) struct AudioFrame {
     #[serde(default)]

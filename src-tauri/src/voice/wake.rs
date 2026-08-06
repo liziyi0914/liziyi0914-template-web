@@ -110,11 +110,6 @@ impl WakeDetector {
             State::Idle => WakeOutcome::None,
         }
     }
-
-    /// 会话重启时清空唤醒状态，避免上一轮的 Armed 泄漏到新会话。
-    pub fn reset(&mut self) {
-        self.state = State::Idle;
-    }
 }
 
 #[cfg(test)]
@@ -276,18 +271,6 @@ mod tests {
         assert_eq!(
             d.on_final("你好 小财 打开投影仪", Instant::now()),
             cmd("打开投影仪")
-        );
-    }
-
-    #[test]
-    fn reset_clears_pending_wake() {
-        let mut d = detector();
-        let t0 = Instant::now();
-        d.on_final("你好小财", t0);
-        d.reset();
-        assert_eq!(
-            d.on_final("打开投影仪", t0 + Duration::from_secs(1)),
-            WakeOutcome::None
         );
     }
 

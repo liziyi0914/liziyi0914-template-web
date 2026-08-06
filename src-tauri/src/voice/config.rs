@@ -41,19 +41,6 @@ pub const SAMPLE_RATE: u32 = 16_000;
 /// 单个 PCM 帧的字节数。16 kHz 单声道 PCM16 下 6400 字节即 200 ms，
 /// 取这个长度是为了把跨语言调用压到每秒 5 次。
 pub const FRAME_BYTES: usize = 6_400;
-
-/// 启动前的配置自检，返回缺失项的名字。
-pub fn missing_keys() -> Vec<&'static str> {
-    let mut missing = Vec::new();
-    if DASHSCOPE_API_KEY.is_empty() {
-        missing.push("DASHSCOPE_API_KEY");
-    }
-    if ASR_WS_URL.is_empty() {
-        missing.push("ASR_WS_URL");
-    }
-    missing
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

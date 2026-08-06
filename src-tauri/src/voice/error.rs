@@ -40,18 +40,6 @@ impl VoiceError {
             Self::Config { stage, .. } => *stage,
         }
     }
-
-    pub fn audio(source: impl std::fmt::Display) -> Self {
-        Self::Audio(source.to_string())
-    }
-
-    pub fn asr(source: impl std::fmt::Display) -> Self {
-        Self::Asr(source.to_string())
-    }
-
-    pub fn llm(source: impl std::fmt::Display) -> Self {
-        Self::Llm(source.to_string())
-    }
 }
 
 pub type Result<T> = std::result::Result<T, VoiceError>;
