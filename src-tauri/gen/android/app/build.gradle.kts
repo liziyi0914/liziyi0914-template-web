@@ -24,14 +24,11 @@ android {
     versionCode = tauriProperties.getProperty("tauri.android.versionCode", "1").toInt()
     versionName = tauriProperties.getProperty("tauri.android.versionName", "1.0")
   }
+  // 不要在这里自定义名为 debug 的 SigningConfig：
+  // tauri android 会把 applicationIdSuffix 注入到第一个 getByName("debug") 块里，
+  // 写到签名配置上就会编译失败。debug 构建用 Android 默认调试密钥库即可。
   signingConfigs {
     create("release") {
-      storeFile = file("../../../../android_sign.jks")
-      storePassword = "GcVg3a03A2026"
-      keyAlias = "sign"
-      keyPassword = "GcVg3a03A2026"
-    }
-    create("debug") {
       storeFile = file("../../../../android_sign.jks")
       storePassword = "GcVg3a03A2026"
       keyAlias = "sign"
@@ -51,7 +48,6 @@ android {
         jniLibs.keepDebugSymbols.add("*/x86/*.so")
         jniLibs.keepDebugSymbols.add("*/x86_64/*.so")
       }
-      signingConfig = signingConfigs.getByName("debug")
     }
     getByName("release") {
       isMinifyEnabled = true
