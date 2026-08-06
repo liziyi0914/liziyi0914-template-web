@@ -16,11 +16,15 @@
 
 ### 三个必须先拿到的外部值
 
-以下三项无法从代码推导，缺一不可，全部填在 `src-tauri/src/voice/config.rs`：
+以下三项无法从代码推导：
 
 1. DashScope API Key（北京地域与新加坡地域的 Key 不通用）
-2. WebSocket URL 中的真实 WorkspaceId，替换 `wss://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference/` 里的占位符
+2. WebSocket URL 中的真实业务空间 ID
 3. 确认 `qwen3.7-plus` 在 DashScope OpenAI 兼容端点上的准确模型名
+
+前两项**不要写进 `config.rs`**，该文件会进版本库。它们放在 `scripts/voice-env.sh`（已被 `.gitignore` 排除，模板见 `scripts/voice-env.sh.example`），`scripts/android-env.sh` 会自动 source，`config.rs` 里的 `option_env!` 在编译期读取。本机该文件已配置好，直接跑 `pnpm android:dev` 即可。
+
+第三项若默认值不对，改 `config.rs` 里的 `LLM_MODEL` 常量（模型名不是密钥，可以提交）。
 
 ### 已知的最大风险：Android 上的 TLS 根证书
 
@@ -2617,9 +2621,13 @@ git commit -m "feat(voice): 语音命令 demo 界面"
 
 **Files:** 无代码改动
 
-- [ ] **Step 1: 填入真实配置**
+- [ ] **Step 1: 确认配置已注入**
 
-编辑 `src-tauri/src/voice/config.rs`，把 `DASHSCOPE_API_KEY` 和 `ASR_WS_URL` 换成真值，确认 `LLM_MODEL` 是兼容端点上可用的模型名。
+```bash
+source ./scripts/android-env.sh && echo "${ASR_WS_URL:?未配置}" && echo "${DASHSCOPE_API_KEY:0:8}…"
+```
+
+Expected: 打印出真实的 WS 地址和 Key 前缀。若报「未配置」，从 `scripts/voice-env.sh.example` 复制一份 `scripts/voice-env.sh` 并填值。
 
 - [ ] **Step 2: 装到真机**
 
