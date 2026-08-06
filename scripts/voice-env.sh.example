@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# 语音链路的密钥与端点。复制成同目录下的 voice-env.sh 并填入真实值。
+#
+#   cp scripts/voice-env.sh.example scripts/voice-env.sh
+#
+# voice-env.sh 已被 .gitignore 排除，不会进版本库。
+# android-env.sh 会在存在时自动 source 它，因此 pnpm android:* 无需额外操作。
+#
+# 这些值由 src-tauri/src/voice/config.rs 里的 option_env! 在编译期读取，
+# 改动后需要重新编译 Rust 侧才会生效。
+
+# 百炼 API Key。北京地域与新加坡地域的 Key 不通用。
+export DASHSCOPE_API_KEY="sk-REPLACE_ME"
+
+# 实时识别 WebSocket 地址，子域名是业务空间 ID。
+export ASR_WS_URL="wss://REPLACE_ME.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference/"

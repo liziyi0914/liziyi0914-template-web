@@ -23,3 +23,10 @@ if [ -z "${NDK_HOME:-}" ]; then
   fi
   export NDK_HOME="$SDK_DIR/ndk/$latest_ndk"
 fi
+
+# 语音链路的密钥，未配置时不阻断构建，只是运行期会连不上服务
+voice_env="$(dirname "${BASH_SOURCE[0]}")/voice-env.sh"
+if [ -f "$voice_env" ]; then
+  # shellcheck source=/dev/null
+  source "$voice_env"
+fi

@@ -17,3 +17,6 @@ dist/
 
 # Session
 .superpowers/
+
+# Secrets
+scripts/voice-env.sh
