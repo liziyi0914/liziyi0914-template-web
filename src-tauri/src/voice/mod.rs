@@ -1,6 +1,7 @@
 pub mod asr;
 pub mod config;
 pub mod error;
+pub mod llm;
 pub mod tls;
 pub mod wake;
 

@@ -1,5 +1,6 @@
 //! ASR 模型抽象层。上层只认这里的 trait 和事件，不知道底下是 WebSocket 还是别的。
 
+pub mod dashscope_ws;
 pub mod protocol;
 
 use async_trait::async_trait;

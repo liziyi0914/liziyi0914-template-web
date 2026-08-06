@@ -6,7 +6,10 @@ use std::sync::Arc;
 use std::sync::OnceLock;
 
 /// ring 的 crypto provider 只能安装一次，重复安装会返回 Err，因此用 OnceLock 兜住。
-fn ensure_crypto_provider() {
+///
+/// 任何走 rustls 的连接（含 tokio-tungstenite 自建的 ClientConfig）都要先调它，
+/// 否则 `rustls::ClientConfig::builder()` 在没有默认 provider 时直接 panic。
+pub fn ensure_crypto_provider() {
     static INSTALLED: OnceLock<()> = OnceLock::new();
     INSTALLED.get_or_init(|| {
         let _ = rustls::crypto::ring::default_provider().install_default();
