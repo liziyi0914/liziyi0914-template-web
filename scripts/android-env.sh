@@ -24,8 +24,11 @@ if [ -z "${NDK_HOME:-}" ]; then
   export NDK_HOME="$SDK_DIR/ndk/$latest_ndk"
 fi
 
-# 语音链路的密钥，未配置时不阻断构建，只是运行期会连不上服务
-voice_env="$(dirname "${BASH_SOURCE[0]}")/voice-env.sh"
+# 语音链路的密钥，未配置时不阻断构建，只是运行期会连不上服务。
+# BASH_SOURCE 在 bash/source 场景下可用；被 zsh source 时退回到 $0。
+_script="${BASH_SOURCE[0]:-$0}"
+voice_env="$(CDPATH= cd -- "$(dirname -- "$_script")" && pwd)/voice-env.sh"
+unset _script
 if [ -f "$voice_env" ]; then
   # shellcheck source=/dev/null
   source "$voice_env"
