@@ -1,0 +1,19 @@
+[package]
+name = "tauri-plugin-mic"
+version = "0.1.0"
+description = "安卓端麦克风采集，向 Rust 侧推送 PCM16 帧"
+edition = "2021"
+rust-version = "1.85"
+# tauri-plugin 的构建脚本要求 links 与包名一致
+links = "tauri-plugin-mic"
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }
+
+[dependencies]
+tauri = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.23"
+thiserror = "2"
+log = "0.4"
