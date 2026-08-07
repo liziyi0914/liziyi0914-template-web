@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   customizationUrlFromAsrWs,
+  formatVocabularyEnv,
   loadEnv,
   validateSource,
   type VocabularySource,
@@ -103,5 +104,23 @@ describe("loadEnv", () => {
     });
     assert.equal(env.apiKey, "sk-test");
     assert.match(env.endpoint, /\/asr\/customization$/);
+  });
+});
+
+describe("formatVocabularyEnv", () => {
+  it("生成可 source 的 export 行", () => {
+    const body = formatVocabularyEnv("vocab-gdufe-xxxx");
+    assert.match(body, /^# 由 pnpm vocabulary sync 自动生成/m);
+    assert.match(
+      body,
+      /^export ASR_VOCABULARY_ID="vocab-gdufe-xxxx"$/m,
+    );
+  });
+
+  it("拒绝含非法字符的 id", () => {
+    assert.throws(
+      () => formatVocabularyEnv('vocab"; rm -rf /'),
+      (err: Error) => err.message.includes("非法字符"),
+    );
   });
 });

@@ -25,6 +25,37 @@ export type VocabularyState = {
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 export const SOURCE_PATH = path.join(SCRIPT_DIR, "vocabulary.json");
 export const STATE_PATH = path.join(SCRIPT_DIR, "vocabulary.state.json");
+export const VOCAB_ENV_PATH = path.join(SCRIPT_DIR, "vocabulary-env.sh");
+
+/** 生成 vocabulary-env.sh 正文（含末尾换行）。 */
+export function formatVocabularyEnv(vocabularyId: string): string {
+  if (!/^[A-Za-z0-9_-]+$/.test(vocabularyId)) {
+    throw new Error("vocabulary_id 含非法字符，拒绝写入 vocabulary-env.sh");
+  }
+  return [
+    "# 由 pnpm vocabulary sync 自动生成，请勿手改。",
+    `export ASR_VOCABULARY_ID="${vocabularyId}"`,
+    "",
+  ].join("\n");
+}
+
+export async function writeVocabularyEnv(
+  vocabularyId: string,
+  filePath: string = VOCAB_ENV_PATH,
+): Promise<void> {
+  await writeFile(filePath, formatVocabularyEnv(vocabularyId), "utf8");
+}
+
+export async function clearVocabularyEnv(
+  filePath: string = VOCAB_ENV_PATH,
+): Promise<void> {
+  try {
+    await unlink(filePath);
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code !== "ENOENT") throw err;
+  }
+}
 
 const USAGE = `用法:
   pnpm vocabulary -- sync
@@ -308,7 +339,9 @@ async function cmdSync(): Promise<void> {
       vocabulary_id: vocabularyId,
       synced_at: new Date().toISOString(),
     });
+    await writeVocabularyEnv(vocabularyId);
     console.log(`已创建热词列表：${vocabularyId}`);
+    console.log(`已写入 ${VOCAB_ENV_PATH}（重新编译后 ASR 才会带上热词）`);
     return;
   }
   try {
@@ -327,7 +360,9 @@ async function cmdSync(): Promise<void> {
     vocabulary_id: state.vocabulary_id,
     synced_at: new Date().toISOString(),
   });
+  await writeVocabularyEnv(state.vocabulary_id);
   console.log(`已更新热词列表：${state.vocabulary_id}`);
+  console.log(`已写入 ${VOCAB_ENV_PATH}（重新编译后 ASR 才会带上热词）`);
 }
 
 async function cmdList(argv: string[]): Promise<void> {
@@ -364,6 +399,7 @@ async function cmdDelete(argv: string[]): Promise<void> {
   });
   if (state?.vocabulary_id === id) {
     await clearState();
+    await clearVocabularyEnv();
   }
   console.log(`已删除热词列表：${id}`);
 }
