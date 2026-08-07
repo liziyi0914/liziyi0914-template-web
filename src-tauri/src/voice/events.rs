@@ -33,7 +33,9 @@ pub enum VoiceEvent {
         command: VoiceCommand,
         /// 触发这条命令的 ASR 原句。
         source: String,
-        /// 模型返回的原始字符串，解析失败时用于排查。
+        /// 发给模型的 system 提示全文，供前端调试展示。
+        system: String,
+        /// 模型返回的原始字符串，始终可用于调试展示。
         raw: String,
     },
     Error {
@@ -111,12 +113,14 @@ mod tests {
             json_of(VoiceEvent::Command {
                 command,
                 source: "打开投影仪".to_string(),
+                system: "你是教室机器人的命令解析器。".to_string(),
                 raw: "{}".to_string(),
             }),
             json!({
                 "type": "command",
                 "command": { "intent": "open_projector", "params": {}, "reply": "好的" },
                 "source": "打开投影仪",
+                "system": "你是教室机器人的命令解析器。",
                 "raw": "{}"
             })
         );
