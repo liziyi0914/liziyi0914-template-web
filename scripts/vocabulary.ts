@@ -127,6 +127,141 @@ export function validateSource(raw: unknown): VocabularySource {
   };
 }
 
+export type DashScopeEnv = {
+  apiKey: string;
+  endpoint: string;
+};
+
+export function loadEnv(
+  env: NodeJS.ProcessEnv = process.env,
+): DashScopeEnv {
+  const apiKey = env.DASHSCOPE_API_KEY?.trim() ?? "";
+  const asrWs = env.ASR_WS_URL?.trim() ?? "";
+  if (!apiKey) {
+    throw new Error(
+      "缺少 DASHSCOPE_API_KEY。请先配置 scripts/voice-env.sh",
+    );
+  }
+  if (!asrWs) {
+    throw new Error("缺少 ASR_WS_URL。请先配置 scripts/voice-env.sh");
+  }
+  return {
+    apiKey,
+    endpoint: customizationUrlFromAsrWs(asrWs),
+  };
+}
+
+export async function readSource(
+  filePath: string = SOURCE_PATH,
+): Promise<VocabularySource> {
+  let text: string;
+  try {
+    text = await readFile(filePath, "utf8");
+  } catch {
+    throw new Error(`无法读取 ${filePath}`);
+  }
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    throw new Error(`${path.basename(filePath)} 不是合法 JSON`);
+  }
+  return validateSource(raw);
+}
+
+export async function writeSource(
+  source: VocabularySource,
+  filePath: string = SOURCE_PATH,
+): Promise<void> {
+  await writeFile(filePath, `${JSON.stringify(source, null, 2)}\n`, "utf8");
+}
+
+export async function readState(
+  filePath: string = STATE_PATH,
+): Promise<VocabularyState | null> {
+  try {
+    await access(filePath);
+  } catch {
+    return null;
+  }
+  const text = await readFile(filePath, "utf8");
+  const raw = JSON.parse(text) as Partial<VocabularyState>;
+  if (typeof raw.vocabulary_id !== "string" || !raw.vocabulary_id) {
+    throw new Error("vocabulary.state.json 缺少 vocabulary_id");
+  }
+  return {
+    vocabulary_id: raw.vocabulary_id,
+    synced_at:
+      typeof raw.synced_at === "string"
+        ? raw.synced_at
+        : new Date(0).toISOString(),
+  };
+}
+
+export async function writeState(
+  state: VocabularyState,
+  filePath: string = STATE_PATH,
+): Promise<void> {
+  await writeFile(filePath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+}
+
+export async function clearState(
+  filePath: string = STATE_PATH,
+): Promise<void> {
+  try {
+    await unlink(filePath);
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code !== "ENOENT") throw err;
+  }
+}
+
+type ApiOutput = Record<string, unknown>;
+
+export async function callVocabularyApi(
+  env: DashScopeEnv,
+  input: Record<string, unknown>,
+): Promise<{ output: ApiOutput; requestId?: string }> {
+  const body = {
+    model: "speech-biasing",
+    input,
+  };
+  const res = await fetch(env.endpoint, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  let json: Record<string, unknown>;
+  try {
+    json = JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    throw new Error(
+      `热词 API 返回非 JSON（HTTP ${res.status}）：${text.slice(0, 400)}`,
+    );
+  }
+  const requestId =
+    typeof json.request_id === "string" ? json.request_id : undefined;
+  const hasOutput = json.output !== undefined && typeof json.output === "object";
+  // 成功：HTTP 2xx 且带 output（update/delete 时可为 {}）
+  // 失败：非 2xx，或无 output 且带 message
+  if (!res.ok || (!hasOutput && typeof json.message === "string")) {
+    const msg =
+      typeof json.message === "string"
+        ? json.message
+        : text.slice(0, 400);
+    const rid = requestId ? ` request_id=${requestId}` : "";
+    throw new Error(`热词 API 失败（HTTP ${res.status}）${rid}：${msg}`);
+  }
+  return {
+    output: (hasOutput ? json.output : {}) as ApiOutput,
+    requestId,
+  };
+}
+
 function main(argv: string[]): void {
   const [cmd] = argv;
   if (!cmd || cmd === "-h" || cmd === "--help") {

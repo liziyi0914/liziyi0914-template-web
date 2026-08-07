@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   customizationUrlFromAsrWs,
+  loadEnv,
   validateSource,
   type VocabularySource,
 } from "./vocabulary.ts";
@@ -78,5 +79,29 @@ describe("validateSource", () => {
         }),
       (err: Error) => err.message.includes("weight"),
     );
+  });
+});
+
+describe("loadEnv", () => {
+  it("缺少 API Key 时抛错", () => {
+    assert.throws(
+      () =>
+        loadEnv({
+          DASHSCOPE_API_KEY: "",
+          ASR_WS_URL:
+            "wss://abc.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference",
+        }),
+      (err: Error) => err.message.includes("DASHSCOPE_API_KEY"),
+    );
+  });
+
+  it("齐全时返回 endpoint", () => {
+    const env = loadEnv({
+      DASHSCOPE_API_KEY: "sk-test",
+      ASR_WS_URL:
+        "wss://abc.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference",
+    });
+    assert.equal(env.apiKey, "sk-test");
+    assert.match(env.endpoint, /\/asr\/customization$/);
   });
 });
