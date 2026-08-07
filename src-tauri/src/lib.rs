@@ -4,6 +4,11 @@ mod voice;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+  // reqwest 开了 rustls-no-provider 后，进程内任何 Client（含 Tauri 移动端
+  // dev 协议）在 build 前都必须有 process-default CryptoProvider，否则直接 abort。
+  // 必须放在 Builder 之前：Tauri 会在创建 webview 协议处理器时立刻建 Client。
+  voice::tls::ensure_crypto_provider();
+
   let builder = tauri::Builder::default()
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_mic::init())

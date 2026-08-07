@@ -3531,6 +3531,7 @@ dependencies = [
  "plist",
  "raw-window-handle",
  "reqwest",
+ "rustls",
  "serde",
  "serde_json",
  "serde_repr",
