@@ -185,7 +185,12 @@ export async function readState(
     return null;
   }
   const text = await readFile(filePath, "utf8");
-  const raw = JSON.parse(text) as Partial<VocabularyState>;
+  let raw: Partial<VocabularyState>;
+  try {
+    raw = JSON.parse(text) as Partial<VocabularyState>;
+  } catch {
+    throw new Error("vocabulary.state.json 不是合法 JSON");
+  }
   if (typeof raw.vocabulary_id !== "string" || !raw.vocabulary_id) {
     throw new Error("vocabulary.state.json 缺少 vocabulary_id");
   }
@@ -245,7 +250,10 @@ export async function callVocabularyApi(
   }
   const requestId =
     typeof json.request_id === "string" ? json.request_id : undefined;
-  const hasOutput = json.output !== undefined && typeof json.output === "object";
+  const hasOutput =
+    json.output !== null &&
+    json.output !== undefined &&
+    typeof json.output === "object";
   // 成功：HTTP 2xx 且带 output（update/delete 时可为 {}）
   // 失败：非 2xx，或无 output 且带 message
   if (!res.ok || (!hasOutput && typeof json.message === "string")) {
@@ -262,14 +270,168 @@ export async function callVocabularyApi(
   };
 }
 
-function main(argv: string[]): void {
-  const [cmd] = argv;
+function parseListPrefix(argv: string[], fallback: string): string {
+  const idx = argv.indexOf("--prefix");
+  if (idx === -1) return fallback;
+  const value = argv[idx + 1];
+  if (!value || value.startsWith("-")) {
+    throw new Error("list --prefix 需要一个值");
+  }
+  return value;
+}
+
+async function resolveId(
+  explicit: string | undefined,
+  state: VocabularyState | null,
+): Promise<string> {
+  if (explicit) return explicit;
+  if (state?.vocabulary_id) return state.vocabulary_id;
+  throw new Error("缺少 vocabulary_id：请传入 id，或先执行 sync");
+}
+
+async function cmdSync(): Promise<void> {
+  const env = loadEnv();
+  const source = await readSource();
+  const state = await readState();
+  if (!state) {
+    const { output } = await callVocabularyApi(env, {
+      action: "create_vocabulary",
+      target_model: source.target_model,
+      prefix: source.prefix,
+      vocabulary: source.vocabulary,
+    });
+    const vocabularyId = output.vocabulary_id;
+    if (typeof vocabularyId !== "string" || !vocabularyId) {
+      throw new Error("create_vocabulary 响应缺少 vocabulary_id");
+    }
+    await writeState({
+      vocabulary_id: vocabularyId,
+      synced_at: new Date().toISOString(),
+    });
+    console.log(`已创建热词列表：${vocabularyId}`);
+    return;
+  }
+  try {
+    await callVocabularyApi(env, {
+      action: "update_vocabulary",
+      vocabulary_id: state.vocabulary_id,
+      vocabulary: source.vocabulary,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `${message}\n若云端词表已不存在：删除 scripts/vocabulary.state.json 后重新 sync，或先手动核对 id。不会自动 recreate。`,
+    );
+  }
+  await writeState({
+    vocabulary_id: state.vocabulary_id,
+    synced_at: new Date().toISOString(),
+  });
+  console.log(`已更新热词列表：${state.vocabulary_id}`);
+}
+
+async function cmdList(argv: string[]): Promise<void> {
+  const env = loadEnv();
+  const source = await readSource();
+  const prefix = parseListPrefix(argv, source.prefix);
+  const { output } = await callVocabularyApi(env, {
+    action: "list_vocabulary",
+    prefix,
+    page_index: 0,
+    page_size: 50,
+  });
+  console.log(JSON.stringify(output.vocabulary_list ?? output, null, 2));
+}
+
+async function cmdQuery(argv: string[]): Promise<void> {
+  const env = loadEnv();
+  const state = await readState();
+  const id = await resolveId(argv[0], state);
+  const { output } = await callVocabularyApi(env, {
+    action: "query_vocabulary",
+    vocabulary_id: id,
+  });
+  console.log(JSON.stringify(output, null, 2));
+}
+
+async function cmdDelete(argv: string[]): Promise<void> {
+  const env = loadEnv();
+  const state = await readState();
+  const id = await resolveId(argv[0], state);
+  await callVocabularyApi(env, {
+    action: "delete_vocabulary",
+    vocabulary_id: id,
+  });
+  if (state?.vocabulary_id === id) {
+    await clearState();
+  }
+  console.log(`已删除热词列表：${id}`);
+}
+
+async function cmdPull(): Promise<void> {
+  const env = loadEnv();
+  const state = await readState();
+  const id = await resolveId(undefined, state);
+  const local = await readSource();
+  const { output } = await callVocabularyApi(env, {
+    action: "query_vocabulary",
+    vocabulary_id: id,
+  });
+  const targetModel = output.target_model;
+  const vocabulary = output.vocabulary;
+  if (typeof targetModel !== "string" || !targetModel) {
+    throw new Error("query 响应缺少 target_model");
+  }
+  if (!Array.isArray(vocabulary)) {
+    throw new Error("query 响应缺少 vocabulary 数组");
+  }
+  const next: VocabularySource = {
+    prefix: local.prefix,
+    target_model: targetModel,
+    vocabulary: vocabulary as Hotword[],
+  };
+  const validated = validateSource(next);
+  console.log(
+    `将用云端词表覆盖本地（保留 prefix=${validated.prefix}），共 ${validated.vocabulary.length} 条：`,
+  );
+  for (const w of validated.vocabulary) {
+    console.log(`  - ${w.text} (weight=${w.weight}${w.lang ? `, lang=${w.lang}` : ""})`);
+  }
+  await writeSource(validated);
+  console.log(`已写入 ${SOURCE_PATH}`);
+}
+
+async function main(argv: string[]): Promise<void> {
+  const [cmd, ...rest] = argv;
   if (!cmd || cmd === "-h" || cmd === "--help") {
     console.log(USAGE);
     process.exit(cmd ? 0 : 1);
   }
-  console.error(`尚未实现子命令：${cmd}`);
-  process.exit(1);
+  try {
+    switch (cmd) {
+      case "sync":
+        await cmdSync();
+        break;
+      case "list":
+        await cmdList(rest);
+        break;
+      case "query":
+        await cmdQuery(rest);
+        break;
+      case "delete":
+        await cmdDelete(rest);
+        break;
+      case "pull":
+        await cmdPull();
+        break;
+      default:
+        console.error(`未知子命令：${cmd}\n\n${USAGE}`);
+        process.exit(1);
+    }
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
 }
 
 const isDirectRun =
@@ -277,5 +439,5 @@ const isDirectRun =
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isDirectRun) {
-  main(process.argv.slice(2));
+  void main(process.argv.slice(2));
 }
