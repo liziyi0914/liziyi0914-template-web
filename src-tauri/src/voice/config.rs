@@ -15,10 +15,15 @@ macro_rules! env_or {
 pub const DASHSCOPE_API_KEY: &str = env_or!("DASHSCOPE_API_KEY", "");
 
 /// 实时语音识别的 WebSocket 端点，形如
-/// `wss://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference/`。
+/// `wss://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference`
+/// （官方路径**不要**尾斜杠）。
 pub const ASR_WS_URL: &str = env_or!("ASR_WS_URL", "");
 
 pub const ASR_MODEL: &str = "fun-asr-realtime";
+
+/// 预编译热词列表 ID。空串表示未配置，run-task 不传 vocabulary_id。
+/// 由 `pnpm vocabulary sync` 写入 scripts/vocabulary-env.sh，经 android-env 注入。
+pub const ASR_VOCABULARY_ID: &str = env_or!("ASR_VOCABULARY_ID", "");
 
 /// 百炼的 OpenAI 兼容端点。async-openai 会在其后自行拼 `/chat/completions`。
 pub const LLM_BASE_URL: &str = env_or!(

@@ -19,12 +19,27 @@ pub enum ServerEvent {
     },
 }
 
-/// 服务端要求 32 位无短横的十六进制 ID。
+/// 官方文档要求 UUID 格式（带短横），示例形如 `2bf83b9a-baeb-4fda-8d9a-xxxxxxxxxxxx`。
 pub fn new_task_id() -> String {
-    uuid::Uuid::new_v4().simple().to_string()
+    uuid::Uuid::new_v4().to_string()
 }
 
-pub fn run_task_frame(task_id: &str, model: &str, sample_rate: u32) -> String {
+pub fn run_task_frame(
+    task_id: &str,
+    model: &str,
+    sample_rate: u32,
+    vocabulary_id: Option<&str>,
+) -> String {
+    let mut parameters = json!({
+        "sample_rate": sample_rate,
+        "format": "pcm"
+    });
+    if let Some(id) = vocabulary_id {
+        let id = id.trim();
+        if !id.is_empty() {
+            parameters["vocabulary_id"] = json!(id);
+        }
+    }
     json!({
         "header": {
             "action": "run-task",
@@ -36,10 +51,7 @@ pub fn run_task_frame(task_id: &str, model: &str, sample_rate: u32) -> String {
             "task": "asr",
             "function": "recognition",
             "model": model,
-            "parameters": {
-                "sample_rate": sample_rate,
-                "format": "pcm"
-            },
+            "parameters": parameters,
             "input": {}
         }
     })
@@ -134,10 +146,11 @@ mod tests {
     }
 
     #[test]
-    fn task_id_is_32_hex_chars() {
+    fn task_id_is_hyphenated_uuid() {
         let id = new_task_id();
-        assert_eq!(id.len(), 32);
-        assert!(id.chars().all(|c| c.is_ascii_hexdigit()));
+        let parsed = uuid::Uuid::parse_str(&id).expect("应当是合法 UUID");
+        assert_eq!(parsed.to_string(), id);
+        assert_eq!(id.len(), 36);
     }
 
     #[test]
@@ -147,7 +160,7 @@ mod tests {
 
     #[test]
     fn run_task_frame_matches_protocol() {
-        let frame = parsed(&run_task_frame("abc123", "fun-asr-realtime", 16000));
+        let frame = parsed(&run_task_frame("abc123", "fun-asr-realtime", 16000, None));
         assert_eq!(
             frame,
             json!({
@@ -169,6 +182,35 @@ mod tests {
                 }
             })
         );
+    }
+
+    #[test]
+    fn run_task_frame_includes_vocabulary_id_when_present() {
+        let frame = parsed(&run_task_frame(
+            "abc123",
+            "fun-asr-realtime",
+            16000,
+            Some("vocab-gdufe-xxxx"),
+        ));
+        assert_eq!(
+            frame["payload"]["parameters"]["vocabulary_id"],
+            json!("vocab-gdufe-xxxx")
+        );
+        assert_eq!(frame["payload"]["parameters"]["sample_rate"], json!(16000));
+        assert_eq!(frame["payload"]["parameters"]["format"], json!("pcm"));
+    }
+
+    #[test]
+    fn run_task_frame_omits_vocabulary_id_for_empty_string() {
+        let frame = parsed(&run_task_frame(
+            "abc123",
+            "fun-asr-realtime",
+            16000,
+            Some(""),
+        ));
+        assert!(frame["payload"]["parameters"]
+            .get("vocabulary_id")
+            .is_none());
     }
 
     #[test]

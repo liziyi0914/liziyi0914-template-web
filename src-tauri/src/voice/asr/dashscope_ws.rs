@@ -28,6 +28,7 @@ pub struct DashScopeWs {
     api_key: String,
     model: String,
     sample_rate: u32,
+    vocabulary_id: String,
 }
 
 impl DashScopeWs {
@@ -46,10 +47,13 @@ impl DashScopeWs {
             });
         }
         Ok(Self {
-            url: config::ASR_WS_URL.to_string(),
+            // 官方文档路径是 `/api-ws/v1/inference`（无尾斜杠）。多一个 `/`
+            // 会在 run-task 后收到 `InvalidParameter: url error, please check url！`。
+            url: config::ASR_WS_URL.trim_end_matches('/').to_string(),
             api_key: config::DASHSCOPE_API_KEY.to_string(),
             model: config::ASR_MODEL.to_string(),
             sample_rate: config::SAMPLE_RATE,
+            vocabulary_id: config::ASR_VOCABULARY_ID.to_string(),
         })
     }
 }
@@ -64,8 +68,8 @@ impl AsrProvider for DashScopeWs {
             .as_str()
             .into_client_request()
             .map_err(|e| VoiceError::Asr(format!("WebSocket 地址不合法：{e}")))?;
-        // 本协议的鉴权 scheme 在文档里是小写 bearer
-        let credential = format!("bearer {}", self.api_key)
+        // 官方文档写作 `Bearer <api_key>`（首字母大写）；部分网关对 scheme 大小写敏感。
+        let credential = format!("Bearer {}", self.api_key)
             .parse()
             .map_err(|_| VoiceError::Asr("API Key 含有不能放进请求头的字符".to_string()))?;
         request.headers_mut().insert("Authorization", credential);
@@ -76,7 +80,9 @@ impl AsrProvider for DashScopeWs {
         let (mut sink, source) = socket.split();
 
         let task_id = protocol::new_task_id();
-        let run_task = protocol::run_task_frame(&task_id, &self.model, self.sample_rate);
+        let vocab = (!self.vocabulary_id.trim().is_empty()).then_some(self.vocabulary_id.as_str());
+        let run_task =
+            protocol::run_task_frame(&task_id, &self.model, self.sample_rate, vocab);
         sink.send(Message::Text(run_task.into()))
             .await
             .map_err(|e| VoiceError::Asr(format!("发送 run-task 失败：{e}")))?;
