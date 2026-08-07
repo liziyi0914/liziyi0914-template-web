@@ -142,6 +142,7 @@ const TimelineRow = memo(function TimelineRow({
         <CommandRow
           command={item.command}
           source={item.source}
+          system={item.system}
           raw={item.raw}
         />
       );
@@ -158,10 +159,12 @@ const TimelineRow = memo(function TimelineRow({
 function CommandRow({
   command,
   source,
+  system,
   raw,
 }: {
   command: VoiceCommand;
   source: string;
+  system: string;
   raw: string;
 }) {
   const unknown = command.intent === 'unknown';
@@ -172,10 +175,10 @@ function CommandRow({
         <Badge variant={unknown ? 'destructive' : 'default'}>
           {command.intent}
         </Badge>
-        <span className="truncate text-xs text-muted-foreground">{source}</span>
+        {command.reply ? (
+          <span className="truncate text-sm">{command.reply}</span>
+        ) : null}
       </div>
-
-      {command.reply ? <p className="mt-1 text-sm">{command.reply}</p> : null}
 
       {Object.keys(command.params).length > 0 ? (
         <pre className="mt-1 overflow-x-auto text-xs text-muted-foreground">
@@ -183,12 +186,19 @@ function CommandRow({
         </pre>
       ) : null}
 
-      {/* 解析失败时原始输出是唯一线索 */}
-      {unknown && raw ? (
-        <pre className="mt-1 overflow-x-auto text-xs text-muted-foreground">
-          {raw}
+      <div className="mt-2 flex flex-col gap-1">
+        <p className="text-xs font-medium text-muted-foreground">发送至 Text</p>
+        <pre className="max-h-32 overflow-auto whitespace-pre-wrap break-words rounded bg-muted/50 p-2 text-xs">
+          {`[system]\n${system}\n\n[user]\n${source}`}
         </pre>
-      ) : null}
+      </div>
+
+      <div className="mt-2 flex flex-col gap-1">
+        <p className="text-xs font-medium text-muted-foreground">模型回复</p>
+        <pre className="max-h-32 overflow-auto whitespace-pre-wrap break-words rounded bg-muted/50 p-2 text-xs">
+          {raw || '（空）'}
+        </pre>
+      </div>
     </div>
   );
 }
