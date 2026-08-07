@@ -13,9 +13,14 @@
 export DASHSCOPE_API_KEY="sk-REPLACE_ME"
 
 # 实时识别 WebSocket 地址，子域名是业务空间 ID。
-export ASR_WS_URL="wss://REPLACE_ME.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference/"
+# 注意：路径末尾不要加斜杠，否则服务端会返回 InvalidParameter: url error。
+export ASR_WS_URL="wss://REPLACE_ME.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference"
 
 # 以下两项有默认值，只在需要覆盖时取消注释。
 # 业务空间专属的 Key 走公共端点可能鉴权失败，届时改成与 ASR 同域的兼容端点。
 # export LLM_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
 # export LLM_MODEL="qwen3.7-plus"
+
+# 预编译热词 ID 不要写在本文件。
+# 执行 pnpm vocabulary -- sync 后会生成 scripts/vocabulary-env.sh
+# （已被 gitignore），android-env.sh 会自动 source。改 ID 后需重新编译。

@@ -14,7 +14,7 @@
     "android:init": "source ./scripts/android-env.sh && tauri android init",
     "android:dev": "source ./scripts/android-env.sh && tauri android dev --open",
     "android:build": "source ./scripts/android-env.sh && tauri android build --apk",
-    "vocabulary": "source ./scripts/voice-env.sh && tsx scripts/vocabulary.ts",
+    "vocabulary": "bash -c 'source ./scripts/voice-env.sh; [ -f ./scripts/vocabulary-env.sh ] && source ./scripts/vocabulary-env.sh; exec tsx scripts/vocabulary.ts \"$@\"' --",
     "vocabulary:test": "tsx --test scripts/vocabulary.test.ts"
   },
   "dependencies": {
