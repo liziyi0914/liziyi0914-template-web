@@ -21,7 +21,12 @@ function dispatch(event: VoiceEvent, handlers: VoiceHandlers) {
       handlers.onWake?.();
       break;
     case 'command':
-      handlers.onCommand?.(event.command, event.source, event.raw);
+      handlers.onCommand?.(
+        event.command,
+        event.source,
+        event.system,
+        event.raw,
+      );
       break;
     case 'error':
       handlers.onError?.(event.stage, event.message);

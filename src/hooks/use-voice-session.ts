@@ -20,6 +20,7 @@ export type TimelineItem =
       kind: 'command';
       command: VoiceCommand;
       source: string;
+      system: string;
       raw: string;
     }
   | { id: string; kind: 'error'; label: string; message: string };
@@ -81,12 +82,13 @@ export function useVoiceSession() {
         onWake: () => {
           append({ id: `${epoch}-w${Date.now()}`, kind: 'wake' });
         },
-        onCommand: (command, source, raw) => {
+        onCommand: (command, source, system, raw) => {
           append({
             id: `${epoch}-c${Date.now()}`,
             kind: 'command',
             command,
             source,
+            system,
             raw,
           });
         },

@@ -25,7 +25,9 @@ export type VoiceEvent =
       command: VoiceCommand;
       /** 触发这条命令的 ASR 原句 */
       source: string;
-      /** 模型返回的原始字符串，解析失败时用于排查 */
+      /** 发给模型的 system 提示全文 */
+      system: string;
+      /** 模型返回的原始字符串，始终可用于调试展示 */
       raw: string;
     }
   | { type: 'error'; stage: ErrorStage; message: string };
@@ -34,6 +36,11 @@ export interface VoiceHandlers {
   onState?: (state: SessionState) => void;
   onTranscript?: (text: string, index: number, final: boolean) => void;
   onWake?: () => void;
-  onCommand?: (command: VoiceCommand, source: string, raw: string) => void;
+  onCommand?: (
+    command: VoiceCommand,
+    source: string,
+    system: string,
+    raw: string,
+  ) => void;
   onError?: (stage: ErrorStage, message: string) => void;
 }
