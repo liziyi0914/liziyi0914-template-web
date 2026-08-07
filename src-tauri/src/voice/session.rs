@@ -207,12 +207,15 @@ fn handle_asr_event(
 
 /// 命令解析失败只丢这一条命令，会话继续，不能因为一次解析失败就关掉麦克风。
 async fn resolve_command(llm: Arc<dyn TextModel>, events: Channel<VoiceEvent>, utterance: String) {
-    match llm.complete(prompt::build_request(&utterance)).await {
+    let request = prompt::build_request(&utterance);
+    let system = request.system.clone();
+    match llm.complete(request).await {
         Ok(raw) => {
             let command = prompt::parse_command(&raw);
             let _ = events.send(VoiceEvent::Command {
                 command,
                 source: utterance,
+                system,
                 raw,
             });
         }
