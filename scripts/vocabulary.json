@@ -1,0 +1,8 @@
+{
+  "prefix": "gdufe",
+  "target_model": "fun-asr-realtime",
+  "vocabulary": [
+    { "text": "你好小财", "weight": 4, "lang": "zh" },
+    { "text": "广财", "weight": 4, "lang": "zh" }
+  ]
+}

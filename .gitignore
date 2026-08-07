@@ -20,3 +20,4 @@ dist/
 
 # Secrets
 scripts/voice-env.sh
+scripts/vocabulary.state.json
