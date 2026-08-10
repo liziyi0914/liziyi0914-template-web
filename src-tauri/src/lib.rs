@@ -1,6 +1,7 @@
 #[cfg(desktop)]
 mod tray;
 
+mod llm;
 mod platform;
 mod voice;
 
