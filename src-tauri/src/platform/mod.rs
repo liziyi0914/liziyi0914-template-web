@@ -28,13 +28,6 @@ pub async fn run_role(app: AppHandle, state: Arc<PlatformState>, config: RoleCon
 }
 
 #[cfg(mobile)]
-pub async fn run_role(app: AppHandle, state: Arc<PlatformState>, _config: RoleConfig) {
-    use events::{LogLevel, LogSource};
-    state.log(
-        &app,
-        LogLevel::Warn,
-        LogSource::Connection,
-        "机器人端接入尚未实现",
-        None,
-    );
+pub async fn run_role(app: AppHandle, state: Arc<PlatformState>, config: RoleConfig) {
+    robot::run(app, state, config).await;
 }

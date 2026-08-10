@@ -10,7 +10,7 @@ use serde_json::{json, Value};
 use teaching_platform::error::{code, ApiError};
 
 use super::tools;
-use crate::llm::{ChatMessage, ChatRequest, ChatResponse, Result, TextModel, ToolCall};
+use crate::llm::{ChatMessage, ChatRequest, Result, TextModel, ToolCall};
 
 /// 历史保留的轮数。一轮 = 一条 cmd 及其全部消息。
 pub const HISTORY_TURNS: usize = 10;
@@ -214,7 +214,7 @@ mod tests {
     use std::collections::VecDeque;
     use std::sync::Mutex;
 
-    use crate::llm::LlmError;
+    use crate::llm::{ChatResponse, LlmError};
 
     /// 按脚本回复的假模型，同时记下每次收到的（消息, 工具名）。
     struct ScriptedModel {
