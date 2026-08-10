@@ -2,5 +2,6 @@
 
 pub mod envelope;
 pub mod error;
+pub mod ws;
 
 pub use error::{ApiError, PlatformError, Result};
