@@ -5,7 +5,6 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { Toaster } from '@/components/ui/sonner';
-import { useConnectionBootstrap } from '@/hooks/use-connection';
 import { IS_MOBILE_UI } from '@/lib/platform';
 
 interface MyRouterContext {
@@ -24,8 +23,6 @@ const MOBILE_TOAST_OFFSET = {
 };
 
 function RootLayout() {
-  useConnectionBootstrap();
-
   return (
     <>
       <Outlet />

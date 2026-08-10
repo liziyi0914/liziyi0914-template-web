@@ -4,10 +4,10 @@ import { ConnectionDetails } from '@/components/connection-details';
 import { ConnectionStatusCard } from '@/components/connection-status-card';
 import { MobilePage } from '@/components/mobile/page';
 import {
-  ClientIdField,
-  ClientSecretField,
   HostField,
   PortField,
+  RobotFields,
+  ScreenAppFields,
   SecureField,
   TargetUrlDescription,
 } from '@/components/server-config-fields';
@@ -27,16 +27,16 @@ import { useServerConfig } from '@/hooks/use-server-config';
 import { useServerConfigDraft } from '@/hooks/use-server-config-draft';
 import {
   isConfigComplete,
-  type ServerConfig,
+  type RoleConfig,
   serverUrl,
-} from '@/lib/connection/types';
+} from '@/lib/platform-api';
 
 /** 保存按钮在应用栏里，靠 form 属性跨 DOM 层级关联到表单 */
 const FORM_ID = 'server-config-form';
 
 export function MobileSettings() {
   const { config, loaded } = useServerConfig();
-  const { info, reconnect, simulateFailure } = useConnection();
+  const { info, reconnect } = useConnection();
   const navigate = useNavigate();
   const handleSubmit = useSaveServerConfig(() => navigate({ to: '/' }));
 
@@ -59,7 +59,6 @@ export function MobileSettings() {
             serverUrl={isConfigComplete(config) ? serverUrl(config) : null}
             unconfiguredHint="尚未配置服务器，请在下方填写连接参数"
             onReconnect={reconnect}
-            onSimulateFailure={simulateFailure}
           />
           <ConnectionDetails info={info} />
         </div>
@@ -78,8 +77,8 @@ function SettingsForm({
   initialConfig,
   onSubmit,
 }: {
-  initialConfig: ServerConfig;
-  onSubmit: (config: ServerConfig) => void;
+  initialConfig: RoleConfig;
+  onSubmit: (config: RoleConfig) => void;
 }) {
   const { draft, errors, patch, submit } = useServerConfigDraft(
     initialConfig,
@@ -115,8 +114,8 @@ function SettingsForm({
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <ClientIdField {...fieldProps} />
-            <ClientSecretField {...fieldProps} />
+            <ScreenAppFields {...fieldProps} />
+            <RobotFields {...fieldProps} />
           </FieldGroup>
         </CardContent>
       </Card>

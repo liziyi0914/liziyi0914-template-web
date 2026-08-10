@@ -10,11 +10,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useServerConfigDraft } from '@/hooks/use-server-config-draft';
-import type { ServerConfig } from '@/lib/connection/types';
+import type { RoleConfig } from '@/lib/platform-api';
 
 interface ServerConfigFormProps {
-  initialConfig: ServerConfig;
-  onSubmit: (config: ServerConfig) => void;
+  initialConfig: RoleConfig;
+  onSubmit: (config: RoleConfig) => void;
 }
 
 /** PC 端表单：与连接详情并排放在主窗口里 */

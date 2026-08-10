@@ -24,10 +24,8 @@ export function formatTime(timestamp: number | null): string {
   });
 }
 
-export function formatText(value: string | null): string {
-  return value?.trim() ? value : PLACEHOLDER;
-}
-
-export function formatLatency(ms: number | null): string {
-  return ms === null ? PLACEHOLDER : `${ms} ms`;
+export function formatText(value: string | number | null): string {
+  if (value === null) return PLACEHOLDER;
+  if (typeof value === 'number') return String(value);
+  return value.trim() ? value : PLACEHOLDER;
 }

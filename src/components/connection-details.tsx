@@ -10,48 +10,43 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Uptime } from '@/components/uptime';
-import type { ConnectionInfo } from '@/lib/connection/types';
-import { formatLatency, formatText, formatTime } from '@/lib/format';
+import { formatText } from '@/lib/format';
+import type { ConnectionInfo } from '@/lib/platform-api';
 
 export function ConnectionDetails({ info }: { info: ConnectionInfo }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>连接详情</CardTitle>
-        <CardDescription>由服务器在握手与心跳中下发</CardDescription>
+        <CardDescription>由服务器在登录快照与事件中下发</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {info.lastError ? (
           <Alert variant="destructive">
             <TriangleAlert />
-            <AlertTitle>最近一次错误</AlertTitle>
-            <AlertDescription>{info.lastError}</AlertDescription>
+            <AlertTitle>
+              {info.kicked ? '已在别处连接' : '最近一次错误'}
+            </AlertTitle>
+            <AlertDescription>
+              {info.lastError}
+              {/* 顶号后 Rust 侧不再自动重连，得说清楚要人工介入 */}
+              {info.kicked ? '。确认另一处已关闭后，点「重新连接」。' : ''}
+            </AlertDescription>
           </Alert>
         ) : null}
 
         <dl className="flex flex-col gap-3 text-sm">
-          <Row label="网络延迟">{formatLatency(info.latencyMs)}</Row>
           <Row label="在线时长">
             <Uptime since={info.connectedAt} />
           </Row>
-          <Row label="最后心跳">{formatTime(info.lastHeartbeatAt)}</Row>
           <Row label="重连次数">{info.reconnectCount}</Row>
 
           <Separator />
 
-          <Row label="会话 ID" mono>
-            {formatText(info.sessionId)}
+          <Row label="课堂 ID" mono>
+            {formatText(info.lessonId)}
           </Row>
-          <Row label="服务端版本" mono>
-            {formatText(info.serverVersion)}
-          </Row>
-
-          <Separator />
-
-          <Row label="安卓端版本" mono>
-            {formatText(info.robot.appVersion)}
-          </Row>
-          <Row label="机器人最后在线">{formatTime(info.robot.lastSeenAt)}</Row>
+          <Row label="课程">{formatText(info.courseName)}</Row>
         </dl>
       </CardContent>
     </Card>

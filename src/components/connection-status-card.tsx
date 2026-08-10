@@ -1,6 +1,5 @@
-import { Bot, DoorOpen, PlugZap, RefreshCw } from 'lucide-react';
+import { BookOpen, DoorOpen, RefreshCw } from 'lucide-react';
 import { ConnectionStateBadge } from '@/components/connection-state-badge';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import type { ConnectionInfo } from '@/lib/connection/types';
 import { formatText } from '@/lib/format';
+import type { ConnectionInfo } from '@/lib/platform-api';
 
 const BUSY_STATES = new Set(['connecting', 'reconnecting']);
 
@@ -23,7 +22,6 @@ interface ConnectionStatusCardProps {
   /** 未配置时的引导文案，移动端的设置入口不在右侧而在应用栏 */
   unconfiguredHint?: string;
   onReconnect: () => void;
-  onSimulateFailure: () => void;
 }
 
 export function ConnectionStatusCard({
@@ -31,36 +29,20 @@ export function ConnectionStatusCard({
   serverUrl,
   unconfiguredHint = DESKTOP_UNCONFIGURED_HINT,
   onReconnect,
-  onSimulateFailure,
 }: ConnectionStatusCardProps) {
   const busy = BUSY_STATES.has(info.state);
-  const robotLabel =
-    info.state === 'connected' ? (info.robot.online ? '在线' : '离线') : '未知';
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>连接状态</CardTitle>
-        <CardDescription>
-          {serverUrl ? serverUrl : unconfiguredHint}
-        </CardDescription>
-        <CardAction className="flex flex-wrap items-center justify-end gap-2">
-          {import.meta.env.DEV && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onSimulateFailure}
-              disabled={info.state === 'idle'}
-            >
-              <PlugZap data-icon="inline-start" />
-              模拟断线
-            </Button>
-          )}
+        <CardDescription>{serverUrl ?? unconfiguredHint}</CardDescription>
+        <CardAction>
           <Button
             variant="outline"
             size="sm"
             onClick={onReconnect}
-            disabled={info.state === 'idle' || busy}
+            disabled={busy}
           >
             <RefreshCw data-icon="inline-start" />
             重新连接
@@ -72,35 +54,22 @@ export function ConnectionStatusCard({
           <ConnectionStateBadge state={info.state} />
         </StatBlock>
 
-        <StatBlock label="课室 ID" icon={<DoorOpen className="size-3.5" />}>
-          <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-lg leading-none font-medium">
-              {formatText(info.classroomId)}
-            </span>
-            {info.classroomName ? (
-              <span className="truncate text-xs text-muted-foreground">
-                {info.classroomName}
-              </span>
-            ) : null}
-          </div>
+        <StatBlock label="教室 ID" icon={<DoorOpen className="size-3.5" />}>
+          <span className="font-mono text-lg leading-none font-medium">
+            {formatText(info.classroomId)}
+          </span>
         </StatBlock>
 
-        <StatBlock label="机器人状态" icon={<Bot className="size-3.5" />}>
-          <div className="flex flex-col items-start gap-1">
-            <Badge
-              variant={
-                info.state !== 'connected'
-                  ? 'outline'
-                  : info.robot.online
-                    ? 'default'
-                    : 'secondary'
-              }
-            >
-              {robotLabel}
-            </Badge>
-            <span className="truncate text-xs text-muted-foreground">
-              {formatText(info.robot.deviceName)}
+        <StatBlock label="当前课堂" icon={<BookOpen className="size-3.5" />}>
+          <div className="flex flex-col gap-0.5">
+            <span className="truncate font-medium">
+              {formatText(info.lessonTitle)}
             </span>
+            {info.courseName ? (
+              <span className="truncate text-xs text-muted-foreground">
+                {info.courseName}
+              </span>
+            ) : null}
           </div>
         </StatBlock>
       </CardContent>

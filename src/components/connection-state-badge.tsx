@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   CONNECTION_STATE_LABEL,
   type ConnectionState,
-} from '@/lib/connection/types';
+} from '@/lib/platform-api';
 import { cn } from '@/lib/utils';
 
 type BadgeVariant = 'default' | 'secondary' | 'outline' | 'destructive';
@@ -12,6 +12,7 @@ const STATE_STYLE: Record<
   { variant: BadgeVariant; dot: string }
 > = {
   idle: { variant: 'outline', dot: 'bg-muted-foreground' },
+  authorizing: { variant: 'secondary', dot: 'bg-primary animate-pulse' },
   connecting: { variant: 'secondary', dot: 'bg-primary animate-pulse' },
   connected: { variant: 'default', dot: 'bg-primary-foreground' },
   reconnecting: { variant: 'secondary', dot: 'bg-primary animate-pulse' },
