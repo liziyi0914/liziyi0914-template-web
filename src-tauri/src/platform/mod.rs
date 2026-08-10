@@ -1,6 +1,7 @@
 pub mod commands;
 pub mod config;
 pub mod events;
+pub mod robot;
 pub mod state;
 
 #[cfg(desktop)]
