@@ -3,6 +3,7 @@ import { listen } from '@tauri-apps/api/event';
 import { IS_ANDROID } from '@/lib/platform';
 import {
   type ConnectionInfo,
+  type DeviceFlowInfo,
   EMPTY_ROBOT_CONFIG,
   EMPTY_SCREEN_APP_CONFIG,
   INITIAL_CONNECTION_INFO,
@@ -47,6 +48,16 @@ export async function getConnectionInfo(): Promise<ConnectionInfo> {
 export async function getRecentLogs(): Promise<LogEntry[]> {
   if (!isTauri()) return [];
   return await invoke<LogEntry[]>('platform_recent_logs');
+}
+
+/**
+ * 机器人待授权信息。没在等授权时为 null。
+ *
+ * 桌面端没有注册这个 command，调用会抛错，因此非安卓直接返回 null。
+ */
+export async function getDeviceFlowState(): Promise<DeviceFlowInfo | null> {
+  if (!isTauri() || !IS_ANDROID) return null;
+  return await invoke<DeviceFlowInfo | null>('robot_device_flow_state');
 }
 
 type Unsubscribe = () => void;

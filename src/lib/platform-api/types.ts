@@ -34,6 +34,16 @@ export interface LogEntry {
   detail?: string;
 }
 
+/** 机器人 Device Flow 的待授权信息，与 events.rs 的 DeviceFlowInfo 对应 */
+export interface DeviceFlowInfo {
+  userCode: string;
+  verificationUri: string;
+  /** 已带上 user_code 的完整地址，二维码编码的就是这个 */
+  verificationUriComplete: string;
+  /** 毫秒时间戳 */
+  expiresAt: number;
+}
+
 export interface BaseConfig {
   host: string;
   port: number;
