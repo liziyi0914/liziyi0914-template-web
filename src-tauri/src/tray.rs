@@ -128,3 +128,9 @@ fn status_icon(state: &str) -> Image<'static> {
 
     Image::new_owned(rgba, ICON_SIZE, ICON_SIZE)
 }
+
+/// 托盘状态同步。Task 11 接上真实的菜单项更新。
+///
+/// 签名用具体的 `AppHandle`（即 `AppHandle<Wry>`）而不是泛型：托盘只在桌面存在，
+/// 调用方 `PlatformState::update` 拿到的也是具体类型，泛型只会逼出多余的转换。
+pub fn sync(_app: &AppHandle, _info: &crate::platform::events::ConnectionInfo) {}
