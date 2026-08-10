@@ -4,7 +4,6 @@ import type { VoiceEvent, VoiceHandlers } from './types';
 export type {
   ErrorStage,
   SessionState,
-  VoiceCommand,
   VoiceEvent,
   VoiceHandlers,
 } from './types';
@@ -21,12 +20,7 @@ function dispatch(event: VoiceEvent, handlers: VoiceHandlers) {
       handlers.onWake?.();
       break;
     case 'command':
-      handlers.onCommand?.(
-        event.command,
-        event.source,
-        event.system,
-        event.raw,
-      );
+      handlers.onCommand?.(event.text);
       break;
     case 'error':
       handlers.onError?.(event.stage, event.message);

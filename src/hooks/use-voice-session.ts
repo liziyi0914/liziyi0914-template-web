@@ -4,7 +4,6 @@ import {
   type SessionState,
   startASR,
   stopASR,
-  type VoiceCommand,
 } from '@/lib/voice';
 
 export type TimelineItem =
@@ -15,14 +14,7 @@ export type TimelineItem =
       final: boolean;
     }
   | { id: string; kind: 'wake' }
-  | {
-      id: string;
-      kind: 'command';
-      command: VoiceCommand;
-      source: string;
-      system: string;
-      raw: string;
-    }
+  | { id: string; kind: 'command'; text: string }
   | { id: string; kind: 'error'; label: string; message: string };
 
 export type VoiceStatus = 'idle' | SessionState;
@@ -31,7 +23,6 @@ const STAGE_LABELS: Record<ErrorStage, string> = {
   permission: '麦克风权限',
   audio: '录音',
   asr: '语音识别',
-  llm: '命令解析',
 };
 
 /**
@@ -82,15 +73,8 @@ export function useVoiceSession() {
         onWake: () => {
           append({ id: `${epoch}-w${Date.now()}`, kind: 'wake' });
         },
-        onCommand: (command, source, system, raw) => {
-          append({
-            id: `${epoch}-c${Date.now()}`,
-            kind: 'command',
-            command,
-            source,
-            system,
-            raw,
-          });
+        onCommand: (text) => {
+          append({ id: `${epoch}-c${Date.now()}`, kind: 'command', text });
         },
         onError: (stage, message) => {
           append({

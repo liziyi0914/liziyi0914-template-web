@@ -17,7 +17,6 @@ import {
   type VoiceStatus,
 } from '@/hooks/use-voice-session';
 import { IS_ANDROID } from '@/lib/platform';
-import type { VoiceCommand } from '@/lib/voice';
 
 const STATUS_TEXT: Record<VoiceStatus, string> = {
   idle: '未启动',
@@ -50,7 +49,9 @@ export function VoiceDemo() {
     <Card>
       <CardHeader>
         <CardTitle>语音命令</CardTitle>
-        <CardDescription>唤醒词「你好小财」</CardDescription>
+        <CardDescription>
+          唤醒词「你好小财」，助手的回复见下方运行日志
+        </CardDescription>
         <CardAction>
           <div className="flex items-center gap-2">
             <Badge variant={running ? 'default' : 'secondary'}>
@@ -139,12 +140,12 @@ const TimelineRow = memo(function TimelineRow({
 
     case 'command':
       return (
-        <CommandRow
-          command={item.command}
-          source={item.source}
-          system={item.system}
-          raw={item.raw}
-        />
+        <div className="flex items-baseline gap-2">
+          <Badge variant="default" className="shrink-0">
+            指令
+          </Badge>
+          <span className="break-all text-sm">{item.text}</span>
+        </div>
       );
 
     case 'error':
@@ -155,50 +156,3 @@ const TimelineRow = memo(function TimelineRow({
       );
   }
 });
-
-function CommandRow({
-  command,
-  source,
-  system,
-  raw,
-}: {
-  command: VoiceCommand;
-  source: string;
-  system: string;
-  raw: string;
-}) {
-  const unknown = command.intent === 'unknown';
-
-  return (
-    <div className="rounded-md border bg-background p-2">
-      <div className="flex items-center gap-2">
-        <Badge variant={unknown ? 'destructive' : 'default'}>
-          {command.intent}
-        </Badge>
-        {command.reply ? (
-          <span className="truncate text-sm">{command.reply}</span>
-        ) : null}
-      </div>
-
-      {Object.keys(command.params).length > 0 ? (
-        <pre className="mt-1 overflow-x-auto text-xs text-muted-foreground">
-          {JSON.stringify(command.params)}
-        </pre>
-      ) : null}
-
-      <div className="mt-2 flex flex-col gap-1">
-        <p className="text-xs font-medium text-muted-foreground">发送至 Text</p>
-        <pre className="max-h-32 overflow-auto whitespace-pre-wrap break-words rounded bg-muted/50 p-2 text-xs">
-          {`[system]\n${system}\n\n[user]\n${source}`}
-        </pre>
-      </div>
-
-      <div className="mt-2 flex flex-col gap-1">
-        <p className="text-xs font-medium text-muted-foreground">模型回复</p>
-        <pre className="max-h-32 overflow-auto whitespace-pre-wrap break-words rounded bg-muted/50 p-2 text-xs">
-          {raw || '（空）'}
-        </pre>
-      </div>
-    </div>
-  );
-}
