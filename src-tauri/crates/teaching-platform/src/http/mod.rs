@@ -1,3 +1,4 @@
+pub mod device;
 pub mod screen;
 
 /// base_url 形如 `http://8.163.33.11:8084`，内部自行拼 `/api/v1`。
