@@ -84,7 +84,7 @@ pub fn run() {
       api.prevent_close();
       let _ = window.hide();
     }
-    tauri::WindowEvent::Destroyed => {
+    tauri::WindowEvent::Destroyed if window.label() == "main" => {
       if let Some(browser) = window
         .app_handle()
         .try_state::<Arc<platform::BrowserManager>>()
