@@ -1,7 +1,11 @@
-mod platform;
 #[cfg(desktop)]
 mod tray;
+
+mod platform;
 mod voice;
+
+use std::sync::Arc;
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -14,11 +18,7 @@ pub fn run() {
     .plugin(tauri_plugin_store::Builder::default().build())
     .plugin(tauri_plugin_mic::init())
     .manage(voice::VoiceState::default())
-    .invoke_handler(tauri::generate_handler![
-      voice::commands::start_asr,
-      voice::commands::stop_asr,
-      voice::tls_smoke_test
-    ])
+    .manage(Arc::new(platform::state::PlatformState::default()))
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
@@ -29,22 +29,70 @@ pub fn run() {
       }
 
       #[cfg(desktop)]
-      if let Err(error) = tray::init(app.handle()) {
-        log::error!("托盘初始化失败: {error}");
+      {
+        app.manage(Arc::new(platform::BrowserManager::default()));
+        if let Err(error) = tray::init(app.handle()) {
+          log::error!("托盘初始化失败: {error}");
+        }
       }
+
+      // 大屏是开机常驻程序，不该要求用户在 UI 上点一下才连
+      let handle = app.handle().clone();
+      let state = app
+        .state::<Arc<platform::state::PlatformState>>()
+        .inner()
+        .clone();
+      let config = platform::config::load(&handle);
+      platform::commands::start(handle, state, config);
 
       Ok(())
     });
 
-  // 关闭按钮只隐藏窗口，退出由托盘菜单负责；仅桌面端有此语义
   #[cfg(desktop)]
-  let builder = builder.on_window_event(|window, event| {
-    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-      if window.label() == "main" {
-        api.prevent_close();
-        let _ = window.hide();
+  let builder = builder.invoke_handler(tauri::generate_handler![
+    voice::commands::start_asr,
+    voice::commands::stop_asr,
+    voice::tls_smoke_test,
+    platform::commands::platform_config_get,
+    platform::commands::platform_config_set,
+    platform::commands::platform_connect,
+    platform::commands::platform_disconnect,
+    platform::commands::platform_connection_info,
+    platform::commands::platform_recent_logs,
+    platform::commands::screen_app_browser_status,
+  ]);
+
+  #[cfg(mobile)]
+  let builder = builder.invoke_handler(tauri::generate_handler![
+    voice::commands::start_asr,
+    voice::commands::stop_asr,
+    voice::tls_smoke_test,
+    platform::commands::platform_config_get,
+    platform::commands::platform_config_set,
+    platform::commands::platform_connect,
+    platform::commands::platform_disconnect,
+    platform::commands::platform_connection_info,
+    platform::commands::platform_recent_logs,
+  ]);
+
+  // 关闭按钮只隐藏窗口，退出由托盘菜单负责；窗口真正销毁时顺手收掉 Chrome，
+  // 免得残留一个没有父进程的浏览器。两件事必须在同一个闭包里：
+  // on_window_event 只能注册一次，后注册的会覆盖前一个。
+  #[cfg(desktop)]
+  let builder = builder.on_window_event(|window, event| match event {
+    tauri::WindowEvent::CloseRequested { api, .. } if window.label() == "main" => {
+      api.prevent_close();
+      let _ = window.hide();
+    }
+    tauri::WindowEvent::Destroyed => {
+      if let Some(browser) = window
+        .app_handle()
+        .try_state::<Arc<platform::BrowserManager>>()
+      {
+        browser.close();
       }
     }
+    _ => {}
   });
 
   builder
