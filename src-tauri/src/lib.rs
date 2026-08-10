@@ -1,3 +1,4 @@
+mod platform;
 #[cfg(desktop)]
 mod tray;
 mod voice;
