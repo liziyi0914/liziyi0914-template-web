@@ -25,3 +25,4 @@ features = ["json", "charset", "http2", "rustls-no-provider"]
 
 [dev-dependencies]
 tokio = { version = "1.53", features = ["rt-multi-thread", "macros", "net", "time", "sync"] }
+rustls = { version = "0.23", default-features = false, features = ["std", "ring"] }
