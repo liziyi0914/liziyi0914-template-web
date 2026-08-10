@@ -1,7 +1,21 @@
 # 辅助教学平台接入设计
 
 日期：2026-08-10
-状态：已确认，待实现
+状态：大屏 APP 端（实施顺序 1–4）已实现；机器人端待第二份计划
+
+### 联调记录（2026-08-10，大屏协议冒烟）
+
+对测试服务器 `http://8.163.33.11:8084` 实测确认：
+
+| 项 | 实测值 |
+|---|---|
+| `GET /api/v1/health` → `app_env` | `prod` |
+| `POST /api/v1/screen/token` → `ws_url` | `"/ws/app"`（路径，须拼到 base 并做 `http→ws`） |
+| 同上 → `expires_in` | `86400`（24 小时） |
+| 同上 → `classroom_id` / `lesson_id` | `1` / `null`（无进行中课堂时） |
+| `auth.login` ack | 成功，返回 `conn_id` |
+
+桌面应用 UI 联调（`openscreen` / 顶号 / 断网重连等）与 `robot_sim` Device Flow 需在本机交互完成，见计划 Task 14 清单。
 
 ## 背景
 
@@ -275,6 +289,8 @@ impl Backoff {
 `Snapshot` 对应 `auth.login` ack 的 `data`，`ScreenState` 对应其中的 `screen_state`。`active_quiz` / `active_discussion` 协议注明恒为 `null`，不定义字段。
 
 事件按 op 反序列化成枚举 `ServerEvent`，未知 op 落到 `Unknown { op, data }` 而不是报错——后端加新事件不该让客户端崩。
+
+大屏 APP 端除 `conn.kicked` 外还必须处理 `lesson.started` / `lesson.ended`（载荷 `{lesson_id, title, course_name}`）。它是开机常驻程序，一条连接可能跨越十几次课堂，服务端会在课堂起止时把它重挂到新房间（WS 文档 §5.1）。**登录快照里的 `lesson_id` 只在首帧正确**，之后必须以事件为准，否则状态卡与托盘上显示的课堂会一直停在开机那一刻。
 
 ## app crate `src/platform/`
 
