@@ -138,6 +138,9 @@ impl InboundHandler for ScreenHandler {
             ServerEvent::Unknown { op, .. } => {
                 log::debug!("忽略事件 {op}");
             }
+
+            // 大屏视图、签到、点名这些是机器人的现场上下文，大屏端不处理
+            _ => {}
         }
     }
 }

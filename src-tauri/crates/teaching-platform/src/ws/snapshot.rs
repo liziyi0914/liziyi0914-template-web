@@ -16,7 +16,7 @@ pub struct Snapshot {
     pub sign_in: Option<SignIn>,
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 #[serde(default)]
 pub struct LessonBrief {
     pub id: i64,
@@ -26,7 +26,7 @@ pub struct LessonBrief {
     pub course_name: Option<String>,
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 #[serde(default)]
 pub struct ScreenState {
     pub view: String,
@@ -36,7 +36,7 @@ pub struct ScreenState {
     pub ideology_material_id: Option<i64>,
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 #[serde(default)]
 pub struct SignIn {
     pub status: String,
