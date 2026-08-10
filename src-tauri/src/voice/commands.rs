@@ -3,14 +3,14 @@
 use std::sync::Arc;
 
 use tauri::ipc::Channel;
-use tauri::{AppHandle, Runtime, State};
+use tauri::{AppHandle, Manager, Runtime, State};
 use tokio::sync::Mutex;
 
 use super::asr::dashscope_ws::DashScopeWs;
 use super::audio::android::AndroidMic;
 use super::events::VoiceEvent;
-use super::llm::openai_sdk::OpenAiCompatibleModel;
 use super::session::{self, SessionDeps, SessionHandle};
+use crate::platform::state::PlatformState;
 
 #[derive(Default)]
 pub struct VoiceState(Mutex<Option<SessionHandle>>);
@@ -28,10 +28,15 @@ pub async fn start_asr<R: Runtime>(
         return Err("语音会话已在运行".to_string());
     }
 
+    // 机器人可能还没授权，此时没有接收方，命令句只进事件流供前端展示
+    let commands = app
+        .try_state::<Arc<PlatformState>>()
+        .and_then(|platform| platform.command_sender());
+
     let deps = SessionDeps {
-        audio: Arc::new(AndroidMic::new(app)),
+        audio: Arc::new(AndroidMic::new(app.clone())),
         asr: Arc::new(DashScopeWs::from_config().map_err(|e| e.to_string())?),
-        llm: Arc::new(OpenAiCompatibleModel::from_config().map_err(|e| e.to_string())?),
+        commands,
     };
 
     *slot = Some(session::spawn(deps, on_event));

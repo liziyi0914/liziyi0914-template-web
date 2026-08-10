@@ -4,7 +4,6 @@ pub mod commands;
 pub mod config;
 pub mod error;
 pub mod events;
-pub mod llm;
 pub mod session;
 pub mod tls;
 pub mod wake;

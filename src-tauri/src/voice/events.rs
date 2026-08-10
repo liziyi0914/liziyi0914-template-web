@@ -3,7 +3,6 @@
 use serde::Serialize;
 
 use super::error::{Stage, VoiceError};
-use super::llm::prompt::VoiceCommand;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -29,14 +28,9 @@ pub enum VoiceEvent {
     /// 命中唤醒词。同句就带出命令时也会先发这条，
     /// 前端的唤醒提示逻辑不必区分命令来自同句还是下一句。
     Wake,
+    /// 唤醒后收到的命令句原文。怎么解释它由 `platform::robot` 决定。
     Command {
-        command: VoiceCommand,
-        /// 触发这条命令的 ASR 原句。
-        source: String,
-        /// 发给模型的 system 提示全文，供前端调试展示。
-        system: String,
-        /// 模型返回的原始字符串，始终可用于调试展示。
-        raw: String,
+        text: String,
     },
     Error {
         stage: Stage,
@@ -103,26 +97,19 @@ mod tests {
     }
 
     #[test]
-    fn command_event_matches_the_contract() {
-        let command = VoiceCommand {
-            intent: "open_projector".to_string(),
-            params: serde_json::Map::new(),
-            reply: "好的".to_string(),
-        };
+    fn command_event_carries_only_the_raw_utterance() {
+        // 命令怎么解释是 platform/robot 的事，voice 只负责把原句递出去
         assert_eq!(
             json_of(VoiceEvent::Command {
-                command,
-                source: "打开投影仪".to_string(),
-                system: "你是教室机器人的命令解析器。".to_string(),
-                raw: "{}".to_string(),
+                text: "翻到下一页".to_string(),
             }),
-            json!({
-                "type": "command",
-                "command": { "intent": "open_projector", "params": {}, "reply": "好的" },
-                "source": "打开投影仪",
-                "system": "你是教室机器人的命令解析器。",
-                "raw": "{}"
-            })
+            json!({ "type": "command", "text": "翻到下一页" })
         );
+    }
+
+    #[test]
+    fn error_stages_no_longer_include_llm() {
+        let stages = serde_json::to_string(&[Stage::Permission, Stage::Audio, Stage::Asr]).unwrap();
+        assert_eq!(stages, r#"["permission","audio","asr"]"#);
     }
 }

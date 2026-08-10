@@ -1,5 +1,7 @@
 use crate::platform::config::{self, RoleConfig};
 use crate::platform::events::{ConnectionInfo, ConnectionState, LogEntry, LogLevel, LogSource};
+#[cfg(mobile)]
+use crate::platform::events::DeviceFlowInfo;
 use crate::platform::state::PlatformState;
 use std::sync::Arc;
 use tauri::{AppHandle, State};
@@ -60,6 +62,13 @@ pub fn platform_connection_info(state: State<'_, Arc<PlatformState>>) -> Connect
 #[tauri::command]
 pub fn platform_recent_logs(state: State<'_, Arc<PlatformState>>) -> Vec<LogEntry> {
     state.recent_logs()
+}
+
+/// 机器人待授权信息。没在等授权时返回 null。
+#[cfg(mobile)]
+#[tauri::command]
+pub fn robot_device_flow_state(state: State<'_, Arc<PlatformState>>) -> Option<DeviceFlowInfo> {
+    state.device_flow()
 }
 
 #[cfg(desktop)]

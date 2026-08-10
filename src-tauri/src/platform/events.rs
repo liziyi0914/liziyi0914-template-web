@@ -49,6 +49,19 @@ impl Default for ConnectionInfo {
     }
 }
 
+/// Device Flow 待授权信息。老师看着 `user_code` 或扫二维码去网页确认。
+/// 只在机器人端产生，字段变更必须同步修改 src/lib/platform-api/types.ts。
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeviceFlowInfo {
+    pub user_code: String,
+    pub verification_uri: String,
+    /// 已经带上 user_code 的完整地址，二维码编码的就是这个
+    pub verification_uri_complete: String,
+    /// 毫秒时间戳。前端据此显示剩余时间，过期后不必再等后端
+    pub expires_at: i64,
+}
+
 #[derive(Debug, Clone, Copy, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum LogLevel {
@@ -165,5 +178,25 @@ mod tests {
         let a = LogEntry::new(1, LogLevel::Warn, LogSource::Browser, "a".into(), None);
         let b = LogEntry::new(2, LogLevel::Warn, LogSource::Browser, "b".into(), None);
         assert_ne!(a.id, b.id);
+    }
+
+    #[test]
+    fn 授权信息用_camel_case_并带上完整地址() {
+        let value = serde_json::to_value(DeviceFlowInfo {
+            user_code: "H7K2QP".into(),
+            verification_uri: "http://8.163.33.11:8084/device".into(),
+            verification_uri_complete: "http://8.163.33.11:8084/device?code=H7K2QP".into(),
+            expires_at: 1_754_800_000_000,
+        })
+        .unwrap();
+
+        assert_eq!(value["userCode"], "H7K2QP");
+        assert_eq!(value["verificationUri"], "http://8.163.33.11:8084/device");
+        assert_eq!(
+            value["verificationUriComplete"],
+            "http://8.163.33.11:8084/device?code=H7K2QP"
+        );
+        assert_eq!(value["expiresAt"], 1_754_800_000_000_i64);
+        assert!(value.get("user_code").is_none(), "不能出现 snake_case 字段");
     }
 }

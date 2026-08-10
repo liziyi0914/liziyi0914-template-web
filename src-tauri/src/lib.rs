@@ -74,6 +74,7 @@ pub fn run() {
     platform::commands::platform_disconnect,
     platform::commands::platform_connection_info,
     platform::commands::platform_recent_logs,
+    platform::commands::robot_device_flow_state,
   ]);
 
   // 关闭按钮只隐藏窗口，退出由托盘菜单负责；窗口真正销毁时顺手收掉 Chrome，

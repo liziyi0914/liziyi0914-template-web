@@ -1,5 +1,5 @@
 //! 错误按「前端需要区别对待的环节」分类：麦克风没权限要引导用户去设置，
-//! LLM 超时只需提示重说一次，两者不能糊成同一个 message。
+//! 识别服务掉线只需重开一次会话，两者不能糊成同一个 message。
 
 use serde::Serialize;
 
@@ -9,7 +9,6 @@ pub enum Stage {
     Permission,
     Audio,
     Asr,
-    Llm,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -23,9 +22,6 @@ pub enum VoiceError {
     #[error("语音识别失败：{0}")]
     Asr(String),
 
-    #[error("命令解析失败：{0}")]
-    Llm(String),
-
     #[error("缺少配置项 {key}，请检查 scripts/voice-env.sh")]
     Config { key: &'static str, stage: Stage },
 }
@@ -36,7 +32,6 @@ impl VoiceError {
             Self::PermissionDenied => Stage::Permission,
             Self::Audio(_) => Stage::Audio,
             Self::Asr(_) => Stage::Asr,
-            Self::Llm(_) => Stage::Llm,
             Self::Config { stage, .. } => *stage,
         }
     }
@@ -53,7 +48,6 @@ mod tests {
         let json = serde_json::to_string(&Stage::Permission).unwrap();
         assert_eq!(json, "\"permission\"");
         assert_eq!(serde_json::to_string(&Stage::Asr).unwrap(), "\"asr\"");
-        assert_eq!(serde_json::to_string(&Stage::Llm).unwrap(), "\"llm\"");
         assert_eq!(serde_json::to_string(&Stage::Audio).unwrap(), "\"audio\"");
     }
 

@@ -25,17 +25,6 @@ pub const ASR_MODEL: &str = "fun-asr-realtime";
 /// 由 `pnpm vocabulary sync` 写入 scripts/vocabulary-env.sh，经 android-env 注入。
 pub const ASR_VOCABULARY_ID: &str = env_or!("ASR_VOCABULARY_ID", "");
 
-/// 百炼的 OpenAI 兼容端点。async-openai 会在其后自行拼 `/chat/completions`。
-pub const LLM_BASE_URL: &str = env_or!(
-    "LLM_BASE_URL",
-    "https://dashscope.aliyuncs.com/compatible-mode/v1"
-);
-
-pub const LLM_MODEL: &str = env_or!("LLM_MODEL", "qwen3.7-plus");
-
-/// 单次命令解析的等待上限。超时只丢这一条命令，麦克风继续开着。
-pub const LLM_TIMEOUT_SECS: u64 = 15;
-
 pub const WAKE_WORD: &str = "你好小财";
 
 /// 唤醒后等待命令句的时长，超时则退回待唤醒状态。

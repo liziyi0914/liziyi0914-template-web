@@ -36,7 +36,9 @@ impl BaseConfig {
     }
 }
 
-#[cfg(desktop)]
+/// 两个角色的配置结构在两端都编译：桌面上跑测试也要能覆盖机器人那份。
+/// 真正的角色分支只在下面的 `RoleConfig` 别名上。
+#[allow(dead_code)]
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct ScreenAppConfig {
@@ -48,7 +50,6 @@ pub struct ScreenAppConfig {
     pub kiosk: bool,
 }
 
-#[cfg(desktop)]
 impl ScreenAppConfig {
     pub fn is_complete(&self) -> bool {
         self.base.is_complete()
@@ -57,7 +58,7 @@ impl ScreenAppConfig {
     }
 }
 
-#[cfg(mobile)]
+#[allow(dead_code)]
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct RobotConfig {
@@ -67,7 +68,6 @@ pub struct RobotConfig {
     pub device_secret: String,
 }
 
-#[cfg(mobile)]
 impl RobotConfig {
     pub fn is_complete(&self) -> bool {
         self.base.is_complete()
@@ -136,7 +136,6 @@ mod tests {
         assert!(!BaseConfig { port: 0, ..base() }.is_complete());
     }
 
-    #[cfg(desktop)]
     #[test]
     fn 大屏配置要求填齐凭证() {
         let complete = ScreenAppConfig {
@@ -159,7 +158,6 @@ mod tests {
         .is_complete());
     }
 
-    #[cfg(desktop)]
     #[test]
     fn 大屏配置序列化成扁平的_camel_case() {
         let value = serde_json::to_value(ScreenAppConfig {
@@ -180,7 +178,6 @@ mod tests {
         assert_eq!(value["kiosk"], true);
     }
 
-    #[cfg(desktop)]
     #[test]
     fn 缺字段的旧配置反序列化成默认值而不是报错() {
         let config: ScreenAppConfig =
@@ -188,5 +185,40 @@ mod tests {
         assert_eq!(config.base.host, "a");
         assert_eq!(config.app_key, "");
         assert!(!config.kiosk);
+    }
+
+    #[test]
+    fn 机器人配置要求填齐设备凭证() {
+        let complete = RobotConfig {
+            base: base(),
+            device_no: "ROBOT-001".into(),
+            device_secret: "s3cret".into(),
+        };
+        assert!(complete.is_complete());
+        assert!(!RobotConfig {
+            device_no: String::new(),
+            ..complete.clone()
+        }
+        .is_complete());
+        assert!(!RobotConfig {
+            device_secret: "  ".into(),
+            ..complete
+        }
+        .is_complete());
+    }
+
+    #[test]
+    fn 机器人配置序列化成扁平的_camel_case() {
+        let value = serde_json::to_value(RobotConfig {
+            base: base(),
+            device_no: "ROBOT-001".into(),
+            device_secret: "s3cret".into(),
+        })
+        .unwrap();
+
+        assert_eq!(value["host"], "8.163.33.11");
+        assert_eq!(value["deviceNo"], "ROBOT-001");
+        assert_eq!(value["deviceSecret"], "s3cret");
+        assert!(value.get("device_no").is_none(), "不能出现 snake_case 字段");
     }
 }

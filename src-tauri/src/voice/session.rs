@@ -1,4 +1,4 @@
-//! 会话编排器。唯一同时知道录音链路和命令链路的地方。
+//! 会话编排器。唯一同时知道录音链路和命令投递口的地方。
 
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -12,7 +12,6 @@ use super::audio::AudioSource;
 use super::config;
 use super::error::{Result, VoiceError};
 use super::events::{SessionState, VoiceEvent};
-use super::llm::{prompt, TextModel};
 use super::wake::{WakeDetector, WakeOutcome};
 
 /// 等待服务端接受任务的上限。握手过了但迟迟不回 task-started，
@@ -44,7 +43,9 @@ impl SessionHandle {
 pub struct SessionDeps {
     pub audio: Arc<dyn AudioSource>,
     pub asr: Arc<dyn AsrProvider>,
-    pub llm: Arc<dyn TextModel>,
+    /// 命令句的投递口。没有接收方（比如机器人还没授权）时投递失败，
+    /// 只丢这一条命令，麦克风继续开着。
+    pub commands: Option<mpsc::Sender<String>>,
 }
 
 pub fn spawn(deps: SessionDeps, events: Channel<VoiceEvent>) -> SessionHandle {
@@ -87,7 +88,7 @@ async fn run(
     });
 
     let outcome = pump(
-        deps.llm,
+        deps.commands.clone(),
         events,
         &mut asr,
         &mut frames,
@@ -127,7 +128,7 @@ async fn await_started(asr_rx: &mut mpsc::Receiver<AsrEvent>) -> Result<()> {
 }
 
 async fn pump(
-    llm: Arc<dyn TextModel>,
+    commands: Option<mpsc::Sender<String>>,
     events: &Channel<VoiceEvent>,
     asr: &mut Box<dyn AsrSession>,
     frames: &mut mpsc::Receiver<Vec<u8>>,
@@ -150,7 +151,7 @@ async fn pump(
 
             event = asr_rx.recv() => match event {
                 Some(event) => {
-                    if let Some(error) = handle_asr_event(event, &llm, events, &mut detector) {
+                    if let Some(error) = handle_asr_event(event, commands.as_ref(), events, &mut detector) {
                         return Err(error);
                     }
                 }
@@ -163,7 +164,7 @@ async fn pump(
 /// 返回 `Some` 表示这是个终止会话的错误。
 fn handle_asr_event(
     event: AsrEvent,
-    llm: &Arc<dyn TextModel>,
+    commands: Option<&mpsc::Sender<String>>,
     events: &Channel<VoiceEvent>,
     detector: &mut WakeDetector,
 ) -> Option<VoiceError> {
@@ -193,8 +194,10 @@ fn handle_asr_event(
                 }
                 WakeOutcome::Command(utterance) => {
                     let _ = events.send(VoiceEvent::Wake);
-                    // 单独 spawn，命令解析要走一趟网络，不能卡住音频泵
-                    tokio::spawn(resolve_command(Arc::clone(llm), events.clone(), utterance));
+                    let _ = events.send(VoiceEvent::Command {
+                        text: utterance.clone(),
+                    });
+                    dispatch_command(commands, utterance);
                 }
             }
             None
@@ -205,23 +208,14 @@ fn handle_asr_event(
     }
 }
 
-/// 命令解析失败只丢这一条命令，会话继续，不能因为一次解析失败就关掉麦克风。
-async fn resolve_command(llm: Arc<dyn TextModel>, events: Channel<VoiceEvent>, utterance: String) {
-    let request = prompt::build_request(&utterance);
-    let system = request.system.clone();
-    match llm.complete(request).await {
-        Ok(raw) => {
-            let command = prompt::parse_command(&raw);
-            let _ = events.send(VoiceEvent::Command {
-                command,
-                source: utterance,
-                system,
-                raw,
-            });
-        }
-        Err(error) => {
-            log::warn!("解析命令「{utterance}」失败：{error}");
-            let _ = events.send(VoiceEvent::error(&error));
-        }
+/// 用 `try_send` 而不是 `send`：这里在音频泵的线程上，
+/// 阻塞等 Agent 腾出位置会让麦克风的帧堆积起来。
+fn dispatch_command(commands: Option<&mpsc::Sender<String>>, utterance: String) {
+    let Some(sender) = commands else {
+        log::warn!("收到命令「{utterance}」但没有接收方，可能机器人尚未授权");
+        return;
+    };
+    if let Err(error) = sender.try_send(utterance) {
+        log::warn!("命令投递失败：{error}");
     }
 }
