@@ -60,7 +60,9 @@ struct Shared {
 pub struct Connection {
     shared: Arc<Shared>,
     outbound: mpsc::Sender<Message>,
-    tasks: Vec<JoinHandle<()>>,
+    writer: JoinHandle<()>,
+    reader: JoinHandle<()>,
+    heartbeat: JoinHandle<()>,
 }
 
 async fn call_inner(
@@ -117,13 +119,19 @@ where
         let raw = match message {
             Ok(Message::Text(text)) => text.to_string(),
             Ok(Message::Close(frame)) => {
-                return CloseReason {
+                let reason = CloseReason {
                     code: frame.as_ref().map(|f| u16::from(f.code)),
                     message: frame
+                        .as_ref()
                         .map(|f| f.reason.to_string())
                         .filter(|reason| !reason.is_empty())
                         .unwrap_or_else(|| "服务端关闭了连接".into()),
                 };
+                // tokio-tungstenite 的读写两端是各自独立的 split half：
+                // 收到对端 Close 后必须由本地也回一个 Close 帧完成关闭握手，
+                // 否则底层连接迟迟不进入收尾状态，之后的 source.next() 可能永远挂着。
+                let _ = outbound.send(Message::Close(frame)).await;
+                return reason;
             }
             Ok(_) => continue,
             Err(e) => return CloseReason { code: None, message: format!("连接中断：{e}") },
@@ -182,6 +190,11 @@ impl Connection {
             pending: Mutex::new(HashMap::new()),
             close: close_tx,
         });
+        // 必须在此处（reader/heartbeat 都还没跑起来之前）就订阅，而不是等
+        // spawn_heartbeat 内部再 subscribe()：watch 的新订阅者会把创建时刻的值
+        // 当作"已读"，如果 close 在 subscribe() 之前就已经 send 过，心跳会永远
+        // 等不到那次通知。提前在这里订阅可以保证不会错过任何一次关闭信号。
+        let heartbeat_close_rx = shared.close.subscribe();
         let (outbound_tx, mut outbound_rx) = mpsc::channel::<Message>(64);
 
         let writer = tokio::spawn(async move {
@@ -218,10 +231,10 @@ impl Connection {
             }
         };
 
-        let heartbeat = spawn_heartbeat(shared.clone(), outbound_tx.clone());
+        let heartbeat = spawn_heartbeat(shared.clone(), outbound_tx.clone(), heartbeat_close_rx);
 
         Ok((
-            Self { shared, outbound: outbound_tx, tasks: vec![writer, reader, heartbeat] },
+            Self { shared, outbound: outbound_tx, writer, reader, heartbeat },
             snapshot,
         ))
     }
@@ -253,23 +266,46 @@ impl Connection {
     }
 
     pub async fn close(self) {
-        let Self { shared, outbound, tasks } = self;
+        let Self { shared, outbound, mut writer, reader, mut heartbeat } = self;
         let _ = shared.close.send(Some(CloseReason { code: None, message: "本地主动关闭".into() }));
 
-        // 丢掉发送端，写任务会排完队列后发出 WebSocket Close 帧
+        // 丢掉发送端；写任务要等所有 outbound 克隆都释放、队列排空后
+        // 才会走到 sink.close()，所以这一步本身不会让写任务立刻结束。
         drop(outbound);
 
-        for mut task in tasks {
-            if tokio::time::timeout(CLOSE_GRACE, &mut task).await.is_err() {
-                task.abort();
-            }
+        // 心跳已经在 open() 里提前订阅了 close，select! 分支应该几乎立刻命中，
+        // 这里基本不会真的超时。
+        if tokio::time::timeout(CLOSE_GRACE, &mut heartbeat)
+            .await
+            .is_err()
+        {
+            heartbeat.abort();
+        }
+
+        // 读循环只有等到服务端帧或出错才会返回；本地主动关闭时对端未必会再发
+        // 任何东西，source.next() 会一直挂着。它手里那份 outbound 克隆不释放，
+        // 写任务的 recv() 就永远拿不到 None，因此不值得为它等满 CLOSE_GRACE，
+        // 直接 abort 释放资源——反正关闭原因已经在上面 send 过了。
+        reader.abort();
+        let _ = reader.await;
+
+        // 到这里心跳和读循环都已经退出、各自的 outbound 克隆也已释放，
+        // 写任务的 recv() 很快就会拿到 None 并调用 sink.close()。
+        if tokio::time::timeout(CLOSE_GRACE, &mut writer)
+            .await
+            .is_err()
+        {
+            writer.abort();
         }
     }
 }
 
-fn spawn_heartbeat(shared: Arc<Shared>, outbound: mpsc::Sender<Message>) -> JoinHandle<()> {
+fn spawn_heartbeat(
+    shared: Arc<Shared>,
+    outbound: mpsc::Sender<Message>,
+    mut closed: watch::Receiver<Option<CloseReason>>,
+) -> JoinHandle<()> {
     tokio::spawn(async move {
-        let mut closed = shared.close.subscribe();
         let mut ticker = tokio::time::interval(PING_INTERVAL);
         ticker.tick().await; // interval 的首次 tick 立即返回，跳过
 
@@ -278,6 +314,10 @@ fn spawn_heartbeat(shared: Arc<Shared>, outbound: mpsc::Sender<Message>) -> Join
                 _ = ticker.tick() => {
                     if let Err(e) = call_inner(&shared, &outbound, "conn.ping", json!({}), CALL_TIMEOUT).await {
                         log::warn!("心跳失败，停止发送：{e}");
+                        // 必须主动广播关闭，否则 read_loop 若卡在半开的 socket 上，
+                        // wait_closed() 会永远等不到结果，重连循环也就跟着卡死。
+                        let reason = CloseReason { code: None, message: format!("心跳失败：{e}") };
+                        let _ = shared.close.send(Some(reason));
                         return;
                     }
                 }
