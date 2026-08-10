@@ -177,6 +177,9 @@ pub async fn run(
 
         match connect_once(&app, &state, &http, &config, browser.clone(), kicked.clone()).await {
             Ok(reason) => {
+                // 连接已经成功建立过，不管这次是怎么断的，都不该背上一次失败的退避时长
+                backoff.reset();
+
                 if reason.is_kicked() || kicked.load(Ordering::SeqCst) {
                     state.update(&app, |info| {
                         info.state = ConnectionState::Error;
