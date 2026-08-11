@@ -107,9 +107,9 @@ pub fn start(app: AppHandle, state: Arc<PlatformState>, config: RoleConfig) {
     let runner = {
         let app = app.clone();
         let state = state.clone();
-        // PlatformState::swap_runner 存的是 tokio::task::JoinHandle，这里不能用
-        // tauri::async_runtime::spawn（返回类型不同），Tauri 底层本就跑在 tokio 上。
-        tokio::spawn(async move {
+        // 必须用 Tauri 的 runtime：`setup` 与托盘菜单跑在主线程上，
+        // 那时还没有进入 tokio 上下文，裸 `tokio::spawn` 会直接 panic。
+        tauri::async_runtime::spawn(async move {
             crate::platform::run_role(app, state, config).await;
         })
     };

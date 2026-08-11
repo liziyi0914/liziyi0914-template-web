@@ -14,7 +14,9 @@ struct Inner {
     info: ConnectionInfo,
     logs: VecDeque<LogEntry>,
     seq: u64,
-    runner: Option<tokio::task::JoinHandle<()>>,
+    /// 用 Tauri 的 JoinHandle：`setup` / 托盘回调不在 tokio 上下文里，
+    /// 不能存裸的 `tokio::spawn` 句柄。
+    runner: Option<tauri::async_runtime::JoinHandle<()>>,
     /// 语音命令的投递口。机器人授权成功后装上，断开时清掉
     commands: Option<tokio::sync::mpsc::Sender<String>>,
     /// 待授权信息，仅机器人端有
@@ -89,8 +91,8 @@ impl PlatformState {
     /// 装上新的连接循环，返回被替换掉的旧句柄供调用方 abort。
     pub fn swap_runner(
         &self,
-        handle: Option<tokio::task::JoinHandle<()>>,
-    ) -> Option<tokio::task::JoinHandle<()>> {
+        handle: Option<tauri::async_runtime::JoinHandle<()>>,
+    ) -> Option<tauri::async_runtime::JoinHandle<()>> {
         std::mem::replace(&mut self.inner.lock().expect("状态锁被毒化").runner, handle)
     }
 
